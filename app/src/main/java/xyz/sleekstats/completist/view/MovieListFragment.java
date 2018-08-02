@@ -10,28 +10,41 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import xyz.sleekstats.completist.R;
+import xyz.sleekstats.completist.model.CastCredits;
+import xyz.sleekstats.completist.model.MovieCredits;
 import xyz.sleekstats.completist.service.Repo;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.PersonPOJO;
 
-//Shows list of films by a specific actor/director
+//Shows details of, and list of films by, a specific actor/director
 public class MovieListFragment extends Fragment {
 
     private static final String ARG_ID = "id";
     private static final String TAG = MovieListFragment.class.getName();
     private static final String ARG_DIRECTOR = "director";
+    private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
 
     private List<String> titles;
     private String mPersonId;
     private boolean mIsDirector;
+
+    private TextView mNameView;
+    private TextView mBioView;
+    private ImageView mPosterView;
+
 
     private OnFragmentInteractionListener mListener;
 
@@ -59,7 +72,11 @@ public class MovieListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_movie_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list, container, false);
+        mNameView = rootView.findViewById(R.id.person_name);
+        mBioView = rootView.findViewById(R.id.person_summary);
+        mPosterView = rootView.findViewById(R.id.person_poster);
+        return rootView;
     }
 
     @Override
@@ -89,12 +106,35 @@ public class MovieListFragment extends Fragment {
             @Override
             public void onNext(PersonPOJO personPOJO) {
                 List<FilmByPerson> filmByPersonList;
+                MovieCredits movieCredits = personPOJO.getMovieCredits();
 
+                //Determine if person's main role is director and then create list of roles
+                mIsDirector = personPOJO.getKnown_for_department().equals("Directing");
                 if(mIsDirector) {
-                    filmByPersonList = personPOJO.getCrew();
+                    filmByPersonList = new ArrayList<>();
+                    List<FilmByPerson> crewList = movieCredits.getCrew();
+                    //For director filter out roles besides directing
+                    for (FilmByPerson film : crewList) {
+                        if(film.getJob().equals("Director")) {
+                            filmByPersonList.add(film);
+                        }
+                    }
                 } else {
-                    filmByPersonList = personPOJO.getCast();
+                    filmByPersonList = movieCredits.getCast();
                 }
+                String name = personPOJO.getName();
+                String bio = personPOJO.getBiography();
+                String posterUrl = POSTER_BASE_URL + personPOJO.getProfile_path();
+
+                Picasso.get().load(posterUrl)
+                        .placeholder(R.drawable.ic_sharp_account_box_92px)
+                        .error(R.drawable.ic_sharp_account_box_92px)
+                        .into(mPosterView);
+
+                mNameView.setText(name);
+                mBioView.setText(bio);
+                Log.d("ddd", mBioView.getLineCount() + "");
+
 
                 RecyclerView recyclerView = getView().findViewById(R.id.film_list);
                 recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
@@ -112,7 +152,7 @@ public class MovieListFragment extends Fragment {
 
             @Override
             public void onError(Throwable e) {
-                Log.d(TAG, e.getMessage());
+                Log.d("ddd", e.getMessage());
             }
 
             @Override

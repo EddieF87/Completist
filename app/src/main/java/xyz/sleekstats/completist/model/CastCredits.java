@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class Credits {
+public class CastCredits {
 
     @SerializedName("cast")
     private List<CastInfo> cast;

@@ -39,7 +39,7 @@
         android:layout_marginTop="8dp"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@+id/movie_overview"
-        app:layout_constraintStart_toEndOf="@+id/ratingBar"
+        app:layout_constraintStart_toEndOf="@+id/movie_rating"
         app:layout_constraintTop_toBottomOf="@+id/movie_overview" />
 
     <TextView
@@ -54,7 +54,7 @@
         tools:text=" overview overview overview overview  overview overview overview overview  overview overview overview overview  overview overview overview overview  overview overview overview overview  overview overview overview overview " />
 
     <RatingBar
-        android:id="@+id/ratingBar"
+        android:id="@+id/movie_rating"
         style="?android:attr/ratingBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -75,6 +75,14 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/movie_poster" />
+        app:layout_constraintTop_toTopOf="@+id/person_barrier" />
+
+
+    <android.support.constraint.Barrier
+        android:id="@+id/person_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="movie_poster,movie_genre,movie_rating"/>
 
 </android.support.constraint.ConstraintLayout>

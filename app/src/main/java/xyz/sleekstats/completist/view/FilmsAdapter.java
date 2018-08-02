@@ -50,8 +50,8 @@ public class FilmsAdapter extends RecyclerView.Adapter<FilmsAdapter.FilmViewHold
         holder.mView.setTag(id);
 
         Picasso.get().load(posterURL)
-//                .placeholder(R.drawable.ic_paw)
-//                .error(R.drawable.ic_broken_img)
+                .placeholder(R.drawable.ic_sharp_movie_92px)
+                .error(R.drawable.ic_sharp_movie_92px)
                 .into(holder.mPosterView);
     }
 

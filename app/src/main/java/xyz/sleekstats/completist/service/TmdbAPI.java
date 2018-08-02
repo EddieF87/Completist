@@ -16,7 +16,7 @@ public interface TmdbAPI {
     );
 
     //API query for list of films by a specific actor/director based on Tmdb actor/director id
-    @GET("person/{person_id}/movie_credits?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2")
+    @GET("person/{person_id}?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&append_to_response=movie_credits")
     Observable<PersonPOJO> retrievePersonInfo(
             @Path("person_id") String person_id
     );

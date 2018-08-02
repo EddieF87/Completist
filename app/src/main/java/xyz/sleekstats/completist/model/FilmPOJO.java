@@ -22,7 +22,7 @@ public class FilmPOJO {
     private List<Genre> genres;
 
     @SerializedName("credits")
-    private Credits credits;
+    private CastCredits castCredits;
 
     public List<Genre> getGenres() {
         return genres;
@@ -64,11 +64,11 @@ public class FilmPOJO {
         this.poster_path = poster_path;
     }
 
-    public Credits getCredits() {
-        return credits;
+    public CastCredits getCastCredits() {
+        return castCredits;
     }
 
-    public void setCredits(Credits credits) {
-        this.credits = credits;
+    public void setCastCredits(CastCredits castCredits) {
+        this.castCredits = castCredits;
     }
 }

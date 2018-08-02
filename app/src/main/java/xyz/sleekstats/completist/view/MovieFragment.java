@@ -20,9 +20,9 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import xyz.sleekstats.completist.R;
+import xyz.sleekstats.completist.model.CastCredits;
 import xyz.sleekstats.completist.service.Repo;
 import xyz.sleekstats.completist.model.CastInfo;
-import xyz.sleekstats.completist.model.Credits;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.Genre;
 
@@ -103,9 +103,9 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
 
             @Override
             public void onNext(FilmPOJO filmPOJO) {
-                Credits credits = filmPOJO.getCredits();
-                List<CastInfo> castInfos = credits.getCast();
-                List<CastInfo> crewInfos = credits.getCrew();
+                CastCredits castCredits = filmPOJO.getCastCredits();
+                List<CastInfo> castInfos = castCredits.getCast();
+                List<CastInfo> crewInfos = castCredits.getCrew();
                 for(CastInfo castInfo : castInfos) {
                 }
                 CastInfo directorInfo = getDirector(crewInfos);
@@ -133,8 +133,8 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
 
                 String posterURL = POSTER_BASE_URL + filmPOJO.getPoster_path();
                 Picasso.get().load(posterURL)
-//                .placeholder(R.drawable.ic_paw)
-//                .error(R.drawable.ic_broken_img)
+                .placeholder(R.drawable.ic_sharp_movie_92px)
+                .error(R.drawable.ic_sharp_movie_92px)
                         .into(mPosterView);
 
                 List<Genre> genres = filmPOJO.getGenres();

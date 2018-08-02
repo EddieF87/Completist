@@ -16,6 +16,10 @@ public class FilmByPerson {
     @SerializedName("poster_path")
     private String poster_path;
 
+    @SerializedName("job")
+    private String job;
+
+
     public String getTitle() {
         return title;
     }
@@ -46,5 +50,13 @@ public class FilmByPerson {
 
     public void setPoster_path(String poster_path) {
         this.poster_path = poster_path;
+    }
+
+    public String getJob() {
+        return job;
+    }
+
+    public void setJob(String job) {
+        this.job = job;
     }
 }

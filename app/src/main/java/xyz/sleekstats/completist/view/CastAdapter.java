@@ -44,8 +44,8 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder
         String id = castInfo.getId();
 
         Picasso.get().load(posterURL)
-//                .placeholder(R.drawable.ic_paw)
-//                .error(R.drawable.ic_broken_img)
+                .placeholder(R.drawable.ic_sharp_account_box_24px)
+                .error(R.drawable.ic_sharp_account_box_24px)
                 .into(holder.mCastPosterView);
 
         holder.mCastNameView.setText(name);
