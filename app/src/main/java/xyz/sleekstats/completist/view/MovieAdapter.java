@@ -17,13 +17,13 @@ import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.FilmByPerson;
 
 //Load film names and posters for a specific actor/director in a recyclerview
-public class FilmsAdapter extends RecyclerView.Adapter<FilmsAdapter.FilmViewHolder> {
+public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHolder> {
 
     private final List<FilmByPerson> filmByPersonList;
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
     private ItemClickListener mClickListener;
 
-    public FilmsAdapter(List<FilmByPerson> filmByPersonList) {
+    public MovieAdapter(List<FilmByPerson> filmByPersonList) {
         this.filmByPersonList = filmByPersonList;
     }
 

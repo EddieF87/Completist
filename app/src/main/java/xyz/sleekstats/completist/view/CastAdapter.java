@@ -74,7 +74,7 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder
         @Override
         public void onClick(View view) {
             String id = mView.getTag().toString();
-            if (mClickListener != null) mClickListener.onCastClick(id, false);
+            if (mClickListener != null) mClickListener.onCastClick(id);
         }
     }
 
@@ -84,6 +84,6 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder
 
     //When director/actor is clicked, go to their list of films
     public interface ItemClickListener{
-        void onCastClick(String movieID, boolean isDirector);
+        void onCastClick(String movieID);
     }
 }

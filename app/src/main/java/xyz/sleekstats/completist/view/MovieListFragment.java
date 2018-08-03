@@ -2,6 +2,7 @@ package xyz.sleekstats.completist.view;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,47 +16,39 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import xyz.sleekstats.completist.R;
-import xyz.sleekstats.completist.model.CastCredits;
-import xyz.sleekstats.completist.model.MovieCredits;
-import xyz.sleekstats.completist.service.Repo;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.PersonPOJO;
+import xyz.sleekstats.completist.viewmodel.MovieListViewModel;
 
 //Shows details of, and list of films by, a specific actor/director
 public class MovieListFragment extends Fragment {
 
     private static final String ARG_ID = "id";
-    private static final String TAG = MovieListFragment.class.getName();
-    private static final String ARG_DIRECTOR = "director";
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
-
-    private List<String> titles;
     private String mPersonId;
-    private boolean mIsDirector;
 
     private TextView mNameView;
     private TextView mBioView;
     private ImageView mPosterView;
+    private RecyclerView mMoviesRecyclerView;
+    private MovieAdapter mMovieAdapter;
 
-
+    private MovieListViewModel movieListViewModel;
+    private Disposable mPersonDisposable;
+    private Disposable mFilmsByPersonDisposable;
     private OnFragmentInteractionListener mListener;
 
-    public MovieListFragment() {
-    }
+    public MovieListFragment() { }
 
-    public static MovieListFragment newInstance(String id, boolean isDirector) {
+    public static MovieListFragment newInstance(String id) {
         MovieListFragment fragment = new MovieListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ID, id);
-        args.putBoolean(ARG_DIRECTOR, isDirector);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,17 +58,18 @@ public class MovieListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mPersonId = getArguments().getString(ARG_ID);
-            mIsDirector = getArguments().getBoolean(ARG_DIRECTOR);
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
         mNameView = rootView.findViewById(R.id.person_name);
         mBioView = rootView.findViewById(R.id.person_summary);
         mPosterView = rootView.findViewById(R.id.person_poster);
+        mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
+        mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         return rootView;
     }
 
@@ -85,81 +79,58 @@ public class MovieListFragment extends Fragment {
         getFilmsForPerson(mPersonId);
     }
 
-    public void getFilmsForPerson(String person_id) {
+    //Retrieve person/film data from ViewModel
+    private void getFilmsForPerson(String person_id) {
 
-        Repo repo = new Repo();
-        repo.getData();
+        if(movieListViewModel == null) {
+            movieListViewModel = new MovieListViewModel(requireActivity().getApplication());
+        }
 
-        Observable<PersonPOJO> personPOJOObservable = repo.getFilmsByPerson(person_id);
+        Observable<PersonPOJO> personObservable = movieListViewModel.getFilmsByPerson(person_id);
 
+        Observable<List<FilmByPerson>> filmRVObservable = personObservable.map(s -> {
+            if (s.getKnown_for_department().equals("Directing")) {
+                return movieListViewModel.filterCrew(s.getMovieCredits().getCrew());
+            } else {
+                return s.getMovieCredits().getCast();
+            }
+        });
+        mPersonDisposable = personObservable.subscribe(this::setViews);
+        mFilmsByPersonDisposable = filmRVObservable.subscribe(this::setRecyclerView);
+    }
 
-        Observer<PersonPOJO> personPOJOObserver = new Observer<PersonPOJO>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                if(titles == null) {
-                    titles = new ArrayList<>();
-                } else {
-                    titles.clear();
+    //Set display with info for selected actor/director
+    private void setViews(PersonPOJO personPOJO) {
+        String name = personPOJO.getName();
+        String bio = personPOJO.getBiography();
+        String posterUrl = POSTER_BASE_URL + personPOJO.getProfile_path();
+
+        Picasso.get().load(posterUrl)
+                .placeholder(R.drawable.ic_sharp_account_box_92px)
+                .error(R.drawable.ic_sharp_account_box_92px)
+                .into(mPosterView);
+
+        mNameView.setText(name);
+        mBioView.setText(bio);
+    }
+
+    //Populate recyclerview with films from actor/director
+    private void setRecyclerView(List<FilmByPerson> filmByPersonList) {
+        if(mMoviesRecyclerView == null) {
+            View rootView = getView();
+            if(rootView == null){ return; }
+            mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
+            mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        }
+        if(mMovieAdapter == null) {
+            mMovieAdapter = new MovieAdapter(filmByPersonList);
+            mMovieAdapter.setClickListener(movieID -> {
+                if (mListener != null) {
+                    mListener.onFilmSelected(movieID);
                 }
-            }
-
-            @Override
-            public void onNext(PersonPOJO personPOJO) {
-                List<FilmByPerson> filmByPersonList;
-                MovieCredits movieCredits = personPOJO.getMovieCredits();
-
-                //Determine if person's main role is director and then create list of roles
-                mIsDirector = personPOJO.getKnown_for_department().equals("Directing");
-                if(mIsDirector) {
-                    filmByPersonList = new ArrayList<>();
-                    List<FilmByPerson> crewList = movieCredits.getCrew();
-                    //For director filter out roles besides directing
-                    for (FilmByPerson film : crewList) {
-                        if(film.getJob().equals("Director")) {
-                            filmByPersonList.add(film);
-                        }
-                    }
-                } else {
-                    filmByPersonList = movieCredits.getCast();
-                }
-                String name = personPOJO.getName();
-                String bio = personPOJO.getBiography();
-                String posterUrl = POSTER_BASE_URL + personPOJO.getProfile_path();
-
-                Picasso.get().load(posterUrl)
-                        .placeholder(R.drawable.ic_sharp_account_box_92px)
-                        .error(R.drawable.ic_sharp_account_box_92px)
-                        .into(mPosterView);
-
-                mNameView.setText(name);
-                mBioView.setText(bio);
-                Log.d("ddd", mBioView.getLineCount() + "");
-
-
-                RecyclerView recyclerView = getView().findViewById(R.id.film_list);
-                recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
-                FilmsAdapter filmsAdapter = new FilmsAdapter(filmByPersonList);
-                filmsAdapter.setClickListener(new FilmsAdapter.ItemClickListener() {
-                    @Override
-                    public void onFilmClick(String movieID) {
-                        if (mListener != null) {
-                            mListener.onFilmSelected(movieID);
-                        }
-                    }
-                });
-                recyclerView.setAdapter(filmsAdapter);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.d("ddd", e.getMessage());
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        };
-        personPOJOObservable.subscribe(personPOJOObserver);
+            });
+        }
+        mMoviesRecyclerView.setAdapter(mMovieAdapter);
     }
 
     @Override
@@ -177,6 +148,12 @@ public class MovieListFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        if(mPersonDisposable != null && !mPersonDisposable.isDisposed()) {
+            mPersonDisposable.dispose();
+        }
+        if(mFilmsByPersonDisposable != null && !mFilmsByPersonDisposable.isDisposed()) {
+            mFilmsByPersonDisposable.dispose();
+        }
     }
 
     public interface OnFragmentInteractionListener {

@@ -1,5 +1,7 @@
 package xyz.sleekstats.completist.service;
 
+import android.app.Application;
+
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -15,15 +17,22 @@ public class Repo {
     private static final String BASE_URL = "https://api.themoviedb.org/3/";
     private TmdbAPI tmdbAPI;
 
-    //Create retrofit API service
-    public void getData() {
+
+    public Repo(Application application) {
+        if(tmdbAPI == null) {
+            tmdbAPI = getData();
+        }
+    }
+
+    //Build Retrofit API service
+    private TmdbAPI getData() {
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
 
         Retrofit retrofit = builder.build();
-        tmdbAPI = retrofit.create(TmdbAPI.class);
+        return retrofit.create(TmdbAPI.class);
     }
 
     //Get specific film details based on Tmdb film id

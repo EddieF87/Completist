@@ -1,9 +1,11 @@
 package xyz.sleekstats.completist.view;
 
+import android.annotation.SuppressLint;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
 import xyz.sleekstats.completist.R;
 
@@ -18,30 +20,25 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment fragment = MovieListFragment.newInstance(TEST_ID, true);
-        fragmentManager.beginTransaction()
-                .add(R.id.fragment_container, fragment)
-                .commit();
+        replaceFragment(MovieListFragment.newInstance(TEST_ID)).commit();
     }
 
     @Override
     public void onFilmSelected(String movieID) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment fragment = MovieFragment.newInstance(movieID);
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .addToBackStack(null)
-                .commit();
+        replaceFragment(MovieFragment.newInstance(movieID))
+                .addToBackStack(null).commit();
     }
 
     @Override
-    public void onCastSelected(String castID, boolean isDirector) {
+    public void onCastSelected(String castID) {
+        replaceFragment(MovieListFragment.newInstance(castID))
+                .addToBackStack(null).commit();
+    }
+
+    @SuppressLint("CommitTransaction")
+    private FragmentTransaction replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment fragment = MovieListFragment.newInstance(castID, isDirector);
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .addToBackStack(null)
-                .commit();
+        return fragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment);
     }
 }

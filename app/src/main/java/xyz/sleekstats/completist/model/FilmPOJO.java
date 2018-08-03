@@ -28,47 +28,23 @@ public class FilmPOJO {
         return genres;
     }
 
-    public void setGenres(List<Genre> genres) {
-        this.genres = genres;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getOverview() {
         return overview;
     }
 
-    public void setOverview(String overview) {
-        this.overview = overview;
-    }
-
     public String getPopularity() {
         return popularity;
-    }
-
-    public void setPopularity(String popularity) {
-        this.popularity = popularity;
     }
 
     public String getPoster_path() {
         return poster_path;
     }
 
-    public void setPoster_path(String poster_path) {
-        this.poster_path = poster_path;
-    }
-
     public CastCredits getCastCredits() {
         return castCredits;
-    }
-
-    public void setCastCredits(CastCredits castCredits) {
-        this.castCredits = castCredits;
     }
 }

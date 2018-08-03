@@ -2,6 +2,7 @@ package xyz.sleekstats.completist.view;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,26 +18,30 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.CastCredits;
-import xyz.sleekstats.completist.service.Repo;
 import xyz.sleekstats.completist.model.CastInfo;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.Genre;
+import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 //Shows details for selected film, including director/cast, rating, and summary
 public class MovieFragment extends Fragment implements CastAdapter.ItemClickListener {
 
     private static final String ARG_ID = "id";
+    private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w500/";
 
     private String mMovieId;
     private TextView mTitleView;
     private TextView mOverviewView;
     private ImageView mPosterView;
     private TextView mGenreView;
-    private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w500/";
+    private RecyclerView mCastView;
+    private CastAdapter mCastAdapter;
+
+    private MovieViewModel movieViewModel;
+    private Disposable mFilmDisposable;
 
     private OnFragmentInteractionListener mListener;
 
@@ -59,14 +64,15 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_movie, container, false);
         mTitleView = rootView.findViewById(R.id.movie_title);
         mOverviewView = rootView.findViewById(R.id.movie_overview);
         mPosterView = rootView.findViewById(R.id.movie_poster);
         mGenreView = rootView.findViewById(R.id.movie_genre);
+        mCastView = rootView.findViewById(R.id.cast_recyclerview);
+        mCastView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         return rootView;
     }
 
@@ -75,7 +81,6 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
         super.onActivityCreated(savedInstanceState);
         getFilm(mMovieId);
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -88,83 +93,80 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
         }
     }
 
-    public void getFilm(String movie_id) {
+    //Retrieve film data from ViewModel
+    private void getFilm(String movie_id) {
+        if(movieViewModel == null) {
+            movieViewModel = new MovieViewModel(requireActivity().getApplication());
+        }
 
-        Repo repo = new Repo();
-        repo.getData();
-
-        Observable<FilmPOJO> filmPOJOObservable = repo.getFilm(movie_id);
-
-
-        Observer<FilmPOJO> filmObserver = new Observer<FilmPOJO>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-            }
-
-            @Override
-            public void onNext(FilmPOJO filmPOJO) {
-                CastCredits castCredits = filmPOJO.getCastCredits();
-                List<CastInfo> castInfos = castCredits.getCast();
-                List<CastInfo> crewInfos = castCredits.getCrew();
-                for(CastInfo castInfo : castInfos) {
+        Observable<FilmPOJO> filmPOJOObservable = movieViewModel.getMovieInfo(movie_id);
+        mFilmDisposable = filmPOJOObservable.subscribe(s -> {
+                    setMovieInfoDisplay(s);
+                    setCastRecyclerView(s.getCastCredits());
                 }
-                CastInfo directorInfo = getDirector(crewInfos);
-                castInfos.add(0, directorInfo);
-                RecyclerView recyclerView = getView().findViewById(R.id.cast_recyclerview);
-                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-                CastAdapter castAdapter = new CastAdapter(castInfos);
-                castAdapter.setClickListener(new CastAdapter.ItemClickListener() {
-                    @Override
-                    public void onCastClick(String castID, boolean isDirector) {
-                        if (mListener != null) {
-                            mListener.onCastSelected(castID, isDirector);
-                        }
-                    }
-                });
-                recyclerView.setAdapter(castAdapter);
+        );
+    }
 
-                String title = filmPOJO.getTitle();
-                mTitleView.setText(title);
+    //Set display of movie details
+    private void setMovieInfoDisplay(FilmPOJO filmPOJO) {
+        String title = filmPOJO.getTitle();
+        mTitleView.setText(title);
 
-                String overview = filmPOJO.getOverview();
-                if(overview != null) {
-                    mOverviewView.setText(overview);
-                }
+        String overview = filmPOJO.getOverview();
+        if (overview != null) {
+            mOverviewView.setText(overview);
+        }
 
-                String posterURL = POSTER_BASE_URL + filmPOJO.getPoster_path();
-                Picasso.get().load(posterURL)
+        String posterURL = POSTER_BASE_URL + filmPOJO.getPoster_path();
+        Picasso.get().load(posterURL)
                 .placeholder(R.drawable.ic_sharp_movie_92px)
                 .error(R.drawable.ic_sharp_movie_92px)
-                        .into(mPosterView);
+                .into(mPosterView);
 
-                List<Genre> genres = filmPOJO.getGenres();
+        List<Genre> genres = filmPOJO.getGenres();
 
-                StringBuilder stringBuilder = new StringBuilder();
-                for(int i = 0; i < genres.size(); i++) {
-                    String name = genres.get(i).getName();
-                    stringBuilder.append(name);
-                    if(i < genres.size() - 1) {
-                        stringBuilder.append("/ ");
-                    }
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < genres.size(); i++) {
+            String name = genres.get(i).getName();
+            stringBuilder.append(name);
+            if (i < genres.size() - 1) {
+                stringBuilder.append("/ ");
+            }
+        }
+        String genreString = stringBuilder.toString();
+        mGenreView.setText(genreString);
+    }
+
+    //Populate recyclerview of cast names and images
+    private void setCastRecyclerView(CastCredits castCredits) {
+
+        List<CastInfo> castInfos = castCredits.getCast();
+        List<CastInfo> crewInfos = castCredits.getCrew();
+//                for(CastInfo castInfo : castInfos) {
+//                }
+        CastInfo directorInfo = getDirector(crewInfos);
+        castInfos.add(0, directorInfo);
+
+        if(mCastView == null) {
+            View rootView = getView();
+            if(rootView == null) { return; }
+            mCastView = rootView.findViewById(R.id.cast_recyclerview);
+            mCastView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        }
+        if(mCastAdapter == null) {
+            mCastAdapter = new CastAdapter(castInfos);
+            mCastAdapter.setClickListener(castID -> {
+                if (mListener != null) {
+                    mListener.onCastSelected(castID);
                 }
-                String genreString = stringBuilder.toString();
-                mGenreView.setText(genreString);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        };
-        filmPOJOObservable.subscribe(filmObserver);
+            });
+        }
+        mCastView.setAdapter(mCastAdapter);
     }
 
     private CastInfo getDirector(List<CastInfo> crewInfo) {
-        for(CastInfo castInfo : crewInfo) {
-            if(castInfo.getJob().equals("Director")) {
+        for (CastInfo castInfo : crewInfo) {
+            if (castInfo.getJob().equals("Director")) {
                 return castInfo;
             }
         }
@@ -175,16 +177,19 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        if(mFilmDisposable != null && !mFilmDisposable.isDisposed()) {
+            mFilmDisposable.dispose();
+        }
     }
 
     @Override
-    public void onCastClick(String castID, boolean isDirector) {
+    public void onCastClick(String castID) {
         if (mListener != null) {
-            mListener.onCastSelected(castID, isDirector);
+            mListener.onCastSelected(castID);
         }
     }
 
     public interface OnFragmentInteractionListener {
-        void onCastSelected(String castID, boolean isDirector);
+        void onCastSelected(String castID);
     }
 }

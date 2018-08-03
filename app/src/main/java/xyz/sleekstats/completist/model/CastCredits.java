@@ -16,15 +16,7 @@ public class CastCredits {
         return cast;
     }
 
-    public void setCast(List<CastInfo> cast) {
-        this.cast = cast;
-    }
-
     public List<CastInfo> getCrew() {
         return crew;
-    }
-
-    public void setCrew(List<CastInfo> crew) {
-        this.crew = crew;
     }
 }
