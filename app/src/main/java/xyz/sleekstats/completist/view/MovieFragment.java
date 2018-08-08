@@ -1,5 +1,6 @@
 package xyz.sleekstats.completist.view;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -73,12 +74,16 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
         mGenreView = rootView.findViewById(R.id.movie_genre);
         mCastView = rootView.findViewById(R.id.cast_recyclerview);
         mCastView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        setRetainInstance(true);
         return rootView;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        if(savedInstanceState != null) {
+            mMovieId = savedInstanceState.getString("id", mMovieId);
+        }
         getFilm(mMovieId);
     }
 
@@ -94,11 +99,11 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
     }
 
     //Retrieve film data from ViewModel
-    private void getFilm(String movie_id) {
+    public void getFilm(String movie_id) {
+        mMovieId = movie_id;
         if(movieViewModel == null) {
-            movieViewModel = new MovieViewModel(requireActivity().getApplication());
+            movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
         }
-
         Observable<FilmPOJO> filmPOJOObservable = movieViewModel.getMovieInfo(movie_id);
         mFilmDisposable = filmPOJOObservable.subscribe(s -> {
                     setMovieInfoDisplay(s);
@@ -160,6 +165,8 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
                     mListener.onCastSelected(castID);
                 }
             });
+        } else {
+            mCastAdapter.setCastInfoList(castInfos);
         }
         mCastView.setAdapter(mCastAdapter);
     }
@@ -191,5 +198,11 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
 
     public interface OnFragmentInteractionListener {
         void onCastSelected(String castID);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("id", mMovieId);
     }
 }

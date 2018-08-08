@@ -1,5 +1,6 @@
 package xyz.sleekstats.completist.view;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -7,12 +8,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -23,7 +24,7 @@ import io.reactivex.disposables.Disposable;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.PersonPOJO;
-import xyz.sleekstats.completist.viewmodel.MovieListViewModel;
+import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 //Shows details of, and list of films by, a specific actor/director
 public class MovieListFragment extends Fragment {
@@ -38,7 +39,7 @@ public class MovieListFragment extends Fragment {
     private RecyclerView mMoviesRecyclerView;
     private MovieAdapter mMovieAdapter;
 
-    private MovieListViewModel movieListViewModel;
+    private MovieViewModel movieViewModel;
     private Disposable mPersonDisposable;
     private Disposable mFilmsByPersonDisposable;
     private OnFragmentInteractionListener mListener;
@@ -70,27 +71,30 @@ public class MovieListFragment extends Fragment {
         mPosterView = rootView.findViewById(R.id.person_poster);
         mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
         mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        setRetainInstance(true);
         return rootView;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        if(savedInstanceState != null) {
+            mPersonId = savedInstanceState.getString("id", mPersonId);
+        }
         getFilmsForPerson(mPersonId);
     }
 
     //Retrieve person/film data from ViewModel
-    private void getFilmsForPerson(String person_id) {
-
-        if(movieListViewModel == null) {
-            movieListViewModel = new MovieListViewModel(requireActivity().getApplication());
+    public void getFilmsForPerson(String person_id) {
+        mPersonId = person_id;
+        if(movieViewModel == null) {
+            movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
         }
-
-        Observable<PersonPOJO> personObservable = movieListViewModel.getFilmsByPerson(person_id);
+        Observable<PersonPOJO> personObservable = movieViewModel.getFilmsByPerson(person_id);
 
         Observable<List<FilmByPerson>> filmRVObservable = personObservable.map(s -> {
             if (s.getKnown_for_department().equals("Directing")) {
-                return movieListViewModel.filterCrew(s.getMovieCredits().getCrew());
+                return movieViewModel.filterCrew(s.getMovieCredits().getCrew());
             } else {
                 return s.getMovieCredits().getCast();
             }
@@ -129,6 +133,8 @@ public class MovieListFragment extends Fragment {
                     mListener.onFilmSelected(movieID);
                 }
             });
+        } else {
+            mMovieAdapter.setFilmByPersonList(filmByPersonList);
         }
         mMoviesRecyclerView.setAdapter(mMovieAdapter);
     }
@@ -158,5 +164,11 @@ public class MovieListFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         void onFilmSelected(String movieID);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("id", mPersonId);
     }
 }

@@ -78,6 +78,11 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder
         }
     }
 
+    public void setCastInfoList(List<CastInfo> castInfoList) {
+        this.castInfoList = castInfoList;
+        notifyDataSetChanged();
+    }
+
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }

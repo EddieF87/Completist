@@ -25,4 +25,18 @@ public class MovieViewModel extends AndroidViewModel {
     public Observable<FilmPOJO> getMovieInfo(String movieId) {
         return mRepo.getFilm(movieId);
     }
+
+    public Observable<PersonPOJO> getFilmsByPerson(String personId) {
+        return mRepo.getFilmsByPerson(personId);
+    }
+
+    public List<FilmByPerson> filterCrew(List<FilmByPerson> unfiltered) {
+        List<FilmByPerson> filteredList = new ArrayList<>();
+        for (FilmByPerson film : unfiltered) {
+            if (film.getJob().equals("Director")) {
+                filteredList.add(film);
+            }
+        }
+        return filteredList;
+    }
 }
