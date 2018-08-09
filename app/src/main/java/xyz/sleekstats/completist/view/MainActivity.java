@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.ViewGroup;
 
 import xyz.sleekstats.completist.R;
@@ -143,5 +144,11 @@ public class MainActivity extends AppCompatActivity
             }
             return createdFragment;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
 }

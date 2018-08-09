@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -36,6 +36,7 @@ public class MovieListFragment extends Fragment {
     private TextView mNameView;
     private TextView mBioView;
     private ImageView mPosterView;
+    private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private RecyclerView mMoviesRecyclerView;
     private MovieAdapter mMovieAdapter;
 
@@ -70,6 +71,7 @@ public class MovieListFragment extends Fragment {
         mBioView = rootView.findViewById(R.id.person_summary);
         mPosterView = rootView.findViewById(R.id.person_poster);
         mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
+        mCollapsingToolbarLayout = rootView.findViewById(R.id.collapsing_toolbar);
         mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         setRetainInstance(true);
         return rootView;
@@ -107,13 +109,16 @@ public class MovieListFragment extends Fragment {
     private void setViews(PersonPOJO personPOJO) {
         String name = personPOJO.getName();
         String bio = personPOJO.getBiography();
+        String known_for_department = personPOJO.getKnown_for_department();
         String posterUrl = POSTER_BASE_URL + personPOJO.getProfile_path();
+        String title = name + " (" + known_for_department + ")";
 
         Picasso.get().load(posterUrl)
                 .placeholder(R.drawable.ic_sharp_account_box_92px)
                 .error(R.drawable.ic_sharp_account_box_92px)
                 .into(mPosterView);
 
+        mCollapsingToolbarLayout.setTitle(title);
         mNameView.setText(name);
         mBioView.setText(bio);
     }
