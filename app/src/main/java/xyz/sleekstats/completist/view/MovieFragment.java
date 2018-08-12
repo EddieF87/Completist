@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,8 +32,10 @@ import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 public class MovieFragment extends Fragment implements CastAdapter.ItemClickListener {
 
     private static final String ARG_ID = "id";
+    private static final String KEY_ISTV = "istv";
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w500/";
 
+    private boolean isTV;
     private String mMovieId;
     private TextView mTitleView;
     private TextView mOverviewView;
@@ -46,7 +49,8 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
 
     private OnFragmentInteractionListener mListener;
 
-    public MovieFragment() {}
+    public MovieFragment() {
+    }
 
     public static MovieFragment newInstance(String id) {
         MovieFragment fragment = new MovieFragment();
@@ -81,10 +85,15 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             mMovieId = savedInstanceState.getString("id", mMovieId);
+            isTV = savedInstanceState.getBoolean(KEY_ISTV);
         }
-        getFilm(mMovieId);
+        if(isTV) {
+            getShow(mMovieId);
+        } else {
+            getFilm(mMovieId);
+        }
     }
 
     @Override
@@ -100,12 +109,30 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
 
     //Retrieve film data from ViewModel
     public void getFilm(String movie_id) {
+        isTV = false;
         mMovieId = movie_id;
-        if(movieViewModel == null) {
+        if (movieViewModel == null) {
             movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
         }
         Observable<FilmPOJO> filmPOJOObservable = movieViewModel.getMovieInfo(movie_id);
         mFilmDisposable = filmPOJOObservable.subscribe(s -> {
+                    setMovieInfoDisplay(s);
+                    setCastRecyclerView(s.getCastCredits());
+                }
+        );
+    }
+
+    //Retrieve tv show data from ViewModel
+    public void getShow(String showID) {
+        isTV = true;
+        mMovieId = showID;
+        if (movieViewModel == null) {
+            movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
+        }
+        Observable<FilmPOJO> filmPOJOObservable = movieViewModel.getShowInfo(showID);
+        mFilmDisposable = filmPOJOObservable.subscribe(s -> {
+                    String name = s.getName();
+                    s.setTitle(name);
                     setMovieInfoDisplay(s);
                     setCastRecyclerView(s.getCastCredits());
                 }
@@ -147,18 +174,21 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
 
         List<CastInfo> castInfos = castCredits.getCast();
         List<CastInfo> crewInfos = castCredits.getCrew();
-//                for(CastInfo castInfo : castInfos) {
-//                }
-        CastInfo directorInfo = getDirector(crewInfos);
-        castInfos.add(0, directorInfo);
 
-        if(mCastView == null) {
+        CastInfo directorInfo = getDirector(crewInfos);
+        if (directorInfo != null) {
+            castInfos.add(0, directorInfo);
+        }
+
+        if (mCastView == null) {
             View rootView = getView();
-            if(rootView == null) { return; }
+            if (rootView == null) {
+                return;
+            }
             mCastView = rootView.findViewById(R.id.cast_recyclerview);
             mCastView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         }
-        if(mCastAdapter == null) {
+        if (mCastAdapter == null) {
             mCastAdapter = new CastAdapter(castInfos);
             mCastAdapter.setClickListener(castID -> {
                 if (mListener != null) {
@@ -184,7 +214,7 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        if(mFilmDisposable != null && !mFilmDisposable.isDisposed()) {
+        if (mFilmDisposable != null && !mFilmDisposable.isDisposed()) {
             mFilmDisposable.dispose();
         }
     }
@@ -204,6 +234,7 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("id", mMovieId);
+        outState.putBoolean(KEY_ISTV, isTV);
     }
 
 }

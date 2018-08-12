@@ -39,12 +39,9 @@ public class Repo {
 
     //Get list of films matching search query
     public Observable<QueryPOJO> queryFilms(String movieQuery) {
-        Log.d("xxx", "repo queryFilms " + movieQuery);
-        Observable<QueryPOJO> list = tmdbAPI.queryFilms(movieQuery)
+        return tmdbAPI.queryFilms(movieQuery)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-        Log.d("xxx", "query succesful");
-        return list;
     }
 
     //Get specific film details based  Tmdb film id
@@ -57,6 +54,13 @@ public class Repo {
     //Get list of films by a specific actor/director based on Tmdb actor/director id
     public Observable<PersonPOJO> getFilmsByPerson(String person_id) {
         return tmdbAPI.retrievePersonInfo(person_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    //Get specific film details based  Tmdb film id
+    public Observable<FilmPOJO> getShow(String show_id) {
+        return tmdbAPI.retrieveShow(show_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

@@ -16,12 +16,15 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.ViewGroup;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import xyz.sleekstats.completist.R;
+import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.MediaPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
@@ -93,6 +96,13 @@ public class MainActivity extends AppCompatActivity
         movieListFragment.getFilmsForPerson(castID);
     }
 
+    public void onShowSelected(String showID) {
+        isListView = false;
+        this.movieID = showID;
+        myViewPager.setCurrentItem(1);
+        movieFragment = (MovieFragment) myPagerAdapter.getItem(1);
+        movieFragment.getShow(showID);
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -165,7 +175,6 @@ public class MainActivity extends AppCompatActivity
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setIconifiedByDefault(true);
 
-
         final String[] from = new String[] {SEARCH_TITLE, SEARCH_ID};
         final int[] to = new int[] {R.id.search_title};
 
@@ -185,10 +194,16 @@ public class MainActivity extends AppCompatActivity
                 String id = cursor.getString(cursor.getColumnIndex(SEARCH_ID));
                 String type = cursor.getString(cursor.getColumnIndex(SEARCH_TYPE));
 
-                if(type.equals("person")) {
-                    onCastSelected(id);
-                } else {
-                    onFilmSelected(id);
+                switch (type) {
+                    case "person":
+                        onCastSelected(id);
+                        break;
+                    case "movie":
+                        onFilmSelected(id);
+                        break;
+                    default:
+                        onShowSelected(id);
+                        break;
                 }
 
                 return true;
@@ -205,7 +220,7 @@ public class MainActivity extends AppCompatActivity
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                movieViewModel.queryFilms(query).subscribe(s -> populateAdapter(s.getResults()));
+                movieViewModel.queryMedia(query).subscribe(s -> populateAdapter(s.getResults()));
                 return true;
             }
 

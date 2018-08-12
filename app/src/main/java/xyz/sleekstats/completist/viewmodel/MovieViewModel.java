@@ -32,9 +32,12 @@ public class MovieViewModel extends AndroidViewModel {
         return mRepo.getFilmsByPerson(personId);
     }
 
-    public Observable<QueryPOJO> queryFilms(String movieQuery) {
-        Log.d("xxx", "mvm queryFilms " + movieQuery);
-        return mRepo.queryFilms(movieQuery);
+    public Observable<FilmPOJO> getShowInfo(String showId) {
+        return mRepo.getShow(showId);
+    }
+
+    public Observable<QueryPOJO> queryMedia(String mediaQuery) {
+        return mRepo.queryFilms(mediaQuery);
     }
 
     public List<FilmByPerson> filterCrew(List<FilmByPerson> unfiltered) {
