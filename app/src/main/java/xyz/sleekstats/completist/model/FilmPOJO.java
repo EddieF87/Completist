@@ -24,6 +24,13 @@ public class FilmPOJO {
     @SerializedName("credits")
     private CastCredits castCredits;
 
+    @SerializedName("id")
+    private String id;
+
+    public String getId() {
+        return id;
+    }
+
     public List<Genre> getGenres() {
         return genres;
     }

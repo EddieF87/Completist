@@ -1,6 +1,7 @@
 package xyz.sleekstats.completist.service;
 
 import android.app.Application;
+import android.util.Log;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -10,6 +11,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.PersonPOJO;
+import xyz.sleekstats.completist.model.QueryPOJO;
 import xyz.sleekstats.completist.service.TmdbAPI;
 
 public class Repo {
@@ -35,7 +37,17 @@ public class Repo {
         return retrofit.create(TmdbAPI.class);
     }
 
-    //Get specific film details based on Tmdb film id
+    //Get list of films matching search query
+    public Observable<QueryPOJO> queryFilms(String movieQuery) {
+        Log.d("xxx", "repo queryFilms " + movieQuery);
+        Observable<QueryPOJO> list = tmdbAPI.queryFilms(movieQuery)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+        Log.d("xxx", "query succesful");
+        return list;
+    }
+
+    //Get specific film details based  Tmdb film id
     public Observable<FilmPOJO> getFilm(String movie_id) {
         return tmdbAPI.retrieveFilm(movie_id)
                 .subscribeOn(Schedulers.io())

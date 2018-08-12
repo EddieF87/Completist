@@ -19,6 +19,13 @@ public class PersonPOJO {
     @SerializedName("profile_path")
     private String profile_path;
 
+    @SerializedName("id")
+    private String id;
+
+    public String getId() {
+        return id;
+    }
+
     public MovieCredits getMovieCredits() {
         return movieCredits;
     }
