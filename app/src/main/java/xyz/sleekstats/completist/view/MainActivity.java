@@ -16,13 +16,19 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.ViewGroup;
 
+import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
+
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.MediaPOJO;
@@ -51,10 +57,10 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             isListView = savedInstanceState.getBoolean("isListView");
         }
-        if(movieViewModel == null) {
+        if (movieViewModel == null) {
             movieViewModel = ViewModelProviders.of(MainActivity.this).get(MovieViewModel.class);
         }
 
@@ -73,7 +79,7 @@ public class MainActivity extends AppCompatActivity
 
         TabLayout tabLayout = findViewById(R.id.my_tab_layout);
         tabLayout.setupWithViewPager(myViewPager);
-        if(!isListView) {
+        if (!isListView) {
             myViewPager.setCurrentItem(1);
         }
     }
@@ -119,12 +125,12 @@ public class MainActivity extends AppCompatActivity
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    if(movieListFragment == null) {
+                    if (movieListFragment == null) {
                         movieListFragment = MovieListFragment.newInstance(personID);
                     }
                     return movieListFragment;
                 case 1:
-                    if(movieFragment == null) {
+                    if (movieFragment == null) {
                         movieFragment = MovieFragment.newInstance(movieID);
                     }
                     return movieFragment;
@@ -175,10 +181,21 @@ public class MainActivity extends AppCompatActivity
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setIconifiedByDefault(true);
 
-        final String[] from = new String[] {SEARCH_TITLE, SEARCH_ID};
-        final int[] to = new int[] {R.id.search_title};
+        RxSearchView.queryTextChanges(searchView)
+                .skip(1)
+                .debounce(600, TimeUnit.MILLISECONDS)
+                .filter(charSequence -> !TextUtils.isEmpty(charSequence))
+                .map(CharSequence::toString)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
+                .switchMap(query -> movieViewModel.queryMedia(query))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(s -> populateAdapter(s.getResults()));
 
-        if(mSearchAdapter == null) {
+        final String[] from = new String[]{SEARCH_TITLE, SEARCH_ID};
+        final int[] to = new int[]{R.id.search_title};
+
+        if (mSearchAdapter == null) {
             mSearchAdapter = new SimpleCursorAdapter(MainActivity.this, R.layout.search_item,
                     null, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
         }
@@ -205,7 +222,6 @@ public class MainActivity extends AppCompatActivity
                         onShowSelected(id);
                         break;
                 }
-
                 return true;
             }
 
@@ -214,25 +230,13 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
-
-
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                movieViewModel.queryMedia(query).subscribe(s -> populateAdapter(s.getResults()));
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
         return true;
     }
 
     private void populateAdapter(List<MediaPOJO> mediaPOJOS) {
+        if(mediaPOJOS==null) {
+            return;
+        }
         String[] columns = {
                 BaseColumns._ID,
                 SEARCH_TITLE,
@@ -250,14 +254,12 @@ public class MainActivity extends AppCompatActivity
             String id = mediaPOJO.getId();
             StringBuilder nameBuilder = new StringBuilder();
 
-            if(type.equals("movie")) {
+            if (type.equals("movie")) {
                 nameBuilder.append(mediaPOJO.getTitle());
             } else {
                 nameBuilder.append(mediaPOJO.getName());
             }
-            nameBuilder.append(" (")
-                    .append(type)
-                    .append(")");
+            nameBuilder.append(" (").append(type.toUpperCase()).append(")");
             String name = nameBuilder.toString();
 
             String[] row = {Integer.toString(i), name, id, type};
