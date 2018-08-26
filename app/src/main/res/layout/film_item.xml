@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/film_drawable"
+    android:background="@drawable/film_default"
     android:layout_margin="4dp"
     android:orientation="vertical"
     >
@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:textColor="@color/colorAccent"
+        android:minLines="2"
         android:maxLines="2"
         android:layout_gravity="center"
         android:gravity="center"
@@ -33,26 +34,42 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="bottom"
+        android:paddingTop="8dp"
         >
 
         <ImageView
+            android:id="@+id/watched_btn"
+            android:paddingRight="6dp"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_sharp_account_box_24px"
+            android:src="@drawable/ic_done_green_24dp"
             android:tint="@color/colorAccent"
+            android:alpha=".3 "
             />
-
 
         <ImageView
+            android:id="@+id/later_btn"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_sharp_account_box_24px"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_watch_later_gold_24dp"
             android:tint="@color/colorAccent"
+            android:alpha=".3"
             />
 
-
+        <ImageView
+            android:id="@+id/ignore_btn"
+            android:paddingLeft="6dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_delete_black_24dp"
+            android:tint="@color/colorAccent"
+            android:alpha=".3"
+            />
     </LinearLayout>
 
 </LinearLayout>

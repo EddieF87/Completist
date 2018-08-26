@@ -1,12 +1,16 @@
 package xyz.sleekstats.completist.view;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -22,9 +26,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
     private List<FilmByPerson> filmByPersonList;
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
     private ItemClickListener mClickListener;
+    private Context mContext;
 
-    public MovieAdapter(List<FilmByPerson> filmByPersonList) {
+    public MovieAdapter(List<FilmByPerson> filmByPersonList, Context context) {
         this.filmByPersonList = filmByPersonList;
+        this.mContext = context;
     }
 
     @NonNull
@@ -69,6 +75,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
 
         private View mView;
         private ImageView mPosterView;
+        private ImageView mWatchedView;
+        private ImageView mLaterView;
+        private ImageView mDeleteView;
         private TextView mTitleView;
 
         public FilmViewHolder(View itemView) {
@@ -76,13 +85,42 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
             mView = itemView;
             mTitleView = itemView.findViewById(R.id.title);
             mPosterView = itemView.findViewById(R.id.poster);
-            mView.setOnClickListener(this);
+            mWatchedView = itemView.findViewById(R.id.watched_btn);
+            mLaterView = itemView.findViewById(R.id.later_btn);
+            mDeleteView = itemView.findViewById(R.id.ignore_btn);
+            mPosterView.setOnClickListener(this);
+            mWatchedView.setOnClickListener(this);
+            mLaterView.setOnClickListener(this);
+            mDeleteView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            String id = (String) view.getTag();
-            if (mClickListener != null) mClickListener.onFilmClick(id);
+            if (mClickListener == null) {
+                return;
+            }
+
+            int viewId = view.getId();
+            switch (viewId) {
+                case R.id.poster:
+                case R.id.title:
+                    String id = (String) mView.getTag();
+                    mClickListener.onFilmClick(id);
+                    Log.d("omg", "onFilmClick" + mTitleView.getText());
+                    break;
+                case R.id.watched_btn:
+                    Log.d("omg", "watched_btn" + mTitleView.getText());
+                    mView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.film_watched));
+                    break;
+                case R.id.later_btn:
+                    Log.d("omg", "rating_btn" + mTitleView.getText());
+                    break;
+                case R.id.ignore_btn:
+                    Log.d("omg", "ignorre" + mTitleView.getText());
+                    break;
+                default:
+                    Log.d("omg", "default");
+            }
         }
     }
 
@@ -90,7 +128,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
         this.mClickListener = itemClickListener;
     }
 
-    public interface ItemClickListener{
+    public interface ItemClickListener {
         void onFilmClick(String movieID);
     }
 }

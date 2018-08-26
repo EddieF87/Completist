@@ -132,7 +132,7 @@ public class MovieListFragment extends Fragment {
             mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         }
         if(mMovieAdapter == null) {
-            mMovieAdapter = new MovieAdapter(filmByPersonList);
+            mMovieAdapter = new MovieAdapter(filmByPersonList, getActivity());
             mMovieAdapter.setClickListener(movieID -> {
                 if (mListener != null) {
                     mListener.onFilmSelected(movieID);
