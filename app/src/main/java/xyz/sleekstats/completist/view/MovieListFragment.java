@@ -17,17 +17,20 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.FilmByPerson;
+import xyz.sleekstats.completist.model.MyMovie;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 //Shows details of, and list of films by, a specific actor/director
-public class MovieListFragment extends Fragment {
+public class MovieListFragment extends Fragment implements MovieAdapter.ItemClickListener {
 
     private static final String ARG_ID = "id";
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
@@ -39,13 +42,15 @@ public class MovieListFragment extends Fragment {
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private RecyclerView mMoviesRecyclerView;
     private MovieAdapter mMovieAdapter;
+    private List<MyMovie> mCurrentFilmList;
 
     private MovieViewModel movieViewModel;
     private Disposable mPersonDisposable;
     private Disposable mFilmsByPersonDisposable;
     private OnFragmentInteractionListener mListener;
 
-    public MovieListFragment() { }
+    public MovieListFragment() {
+    }
 
     public static MovieListFragment newInstance(String id) {
         MovieListFragment fragment = new MovieListFragment();
@@ -80,7 +85,7 @@ public class MovieListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             mPersonId = savedInstanceState.getString("id", mPersonId);
         }
         getFilmsForPerson(mPersonId);
@@ -89,7 +94,7 @@ public class MovieListFragment extends Fragment {
     //Retrieve person/film data from ViewModel
     public void getFilmsForPerson(String person_id) {
         mPersonId = person_id;
-        if(movieViewModel == null) {
+        if (movieViewModel == null) {
             movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
         }
         Observable<PersonPOJO> personObservable = movieViewModel.getFilmsByPerson(person_id);
@@ -125,21 +130,24 @@ public class MovieListFragment extends Fragment {
 
     //Populate recyclerview with films from actor/director
     private void setRecyclerView(List<FilmByPerson> filmByPersonList) {
-        if(mMoviesRecyclerView == null) {
+        Random random = new Random();
+        mCurrentFilmList = new ArrayList<>();
+        for (FilmByPerson film: filmByPersonList) {
+            mCurrentFilmList.add(new MyMovie(Integer.parseInt(film.getId()), film.getTitle(), 0, random.nextInt(3), film.getPoster_path()));
+        }
+        if (mMoviesRecyclerView == null) {
             View rootView = getView();
-            if(rootView == null){ return; }
+            if (rootView == null) {
+                return;
+            }
             mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
             mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         }
-        if(mMovieAdapter == null) {
-            mMovieAdapter = new MovieAdapter(filmByPersonList, getActivity());
-            mMovieAdapter.setClickListener(movieID -> {
-                if (mListener != null) {
-                    mListener.onFilmSelected(movieID);
-                }
-            });
+        if (mMovieAdapter == null) {
+            mMovieAdapter = new MovieAdapter(mCurrentFilmList, getActivity());
+            mMovieAdapter.setClickListener(this);
         } else {
-            mMovieAdapter.setFilmByPersonList(filmByPersonList);
+            mMovieAdapter.setCurrentMovieList(mCurrentFilmList);
         }
         mMoviesRecyclerView.setAdapter(mMovieAdapter);
     }
@@ -159,12 +167,29 @@ public class MovieListFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        if(mPersonDisposable != null && !mPersonDisposable.isDisposed()) {
+        if (mPersonDisposable != null && !mPersonDisposable.isDisposed()) {
             mPersonDisposable.dispose();
         }
-        if(mFilmsByPersonDisposable != null && !mFilmsByPersonDisposable.isDisposed()) {
+        if (mFilmsByPersonDisposable != null && !mFilmsByPersonDisposable.isDisposed()) {
             mFilmsByPersonDisposable.dispose();
         }
+    }
+
+    @Override
+    public void onFilmClick(String movieID) {
+        if (mListener != null) {
+            mListener.onFilmSelected(movieID);
+        }
+    }
+
+    @Override
+    public void onFilmWatched(int pos, int watchType) {
+        if (mMovieAdapter == null) {
+            return;
+        }
+        MyMovie film = mCurrentFilmList.get(pos);
+        film.setWatchType(watchType);
+        mMovieAdapter.notifyItemChanged(pos);
     }
 
     public interface OnFragmentInteractionListener {

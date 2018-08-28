@@ -11,14 +11,24 @@ public class MyMovie {
     private String title;
     private int rating;
     private int watchType;
+    private String poster;
     // 0: not watched, 1: want to watch, 2: ignored, 3:watched
 
 
-    public MyMovie(int movie_id, String title, int rating, int watchType) {
+    public MyMovie(int movie_id, String title, int rating, int watchType, String poster) {
         this.movie_id = movie_id;
         this.title = title;
         this.rating = rating;
         this.watchType = watchType;
+        this.poster = poster;
+    }
+
+    public String getPoster() {
+        return poster;
+    }
+
+    public void setPoster(String poster) {
+        this.poster = poster;
     }
 
     public int getMovie_id() {

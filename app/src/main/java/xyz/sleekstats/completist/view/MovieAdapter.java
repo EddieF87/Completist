@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -19,17 +18,18 @@ import java.util.List;
 
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.FilmByPerson;
+import xyz.sleekstats.completist.model.MyMovie;
 
 //Load film names and posters for a specific actor/director in a recyclerview
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHolder> {
 
-    private List<FilmByPerson> filmByPersonList;
+    private List<MyMovie> mCurrentMovieList;
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
     private ItemClickListener mClickListener;
     private Context mContext;
 
-    public MovieAdapter(List<FilmByPerson> filmByPersonList, Context context) {
-        this.filmByPersonList = filmByPersonList;
+    public MovieAdapter(List<MyMovie> filmByPersonList, Context context) {
+        this.mCurrentMovieList = filmByPersonList;
         this.mContext = context;
     }
 
@@ -43,32 +43,19 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
 
     @Override
     public void onBindViewHolder(@NonNull FilmViewHolder holder, int position) {
-
-        FilmByPerson filmByPerson = filmByPersonList.get(position);
-
-        String title = filmByPerson.getTitle();
-        holder.mTitleView.setText(title);
-
-        String posterPath = filmByPerson.getPoster_path();
-        String posterURL = POSTER_BASE_URL + posterPath;
-
-        String id = filmByPerson.getId();
-        holder.mView.setTag(id);
-
-        Picasso.get().load(posterURL)
-                .placeholder(R.drawable.ic_sharp_movie_92px)
-                .error(R.drawable.ic_sharp_movie_92px)
-                .into(holder.mPosterView);
+        MyMovie movie = mCurrentMovieList.get(position);
+        holder.setMovie(movie);
+        holder.setPos(position);
     }
 
-    public void setFilmByPersonList(List<FilmByPerson> filmByPersonList) {
-        this.filmByPersonList = filmByPersonList;
+    public void setCurrentMovieList(List<MyMovie> mCurrentMovieList) {
+        this.mCurrentMovieList = mCurrentMovieList;
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return filmByPersonList.size();
+        return mCurrentMovieList.size();
     }
 
     class FilmViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -79,6 +66,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
         private ImageView mLaterView;
         private ImageView mDeleteView;
         private TextView mTitleView;
+        private int listPos;
+        private MyMovie myMovie;
 
         public FilmViewHolder(View itemView) {
             super(itemView);
@@ -89,9 +78,40 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
             mLaterView = itemView.findViewById(R.id.later_btn);
             mDeleteView = itemView.findViewById(R.id.ignore_btn);
             mPosterView.setOnClickListener(this);
+            mTitleView.setOnClickListener(this);
             mWatchedView.setOnClickListener(this);
             mLaterView.setOnClickListener(this);
             mDeleteView.setOnClickListener(this);
+        }
+
+        public void setPos(int pos) {
+            listPos = pos;
+        }
+
+        public void setMovie(MyMovie movie){
+            myMovie = movie;
+            String title = movie.getTitle();
+            mTitleView.setText(title);
+
+            String posterPath = movie.getPoster();
+            String posterURL = POSTER_BASE_URL + posterPath;
+
+            int id = movie.getMovie_id();
+            mView.setTag(id);
+
+            Picasso.get().load(posterURL)
+                    .placeholder(R.drawable.ic_sharp_movie_92px)
+                    .error(R.drawable.ic_sharp_movie_92px)
+                    .into(mPosterView);
+
+            int watchType= movie.getWatchType();
+            if(watchType < 2) {
+                mView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.film_default));
+                mWatchedView.setAlpha(.3f);
+            } else {
+                mView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.film_watched));
+                mWatchedView.setAlpha(1f);
+            }
         }
 
         @Override
@@ -99,18 +119,21 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
             if (mClickListener == null) {
                 return;
             }
-
+            String id = String.valueOf(mView.getTag());
             int viewId = view.getId();
             switch (viewId) {
-                case R.id.poster:
                 case R.id.title:
-                    String id = (String) mView.getTag();
+                    Log.d("omg", "TITLE" + mTitleView.getText());
+                case R.id.poster:
                     mClickListener.onFilmClick(id);
                     Log.d("omg", "onFilmClick" + mTitleView.getText());
                     break;
                 case R.id.watched_btn:
-                    Log.d("omg", "watched_btn" + mTitleView.getText());
-                    mView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.film_watched));
+                    if(myMovie.getWatchType() < 2) {
+                        mClickListener.onFilmWatched(listPos, 2);
+                    } else {
+                        mClickListener.onFilmWatched(listPos, 1);
+                    }
                     break;
                 case R.id.later_btn:
                     Log.d("omg", "rating_btn" + mTitleView.getText());
@@ -130,5 +153,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
 
     public interface ItemClickListener {
         void onFilmClick(String movieID);
+
+        void onFilmWatched(int pos, int watchType);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 }

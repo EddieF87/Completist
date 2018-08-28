@@ -39,4 +39,8 @@ public class FilmByPerson {
     public String getJob() {
         return job;
     }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 }
