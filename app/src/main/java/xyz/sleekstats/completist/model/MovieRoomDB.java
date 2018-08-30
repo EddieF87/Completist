@@ -5,7 +5,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
-@Database(entities = {MyMovie.class, MyList.class}, version = 1, exportSchema = false)
+@Database(entities = {MyMovie.class, MyList.class}, version = 1)
 public abstract class MovieRoomDB  extends RoomDatabase {
 
     public abstract MovieDao movieDao();

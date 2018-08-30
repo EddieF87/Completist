@@ -267,5 +267,4 @@ public class MainActivity extends AppCompatActivity
         }
         mSearchAdapter.changeCursor(cursor);
     }
-
 }

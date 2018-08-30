@@ -123,26 +123,25 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
             int viewId = view.getId();
             switch (viewId) {
                 case R.id.title:
-                    Log.d("omg", "TITLE" + mTitleView.getText());
                 case R.id.poster:
                     mClickListener.onFilmClick(id);
-                    Log.d("omg", "onFilmClick" + mTitleView.getText());
                     break;
                 case R.id.watched_btn:
                     if(myMovie.getWatchType() < 2) {
-                        mClickListener.onFilmWatched(listPos, 2);
+                        mClickListener.onFilmChecked(listPos, 2);
                     } else {
-                        mClickListener.onFilmWatched(listPos, 1);
+                        mClickListener.onFilmChecked(listPos, 1);
                     }
                     break;
                 case R.id.later_btn:
-                    Log.d("omg", "rating_btn" + mTitleView.getText());
+                    if(myMovie.getWatchType() < 2) {
+                        mClickListener.onFilmChecked(listPos, 2);
+                    } else {
+                        mClickListener.onFilmChecked(listPos, 1);
+                    }
                     break;
                 case R.id.ignore_btn:
-                    Log.d("omg", "ignorre" + mTitleView.getText());
                     break;
-                default:
-                    Log.d("omg", "default");
             }
         }
     }
@@ -153,8 +152,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
 
     public interface ItemClickListener {
         void onFilmClick(String movieID);
-
-        void onFilmWatched(int pos, int watchType);
+        void onFilmChecked(int pos, int watchType);
     }
 
     @Override

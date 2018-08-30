@@ -27,4 +27,7 @@ public interface MovieDao {
 
     @Query("SELECT * FROM movie_table WHERE movie_id LIKE :id")
     List<MyMovie> checkIfExists(String id);
+
+    @Query("SELECT * FROM movie_table WHERE movie_id IN (:ids)")
+    List<MyMovie> checkIfListExists(List<String> ids);
 }

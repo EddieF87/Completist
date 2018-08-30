@@ -19,12 +19,13 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.FilmByPerson;
+import xyz.sleekstats.completist.model.MovieDao;
+import xyz.sleekstats.completist.model.MovieRoomDB;
 import xyz.sleekstats.completist.model.MyMovie;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
@@ -43,6 +44,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private RecyclerView mMoviesRecyclerView;
     private MovieAdapter mMovieAdapter;
     private List<MyMovie> mCurrentFilmList;
+    private MovieDao mMovieDao;
 
     private MovieViewModel movieViewModel;
     private Disposable mPersonDisposable;
@@ -130,10 +132,9 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     //Populate recyclerview with films from actor/director
     private void setRecyclerView(List<FilmByPerson> filmByPersonList) {
-        Random random = new Random();
         mCurrentFilmList = new ArrayList<>();
         for (FilmByPerson film: filmByPersonList) {
-            mCurrentFilmList.add(new MyMovie(Integer.parseInt(film.getId()), film.getTitle(), 0, random.nextInt(3), film.getPoster_path()));
+            mCurrentFilmList.add(new MyMovie(Integer.parseInt(film.getId()), film.getTitle(), 0, 0, film.getPoster_path()));
         }
         if (mMoviesRecyclerView == null) {
             View rootView = getView();
@@ -150,6 +151,11 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             mMovieAdapter.setCurrentMovieList(mCurrentFilmList);
         }
         mMoviesRecyclerView.setAdapter(mMovieAdapter);
+        if(mMovieDao == null) {
+            MovieRoomDB db = MovieRoomDB.getDatabase(getActivity().getApplication());
+            this.mMovieDao = db.movieDao();
+        }
+        new checkExistenceAsyncTask2(mMovieDao).execute(mCurrentFilmList);
     }
 
     @Override
@@ -183,12 +189,17 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     }
 
     @Override
-    public void onFilmWatched(int pos, int watchType) {
+    public void onFilmChecked(int pos, int watchType) {
         if (mMovieAdapter == null) {
             return;
         }
+        if(mMovieDao == null) {
+            MovieRoomDB db = MovieRoomDB.getDatabase(getActivity().getApplication());
+            this.mMovieDao = db.movieDao();
+        }
         MyMovie film = mCurrentFilmList.get(pos);
         film.setWatchType(watchType);
+        new checkExistenceAsyncTask1(mMovieDao).execute(film);
         mMovieAdapter.notifyItemChanged(pos);
     }
 
@@ -200,5 +211,104 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("id", mPersonId);
+    }
+
+
+    private class checkExistenceAsyncTask1 extends android.os.AsyncTask<MyMovie, Void, List<MyMovie>> {
+
+        private final MovieDao mAsyncTaskDao;
+        private MyMovie myMovie;
+
+        checkExistenceAsyncTask1(MovieDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected List<MyMovie> doInBackground(final MyMovie... params) {
+            myMovie = params[0];
+            return mAsyncTaskDao.checkIfExists(String.valueOf(myMovie.getMovie_id()));
+        }
+
+        @Override
+        protected void onPostExecute(List<MyMovie> list) {
+            if(list == null || list.isEmpty()) {
+                new insertAsyncTask(mMovieDao).execute(myMovie);
+            } else {
+                new deleteAsyncTask(mMovieDao).execute(myMovie.getMovie_id());
+            }
+        }
+    }
+
+
+    private class checkExistenceAsyncTask2 extends android.os.AsyncTask<List<MyMovie>, Void, List<MyMovie>> {
+
+        private final MovieDao mAsyncTaskDao;
+
+        checkExistenceAsyncTask2(MovieDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected List<MyMovie> doInBackground(List<MyMovie>... lists) {
+            List<String> ids = new ArrayList<>();
+            for(MyMovie movie : lists[0]){
+                ids.add(String.valueOf(movie.getMovie_id()));
+            }
+            return mAsyncTaskDao.checkIfListExists(ids);
+        }
+
+        @Override
+        protected void onPostExecute(List<MyMovie> list) {
+            updateWatched(list);
+        }
+    }
+
+    private void updateWatched(List<MyMovie> watchedFilms) {
+        for(MyMovie myMovie : watchedFilms) {
+            MyMovie listMovie = findFilmInList(myMovie.getMovie_id());
+            if(listMovie!= null) {
+                listMovie.setWatchType(2);}
+        }
+        mMovieAdapter.notifyDataSetChanged();
+    }
+
+    private MyMovie findFilmInList(int id) {
+        for (MyMovie movie : mCurrentFilmList) {
+            if(id == movie.getMovie_id()) {
+                return movie;
+            }
+        }
+        return null;
+    }
+
+    private static class insertAsyncTask extends android.os.AsyncTask<MyMovie, Void, Void> {
+
+        private final MovieDao mAsyncTaskDao;
+
+        insertAsyncTask(MovieDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final MyMovie... params) {
+            mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
+    }
+
+
+    private static class deleteAsyncTask extends android.os.AsyncTask<Integer, Void, Void> {
+
+        private final MovieDao mAsyncTaskDao;
+
+        deleteAsyncTask(MovieDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... ints) {
+            mAsyncTaskDao.removeMovie(String.valueOf(ints[0]));
+            return null;
+        }
     }
 }
