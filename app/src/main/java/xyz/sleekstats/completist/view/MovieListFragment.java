@@ -17,6 +17,8 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,6 +135,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     //Populate recyclerview with films from actor/director
     private void setRecyclerView(List<FilmByPerson> filmByPersonList) {
         mCurrentFilmList = new ArrayList<>();
+
         for (FilmByPerson film: filmByPersonList) {
             mCurrentFilmList.add(new MyMovie(Integer.parseInt(film.getId()), film.getTitle(), 0, 0, film.getPoster_path()));
         }
@@ -264,11 +267,27 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     }
 
     private void updateWatched(List<MyMovie> watchedFilms) {
+        NumberFormat f = new DecimalFormat("00");
+        int numberOfMovies = mCurrentFilmList.size();
+        int numberSeen = 0;
+
         for(MyMovie myMovie : watchedFilms) {
             MyMovie listMovie = findFilmInList(myMovie.getMovie_id());
             if(listMovie!= null) {
-                listMovie.setWatchType(2);}
+                listMovie.setWatchType(2);
+                numberSeen++;
+            }
         }
+        int watchedPct = (numberSeen*100)/numberOfMovies;
+        TextView watchedTracker = getView().findViewById(R.id.watched_tracker);
+        String watchedNumbers = numberSeen + "/" + numberOfMovies + "  (" + f.format(watchedPct) + "%)";
+        String watchedText = "Watched: " + watchedNumbers;
+        watchedTracker.setText(watchedText);
+
+        String title = mCollapsingToolbarLayout.getTitle().toString();
+        title += "   " + watchedNumbers;
+        mCollapsingToolbarLayout.setTitle(title);
+
         mMovieAdapter.notifyDataSetChanged();
     }
 
