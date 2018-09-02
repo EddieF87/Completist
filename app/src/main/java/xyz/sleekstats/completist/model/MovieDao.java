@@ -7,6 +7,9 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+import io.reactivex.Single;
+
 @Dao
 public interface MovieDao {
 
@@ -23,11 +26,11 @@ public interface MovieDao {
     void removeList(String id);
 
     @Query("SELECT * from movie_table")
-    List<MyMovie> getSavedImages();
+    Flowable<List<MyMovie>> getSavedMovies();
 
     @Query("SELECT * FROM movie_table WHERE movie_id LIKE :id")
-    List<MyMovie> checkIfExists(String id);
+    Single<MyMovie> checkIfMovieExists(String id);
 
     @Query("SELECT * FROM movie_table WHERE movie_id IN (:ids)")
-    List<MyMovie> checkIfListExists(List<String> ids);
+    Flowable<List<MyMovie>> checkIfListExists(List<String> ids);
 }
