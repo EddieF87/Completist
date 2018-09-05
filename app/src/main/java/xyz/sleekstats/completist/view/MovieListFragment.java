@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.FilmByPerson;
@@ -41,6 +41,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private static final String ARG_ID = "id";
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
     private String mPersonId;
+    private String mPerson;
 
     private TextView mNameView;
     private TextView mBioView;
@@ -54,7 +55,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private MovieViewModel movieViewModel;
     private OnFragmentInteractionListener mListener;
 
-    private final CompositeDisposable mDisposable = new CompositeDisposable();
+    private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private Disposable mDisposable;
 
     public MovieListFragment() {
     }
@@ -100,6 +102,10 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     //Retrieve person/film data from ViewModel
     public void getFilmsForPerson(String person_id) {
+        if(mDisposable != null) {
+            mDisposable.dispose();
+        }
+
         mPersonId = person_id;
         if (movieViewModel == null) {
             movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
@@ -115,8 +121,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             }
         });
 
-        mDisposable.add(personObservable.subscribe(this::setViews));
-        mDisposable.add(filmRVObservable.subscribe(this::setRecyclerView));
+        mCompositeDisposable.add(personObservable.subscribe(this::setViews));
+        mCompositeDisposable.add(filmRVObservable.subscribe(this::setRecyclerView));
     }
 
     //Set display with info for selected actor/director
@@ -125,14 +131,13 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         String bio = personPOJO.getBiography();
         String known_for_department = personPOJO.getKnown_for_department();
         String posterUrl = POSTER_BASE_URL + personPOJO.getProfile_path();
-        String title = name + " (" + known_for_department + ")";
+        mPerson = name + " (" + known_for_department + ")";
 
         Picasso.get().load(posterUrl)
                 .placeholder(R.drawable.ic_sharp_account_box_92px)
                 .error(R.drawable.ic_sharp_account_box_92px)
                 .into(mPosterView);
 
-        mCollapsingToolbarLayout.setTitle(title);
         mNameView.setText(name);
         mBioView.setText(bio);
     }
@@ -168,27 +173,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         for (MyMovie movie : mCurrentFilmList) {
             ids.add(String.valueOf(movie.getMovie_id()));
         }
-
-        mDisposable.add(mMovieDao.checkIfListExists(ids).observeOn(AndroidSchedulers.mainThread()).subscribe(this::updateWatched));
-
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-        mDisposable.clear();
+        mDisposable = mMovieDao.checkIfListExists(ids).observeOn(AndroidSchedulers.mainThread()).subscribe(this::updateFilmsWatched);
+        mCompositeDisposable.add(mDisposable);
     }
 
     @Override
@@ -210,10 +196,11 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         MyMovie film = mCurrentFilmList.get(pos);
         film.setWatchType(watchType);
 
-        mDisposable.add(mMovieDao.checkIfMovieExists(String.valueOf(film.getMovie_id()))
+        mCompositeDisposable.add(mMovieDao.checkIfMovieExists(String.valueOf(film.getMovie_id()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .subscribe(success -> mMovieDao.removeMovie(String.valueOf(film.getMovie_id())),
+                .subscribe(
+                        success -> mMovieDao.removeMovie(String.valueOf(film.getMovie_id())),
                         error -> mMovieDao.insert(film)
                 )
         );
@@ -230,19 +217,27 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         outState.putString("id", mPersonId);
     }
 
-    private void updateWatched(List<MyMovie> watchedFilms) {
+    private void updateFilmsWatched(List<MyMovie> watchedFilms) {
 
-        NumberFormat f = new DecimalFormat("00");
-        int numberOfMovies = mCurrentFilmList.size();
-        int numberSeen = 0;
+        int mTotalMovies = mCurrentFilmList.size();
+        int mSeenMovies = 0;
 
         for (MyMovie myMovie : watchedFilms) {
             MyMovie listMovie = findFilmInList(myMovie.getMovie_id());
             if (listMovie != null) {
                 listMovie.setWatchType(2);
-                numberSeen++;
+                mSeenMovies++;
             }
         }
+
+        mMovieAdapter.notifyDataSetChanged();
+
+        updateWatchedStatus(mSeenMovies, mTotalMovies);
+    }
+
+    private void updateWatchedStatus(int numberSeen, int numberOfMovies) {
+
+        NumberFormat f = new DecimalFormat("00");
 
         int watchedPct = (numberSeen * 100) / numberOfMovies;
         TextView watchedTracker = getView().findViewById(R.id.watched_tracker);
@@ -250,11 +245,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         String watchedText = "Watched: " + watchedNumbers;
         watchedTracker.setText(watchedText);
 
-        String title = mCollapsingToolbarLayout.getTitle().toString();
-        title += "   " + watchedNumbers;
+        String title = mPerson + "   " + watchedNumbers;
         mCollapsingToolbarLayout.setTitle(title);
-
-        mMovieAdapter.notifyDataSetChanged();
     }
 
     private MyMovie findFilmInList(int id) {
@@ -264,5 +256,24 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             }
         }
         return null;
+    }
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+        mCompositeDisposable.clear();
     }
 }
