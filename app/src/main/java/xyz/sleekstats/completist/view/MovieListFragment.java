@@ -138,6 +138,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 .error(R.drawable.ic_sharp_account_box_92px)
                 .into(mPosterView);
 
+        mCollapsingToolbarLayout.setTitle(name);
         mNameView.setText(name);
         mBioView.setText(bio);
     }

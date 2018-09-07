@@ -17,7 +17,6 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.ViewGroup;
 
@@ -26,17 +25,15 @@ import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import xyz.sleekstats.completist.R;
-import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.MediaPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 public class MainActivity extends AppCompatActivity
         implements MovieListFragment.OnFragmentInteractionListener,
-        MovieFragment.OnFragmentInteractionListener {
+        MovieDetailsFragment.OnFragmentInteractionListener {
 
     private boolean isListView = true;
     private String movieID = "287";
@@ -47,7 +44,7 @@ public class MainActivity extends AppCompatActivity
 
     private ViewPager myViewPager;
     private MyPagerAdapter myPagerAdapter;
-    private MovieFragment movieFragment;
+    private MovieDetailsFragment movieDetailsFragment;
     private MovieListFragment movieListFragment;
     private MovieViewModel movieViewModel;
     private SimpleCursorAdapter mSearchAdapter;
@@ -89,8 +86,8 @@ public class MainActivity extends AppCompatActivity
         isListView = false;
         this.movieID = movieID;
         myViewPager.setCurrentItem(1);
-        movieFragment = (MovieFragment) myPagerAdapter.getItem(1);
-        movieFragment.getFilm(movieID);
+        movieDetailsFragment = (MovieDetailsFragment) myPagerAdapter.getItem(1);
+        movieDetailsFragment.getFilm(movieID);
     }
 
     @Override
@@ -106,8 +103,8 @@ public class MainActivity extends AppCompatActivity
         isListView = false;
         this.movieID = showID;
         myViewPager.setCurrentItem(1);
-        movieFragment = (MovieFragment) myPagerAdapter.getItem(1);
-        movieFragment.getShow(showID);
+        movieDetailsFragment = (MovieDetailsFragment) myPagerAdapter.getItem(1);
+        movieDetailsFragment.getShow(showID);
     }
 
     @Override
@@ -130,10 +127,10 @@ public class MainActivity extends AppCompatActivity
                     }
                     return movieListFragment;
                 case 1:
-                    if (movieFragment == null) {
-                        movieFragment = MovieFragment.newInstance(movieID);
+                    if (movieDetailsFragment == null) {
+                        movieDetailsFragment = MovieDetailsFragment.newInstance(movieID);
                     }
-                    return movieFragment;
+                    return movieDetailsFragment;
                 default:
                     return null;
             }
@@ -167,7 +164,7 @@ public class MainActivity extends AppCompatActivity
                     movieListFragment = (MovieListFragment) createdFragment;
                     break;
                 case 1:
-                    movieFragment = (MovieFragment) createdFragment;
+                    movieDetailsFragment = (MovieDetailsFragment) createdFragment;
                     break;
             }
             return createdFragment;

@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +28,7 @@ import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 //Shows details for selected film, including director/cast, rating, and summary
-public class MovieFragment extends Fragment implements CastAdapter.ItemClickListener {
+public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemClickListener {
 
     private static final String ARG_ID = "id";
     private static final String KEY_ISTV = "istv";
@@ -49,11 +48,11 @@ public class MovieFragment extends Fragment implements CastAdapter.ItemClickList
 
     private OnFragmentInteractionListener mListener;
 
-    public MovieFragment() {
+    public MovieDetailsFragment() {
     }
 
-    public static MovieFragment newInstance(String id) {
-        MovieFragment fragment = new MovieFragment();
+    public static MovieDetailsFragment newInstance(String id) {
+        MovieDetailsFragment fragment = new MovieDetailsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ID, id);
         fragment.setArguments(args);
