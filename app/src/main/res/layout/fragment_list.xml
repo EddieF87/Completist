@@ -10,10 +10,8 @@
         android:id="@+id/film_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/film_item">
-
     </android.support.v7.widget.RecyclerView>
 
     <android.support.design.widget.AppBarLayout
@@ -37,7 +35,7 @@
                 android:id="@+id/collapsing_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="16dp"
+                android:paddingBottom="8dp"
                 android:paddingEnd="8dp"
                 android:paddingStart="8dp"
                 android:paddingTop="8dp"
@@ -103,8 +101,7 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/AppBar"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:paddingBottom="8dp"
+                android:layout_height="36dp"
                 app:layout_collapseMode="pin" />
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>

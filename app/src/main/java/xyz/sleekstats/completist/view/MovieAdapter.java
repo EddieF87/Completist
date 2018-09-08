@@ -24,7 +24,7 @@ import xyz.sleekstats.completist.model.MyMovie;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHolder> {
 
     private List<MyMovie> mCurrentMovieList;
-    private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
+    private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w92/";
     private ItemClickListener mClickListener;
     private Context mContext;
 

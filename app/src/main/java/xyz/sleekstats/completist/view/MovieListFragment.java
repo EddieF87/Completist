@@ -29,6 +29,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.FilmByPerson;
+import xyz.sleekstats.completist.model.FilmListDetails;
 import xyz.sleekstats.completist.model.MovieDao;
 import xyz.sleekstats.completist.model.MovieRoomDB;
 import xyz.sleekstats.completist.model.MyMovie;
@@ -42,6 +43,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
     private String mPersonId;
     private String mPerson;
+    private int mGrids;
 
     private TextView mNameView;
     private TextView mBioView;
@@ -80,13 +82,15 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mGrids = getResources().getInteger(R.integer.grid_number);
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
         mNameView = rootView.findViewById(R.id.person_name);
         mBioView = rootView.findViewById(R.id.person_summary);
         mPosterView = rootView.findViewById(R.id.person_poster);
         mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
         mCollapsingToolbarLayout = rootView.findViewById(R.id.collapsing_toolbar);
-        mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+
+        mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mGrids));
         setRetainInstance(true);
         return rootView;
     }
@@ -102,7 +106,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     //Retrieve person/film data from ViewModel
     public void getFilmsForPerson(String person_id) {
-        if(mDisposable != null) {
+        if (mDisposable != null) {
             mDisposable.dispose();
         }
 
@@ -121,12 +125,16 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             }
         });
 
-        mCompositeDisposable.add(personObservable.subscribe(this::setViews));
-        mCompositeDisposable.add(filmRVObservable.subscribe(this::setRecyclerView));
+        Observable<FilmListDetails> filmListDetailsObservable = Observable.zip(personObservable, filmRVObservable,
+                FilmListDetails::new);
+        mCompositeDisposable.add(filmListDetailsObservable.subscribe(this::setViews));
     }
 
     //Set display with info for selected actor/director
-    private void setViews(PersonPOJO personPOJO) {
+    private void setViews(FilmListDetails filmListDetails) {
+        PersonPOJO personPOJO = filmListDetails.getPersonPOJO();
+        List<FilmByPerson> filmByPersonList = filmListDetails.getFilmByPersonList();
+
         String name = personPOJO.getName();
         String bio = personPOJO.getBiography();
         String known_for_department = personPOJO.getKnown_for_department();
@@ -138,9 +146,11 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 .error(R.drawable.ic_sharp_account_box_92px)
                 .into(mPosterView);
 
-        mCollapsingToolbarLayout.setTitle(name);
+//        mCollapsingToolbarLayout.setTitle(name);
         mNameView.setText(name);
         mBioView.setText(bio);
+
+        setRecyclerView(filmByPersonList);
     }
 
     //Populate recyclerview with films from actor/director
@@ -156,7 +166,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 return;
             }
             mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
-            mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+            mGrids = getResources().getInteger(R.integer.grid_number);
+            mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mGrids));
         }
         if (mMovieAdapter == null) {
             mMovieAdapter = new MovieAdapter(mCurrentFilmList, getActivity());
