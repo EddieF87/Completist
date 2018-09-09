@@ -1,12 +1,15 @@
 package xyz.sleekstats.completist.service;
 
+import java.util.List;
+
 import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.PersonPOJO;
-import xyz.sleekstats.completist.model.QueryPOJO;
+import xyz.sleekstats.completist.model.MediaQueryPOJO;
+import xyz.sleekstats.completist.model.PersonQueryPOJO;
 
 public interface TmdbAPI {
 
@@ -32,7 +35,10 @@ public interface TmdbAPI {
 
     @GET("https://api.themoviedb.org/3/search/multi?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2" +
             "&language=en-US&page=1&include_adult=false")
-    Observable<QueryPOJO> queryFilms(
+    Observable<MediaQueryPOJO> queryFilms(
             @Query("query") String movie_query
     );
+
+    @GET("https://api.themoviedb.org/3/person/popular?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&language=en-US&page=1")
+    Observable<PersonQueryPOJO> retrievePopularActors();
 }

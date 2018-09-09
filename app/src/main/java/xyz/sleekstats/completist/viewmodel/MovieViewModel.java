@@ -3,7 +3,6 @@ package xyz.sleekstats.completist.viewmodel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,8 @@ import io.reactivex.Observable;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.PersonPOJO;
-import xyz.sleekstats.completist.model.QueryPOJO;
+import xyz.sleekstats.completist.model.MediaQueryPOJO;
+import xyz.sleekstats.completist.model.PersonQueryPOJO;
 import xyz.sleekstats.completist.service.Repo;
 
 public class MovieViewModel extends AndroidViewModel {
@@ -36,8 +36,12 @@ public class MovieViewModel extends AndroidViewModel {
         return mRepo.getShow(showId);
     }
 
-    public Observable<QueryPOJO> queryMedia(String mediaQuery) {
+    public Observable<MediaQueryPOJO> queryMedia(String mediaQuery) {
         return mRepo.queryFilms(mediaQuery);
+    }
+
+    public Observable<PersonQueryPOJO> queryPopular() {
+        return mRepo.getPopularActors();
     }
 
     public List<FilmByPerson> filterCrew(List<FilmByPerson> unfiltered) {

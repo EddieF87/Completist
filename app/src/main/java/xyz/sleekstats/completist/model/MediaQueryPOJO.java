@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class QueryPOJO {
+public class MediaQueryPOJO {
 
     @SerializedName("results")
     private List<MediaPOJO> results;

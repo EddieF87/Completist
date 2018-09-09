@@ -9,6 +9,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ import xyz.sleekstats.completist.model.MovieDao;
 import xyz.sleekstats.completist.model.MovieRoomDB;
 import xyz.sleekstats.completist.model.MyMovie;
 import xyz.sleekstats.completist.model.PersonPOJO;
+import xyz.sleekstats.completist.model.PersonQueryPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 //Shows details of, and list of films by, a specific actor/director
@@ -57,7 +59,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private MovieViewModel movieViewModel;
     private OnFragmentInteractionListener mListener;
 
-    private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable listCompositeDisposable = new CompositeDisposable();
     private Disposable mDisposable;
 
     public MovieListFragment() {
@@ -127,7 +129,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
         Observable<FilmListDetails> filmListDetailsObservable = Observable.zip(personObservable, filmRVObservable,
                 FilmListDetails::new);
-        mCompositeDisposable.add(filmListDetailsObservable.subscribe(this::setViews));
+        listCompositeDisposable.add(filmListDetailsObservable.subscribe(this::setViews));
     }
 
     //Set display with info for selected actor/director
@@ -186,7 +188,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             ids.add(String.valueOf(movie.getMovie_id()));
         }
         mDisposable = mMovieDao.checkIfListExists(ids).observeOn(AndroidSchedulers.mainThread()).subscribe(this::updateFilmsWatched);
-        mCompositeDisposable.add(mDisposable);
+        listCompositeDisposable.add(mDisposable);
     }
 
     @Override
@@ -208,7 +210,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         MyMovie film = mCurrentFilmList.get(pos);
         film.setWatchType(watchType);
 
-        mCompositeDisposable.add(mMovieDao.checkIfMovieExists(String.valueOf(film.getMovie_id()))
+        listCompositeDisposable.add(mMovieDao.checkIfMovieExists(String.valueOf(film.getMovie_id()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(
@@ -286,6 +288,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        mCompositeDisposable.clear();
+        listCompositeDisposable.clear();
     }
 }

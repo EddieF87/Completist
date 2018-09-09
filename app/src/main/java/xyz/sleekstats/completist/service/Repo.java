@@ -1,7 +1,8 @@
 package xyz.sleekstats.completist.service;
 
 import android.app.Application;
-import android.util.Log;
+
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -11,8 +12,8 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.PersonPOJO;
-import xyz.sleekstats.completist.model.QueryPOJO;
-import xyz.sleekstats.completist.service.TmdbAPI;
+import xyz.sleekstats.completist.model.MediaQueryPOJO;
+import xyz.sleekstats.completist.model.PersonQueryPOJO;
 
 public class Repo {
 
@@ -38,7 +39,7 @@ public class Repo {
     }
 
     //Get list of films matching search query
-    public Observable<QueryPOJO> queryFilms(String movieQuery) {
+    public Observable<MediaQueryPOJO> queryFilms(String movieQuery) {
         return tmdbAPI.queryFilms(movieQuery)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -64,4 +65,13 @@ public class Repo {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
+
+
+    //Get list of most popular film-people
+    public Observable<PersonQueryPOJO> getPopularActors() {
+        return tmdbAPI.retrievePopularActors()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
 }

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.MediaPOJO;
@@ -46,8 +47,10 @@ public class MainActivity extends AppCompatActivity
     private MyPagerAdapter myPagerAdapter;
     private MovieDetailsFragment movieDetailsFragment;
     private MovieListFragment movieListFragment;
+    private MyListsFragment myListsFragment;
     private MovieViewModel movieViewModel;
     private SimpleCursorAdapter mSearchAdapter;
+    private final CompositeDisposable mainCompositeDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,11 +125,16 @@ public class MainActivity extends AppCompatActivity
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
+                    if (myListsFragment == null) {
+                        myListsFragment = MyListsFragment.newInstance();
+                    }
+                    return myListsFragment;
+                case 1:
                     if (movieListFragment == null) {
                         movieListFragment = MovieListFragment.newInstance(personID);
                     }
                     return movieListFragment;
-                case 1:
+                case 2:
                     if (movieDetailsFragment == null) {
                         movieDetailsFragment = MovieDetailsFragment.newInstance(movieID);
                     }
@@ -138,7 +146,7 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Nullable
@@ -146,8 +154,10 @@ public class MainActivity extends AppCompatActivity
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "List";
+                    return "Lists";
                 case 1:
+                    return "List";
+                case 2:
                     return "Movie";
                 default:
                     return null;
@@ -161,9 +171,12 @@ public class MainActivity extends AppCompatActivity
 
             switch (position) {
                 case 0:
-                    movieListFragment = (MovieListFragment) createdFragment;
+                    myListsFragment = (MyListsFragment) createdFragment;
                     break;
                 case 1:
+                    movieListFragment = (MovieListFragment) createdFragment;
+                    break;
+                case 2:
                     movieDetailsFragment = (MovieDetailsFragment) createdFragment;
                     break;
             }
@@ -178,7 +191,7 @@ public class MainActivity extends AppCompatActivity
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setIconifiedByDefault(true);
 
-        RxSearchView.queryTextChanges(searchView)
+        mainCompositeDisposable.add(RxSearchView.queryTextChanges(searchView)
                 .skip(1)
                 .debounce(600, TimeUnit.MILLISECONDS)
                 .filter(charSequence -> !TextUtils.isEmpty(charSequence))
@@ -187,7 +200,8 @@ public class MainActivity extends AppCompatActivity
                 .observeOn(Schedulers.io())
                 .switchMap(query -> movieViewModel.queryMedia(query))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(s -> populateAdapter(s.getResults()));
+                .subscribe(s -> populateAdapter(s.getResults()))
+        );
 
         final String[] from = new String[]{SEARCH_TITLE, SEARCH_ID};
         final int[] to = new int[]{R.id.search_title};
@@ -263,5 +277,11 @@ public class MainActivity extends AppCompatActivity
             cursor.addRow(row);
         }
         mSearchAdapter.changeCursor(cursor);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mainCompositeDisposable.clear();
     }
 }
