@@ -34,7 +34,8 @@ import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 public class MainActivity extends AppCompatActivity
         implements MovieListFragment.OnFragmentInteractionListener,
-        MovieDetailsFragment.OnFragmentInteractionListener {
+        MovieDetailsFragment.OnFragmentInteractionListener,
+        MyListsFragment.OnFragmentInteractionListener {
 
     private boolean isListView = true;
     private String movieID = "287";
@@ -74,13 +75,13 @@ public class MainActivity extends AppCompatActivity
             FragmentManager fragmentManager = getSupportFragmentManager();
             myPagerAdapter = new MyPagerAdapter(fragmentManager);
         }
-        myViewPager.setOffscreenPageLimit(2);
+        myViewPager.setOffscreenPageLimit(3);
         myViewPager.setAdapter(myPagerAdapter);
 
         TabLayout tabLayout = findViewById(R.id.my_tab_layout);
         tabLayout.setupWithViewPager(myViewPager);
         if (!isListView) {
-            myViewPager.setCurrentItem(1);
+            myViewPager.setCurrentItem(2);
         }
     }
 
@@ -88,8 +89,8 @@ public class MainActivity extends AppCompatActivity
     public void onFilmSelected(String movieID) {
         isListView = false;
         this.movieID = movieID;
-        myViewPager.setCurrentItem(1);
-        movieDetailsFragment = (MovieDetailsFragment) myPagerAdapter.getItem(1);
+        myViewPager.setCurrentItem(2);
+        movieDetailsFragment = (MovieDetailsFragment) myPagerAdapter.getItem(2);
         movieDetailsFragment.getFilm(movieID);
     }
 
@@ -97,16 +98,16 @@ public class MainActivity extends AppCompatActivity
     public void onCastSelected(String castID) {
         isListView = true;
         this.personID = castID;
-        myViewPager.setCurrentItem(0);
-        movieListFragment = (MovieListFragment) myPagerAdapter.getItem(0);
+        myViewPager.setCurrentItem(1);
+        movieListFragment = (MovieListFragment) myPagerAdapter.getItem(1);
         movieListFragment.getFilmsForPerson(castID);
     }
 
     public void onShowSelected(String showID) {
         isListView = false;
         this.movieID = showID;
-        myViewPager.setCurrentItem(1);
-        movieDetailsFragment = (MovieDetailsFragment) myPagerAdapter.getItem(1);
+        myViewPager.setCurrentItem(2);
+        movieDetailsFragment = (MovieDetailsFragment) myPagerAdapter.getItem(2);
         movieDetailsFragment.getShow(showID);
     }
 

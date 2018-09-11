@@ -73,7 +73,7 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
         @Override
         public void onClick(View view) {
             String id = mView.getTag().toString();
-            if (mClickListener != null) mClickListener.onCastClick(id);
+            if (mClickListener != null) mClickListener.onListClick(id);
         }
     }
 
@@ -83,6 +83,6 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
 
     //When director/actor is clicked, go to their list of films
     public interface ItemClickListener{
-        void onCastClick(String movieID);
+        void onListClick(String movieID);
     }
 }
