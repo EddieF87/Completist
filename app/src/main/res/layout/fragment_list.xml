@@ -96,14 +96,37 @@
                     app:layout_constraintHorizontal_bias="0.75"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/person_summary" />
+
+                <ImageButton
+                    android:id="@+id/imageButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/watched_tracker"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/watched_tracker"
+                    app:layout_constraintTop_toTopOf="@+id/watched_tracker"
+                    android:background="?android:selectableItemBackground"
+                    app:srcCompat="@drawable/ic_done_green_24dp" />
+
             </android.support.constraint.ConstraintLayout>
 
             <android.support.v7.widget.Toolbar
-                android:id="@+id/AppBar"
+                android:id="@+id/ListToolBar"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 app:layout_collapseMode="pin" />
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/listSaveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_done_green_24dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        />
 
 </android.support.design.widget.CoordinatorLayout>

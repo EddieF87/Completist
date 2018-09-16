@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -33,9 +35,9 @@ import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmListDetails;
 import xyz.sleekstats.completist.model.MovieDao;
 import xyz.sleekstats.completist.model.MovieRoomDB;
+import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.MyMovie;
 import xyz.sleekstats.completist.model.PersonPOJO;
-import xyz.sleekstats.completist.model.PersonQueryPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 //Shows details of, and list of films by, a specific actor/director
@@ -44,7 +46,9 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private static final String ARG_ID = "id";
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
     private String mPersonId;
-    private String mPerson;
+    private String mPersonName;
+    private String mPersonPoster;
+    private int mWatchedPct;
     private int mGrids;
 
     private TextView mNameView;
@@ -91,6 +95,20 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mPosterView = rootView.findViewById(R.id.person_poster);
         mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
         mCollapsingToolbarLayout = rootView.findViewById(R.id.collapsing_toolbar);
+        FloatingActionButton mListSaveButton = rootView.findViewById(R.id.listSaveButton);
+
+        mListSaveButton.setOnClickListener(view ->
+                listCompositeDisposable.add(mMovieDao.checkIfListExists(mPersonId)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(
+                                success -> mMovieDao.removeList(mPersonId),
+                                error -> mMovieDao.insertList(new MyList(
+                                        Integer.parseInt(mPersonId), mPersonName, mWatchedPct, mPersonPoster)
+                                )
+                        )
+                )
+        );
 
         mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mGrids));
         setRetainInstance(true);
@@ -129,7 +147,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
         Observable<FilmListDetails> filmListDetailsObservable = Observable.zip(personObservable, filmRVObservable,
                 FilmListDetails::new);
-        listCompositeDisposable.add(filmListDetailsObservable.subscribe(this::setViews));
+        listCompositeDisposable.add(filmListDetailsObservable.subscribe(this::setViews,
+                e -> Log.e("rxprob", "filmListDetailsObservable setViews" + e.getMessage())));
     }
 
     //Set display with info for selected actor/director
@@ -140,15 +159,16 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         String name = personPOJO.getName();
         String bio = personPOJO.getBiography();
         String known_for_department = personPOJO.getKnown_for_department();
-        String posterUrl = POSTER_BASE_URL + personPOJO.getProfile_path();
-        mPerson = name + " (" + known_for_department + ")";
+
+        mPersonPoster = personPOJO.getProfile_path();
+        String posterUrl = POSTER_BASE_URL + mPersonPoster;
+        mPersonName = name + " (" + known_for_department + ")";
 
         Picasso.get().load(posterUrl)
                 .placeholder(R.drawable.ic_sharp_account_box_92px)
                 .error(R.drawable.ic_sharp_account_box_92px)
                 .into(mPosterView);
 
-//        mCollapsingToolbarLayout.setTitle(name);
         mNameView.setText(name);
         mBioView.setText(bio);
 
@@ -187,7 +207,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         for (MyMovie movie : mCurrentFilmList) {
             ids.add(String.valueOf(movie.getMovie_id()));
         }
-        mDisposable = mMovieDao.checkIfListExists(ids).observeOn(AndroidSchedulers.mainThread()).subscribe(this::updateFilmsWatched);
+        mDisposable = mMovieDao.getMoviesWatched(ids).observeOn(AndroidSchedulers.mainThread()).subscribe(this::updateFilmsWatched,
+                e -> Log.e("rxprob", "getMoviesWatched updateFilmsWatched" + e.getMessage()));
         listCompositeDisposable.add(mDisposable);
     }
 
@@ -215,7 +236,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 .observeOn(Schedulers.io())
                 .subscribe(
                         success -> mMovieDao.removeMovie(String.valueOf(film.getMovie_id())),
-                        error -> mMovieDao.insert(film)
+                        error -> mMovieDao.insertMovie(film)
                 )
         );
         mMovieAdapter.notifyItemChanged(pos);
@@ -253,13 +274,13 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
         NumberFormat f = new DecimalFormat("00");
 
-        int watchedPct = (numberSeen * 100) / numberOfMovies;
+        mWatchedPct = (numberSeen * 100) / numberOfMovies;
         TextView watchedTracker = getView().findViewById(R.id.watched_tracker);
-        String watchedNumbers = numberSeen + "/" + numberOfMovies + "  (" + f.format(watchedPct) + "%)";
+        String watchedNumbers = numberSeen + "/" + numberOfMovies + "  (" + f.format(mWatchedPct) + "%)";
         String watchedText = "Watched: " + watchedNumbers;
         watchedTracker.setText(watchedText);
 
-        String title = mPerson + "   " + watchedNumbers;
+        String title = mPersonName + "   " + watchedNumbers;
         mCollapsingToolbarLayout.setTitle(title);
     }
 

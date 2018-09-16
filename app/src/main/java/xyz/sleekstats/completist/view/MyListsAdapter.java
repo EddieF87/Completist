@@ -14,16 +14,16 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import xyz.sleekstats.completist.R;
-import xyz.sleekstats.completist.model.PersonPOJO;
+import xyz.sleekstats.completist.model.MyList;
 
 public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListViewHolder>{
 
-    private List<PersonPOJO> personList;
+    private List<MyList> mLists;
     private ItemClickListener mClickListener;
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
 
-    public MyListsAdapter(List<PersonPOJO> castInfoList) {
-        this.personList = castInfoList;
+    public MyListsAdapter(List<MyList> lists) {
+        this.mLists = lists;
     }
 
     @NonNull
@@ -37,10 +37,10 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
     //Load name and poster details for director/cast
     @Override
     public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
-        PersonPOJO person = personList.get(position);
-        String posterURL = POSTER_BASE_URL + person.getProfile_path();
-        String name = person.getName();
-        String id = person.getId();
+        MyList myList = mLists.get(position);
+        String posterURL = POSTER_BASE_URL + myList.getList_img();
+        String name = myList.getList_name();
+        String id = String.valueOf(myList.getList_id());
 
         Picasso.get().load(posterURL)
                 .placeholder(R.drawable.ic_person_92px)
@@ -53,7 +53,7 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
 
     @Override
     public int getItemCount() {
-        return personList.size();
+        return mLists.size();
     }
 
     class ListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

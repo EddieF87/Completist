@@ -13,24 +13,36 @@ import io.reactivex.Single;
 @Dao
 public interface MovieDao {
 
+    //Movies Table
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(MyMovie myMovie);
-
-//    @Query("DELETE FROM movie_table")
-//    void deleteAll();
-
-    @Query("DELETE FROM movie_table WHERE movie_id LIKE :id")
-    void removeMovie(String id);
-
-    @Query("DELETE FROM list_table WHERE list_id LIKE :id")
-    void removeList(String id);
+    void insertMovie(MyMovie myMovie);
 
     @Query("SELECT * from movie_table")
     Flowable<List<MyMovie>> getSavedMovies();
+
+    @Query("DELETE FROM movie_table WHERE movie_id LIKE :id")
+    void removeMovie(String id);
 
     @Query("SELECT * FROM movie_table WHERE movie_id LIKE :id")
     Single<MyMovie> checkIfMovieExists(String id);
 
     @Query("SELECT * FROM movie_table WHERE movie_id IN (:ids)")
-    Flowable<List<MyMovie>> checkIfListExists(List<String> ids);
+    Flowable<List<MyMovie>> getMoviesWatched(List<String> ids);
+
+
+
+    //Lists Table
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertList(MyList myList);
+
+    @Query("SELECT * from list_table")
+    Flowable<List<MyList>> getSavedLists();
+
+    @Query("DELETE FROM list_table WHERE list_id LIKE :id")
+    void removeList(String id);
+
+    @Query("SELECT * FROM list_table WHERE list_id LIKE :id")
+    Single<MyList> checkIfListExists(String id);
 }

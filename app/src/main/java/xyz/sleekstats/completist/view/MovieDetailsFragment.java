@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -117,8 +118,8 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
         mFilmDisposable = filmPOJOObservable.subscribe(s -> {
                     setMovieInfoDisplay(s);
                     setCastRecyclerView(s.getCastCredits());
-                }
-        );
+                },
+                e -> Log.e("rxprob", "filmPOJOObservable getMovieInfo" + e.getMessage()));
     }
 
     //Retrieve tv show data from ViewModel
@@ -134,8 +135,8 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
                     s.setTitle(name);
                     setMovieInfoDisplay(s);
                     setCastRecyclerView(s.getCastCredits());
-                }
-        );
+                },
+                e -> Log.e("rxprob", "filmPOJOObservable getShowInfo" + e.getMessage()));
     }
 
     //Set display of movie details
