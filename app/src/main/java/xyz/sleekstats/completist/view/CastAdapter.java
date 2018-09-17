@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -30,9 +32,9 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder
     @NonNull
     @Override
     public CastViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ConstraintLayout constraintLayout = (ConstraintLayout) LayoutInflater.from(parent.getContext())
+        RelativeLayout linearLayout = (RelativeLayout ) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.cast_item, parent, false);
-        return new CastViewHolder(constraintLayout);
+        return new CastViewHolder(linearLayout);
     }
 
     //Load name and poster details for director/cast

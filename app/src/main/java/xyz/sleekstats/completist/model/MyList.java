@@ -9,10 +9,10 @@ public class MyList {
     @PrimaryKey
     private int list_id;
     private String list_name;
-    private double list_pct;
+    private int list_pct;
     private String list_img;
 
-    public MyList(int list_id, String list_name, double list_pct, String list_img) {
+    public MyList(int list_id, String list_name, int list_pct, String list_img) {
         this.list_id = list_id;
         this.list_name = list_name;
         this.list_pct = list_pct;
@@ -35,11 +35,11 @@ public class MyList {
         this.list_name = list_name;
     }
 
-    public double getList_pct() {
+    public int getList_pct() {
         return list_pct;
     }
 
-    public void setList_pct(double list_pct) {
+    public void setList_pct(int list_pct) {
         this.list_pct = list_pct;
     }
 

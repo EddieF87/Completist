@@ -7,10 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 
 import xyz.sleekstats.completist.R;
@@ -21,6 +25,7 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
     private List<MyList> mLists;
     private ItemClickListener mClickListener;
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
+    private static final NumberFormat f = new DecimalFormat("00");
 
     public MyListsAdapter(List<MyList> lists) {
         this.mLists = lists;
@@ -29,9 +34,9 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
     @NonNull
     @Override
     public ListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ConstraintLayout constraintLayout = (ConstraintLayout) LayoutInflater.from(parent.getContext())
+        RelativeLayout linearLayout = (RelativeLayout ) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.cast_item, parent, false);
-        return new ListViewHolder(constraintLayout);
+        return new ListViewHolder(linearLayout);
     }
 
     //Load name and poster details for director/cast
@@ -41,6 +46,7 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
         String posterURL = POSTER_BASE_URL + myList.getList_img();
         String name = myList.getList_name();
         String id = String.valueOf(myList.getList_id());
+        int pct = myList.getList_pct();
 
         Picasso.get().load(posterURL)
                 .placeholder(R.drawable.ic_person_92px)
@@ -48,6 +54,12 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
                 .into(holder.mCastPosterView);
 
         holder.mCastNameView.setText(name);
+
+        if (pct >= 0) {
+            String pctString = f.format(pct) + "%";
+            holder.mWatchedView.setText(pctString);
+            holder.mWatchedView.setVisibility(View.VISIBLE);
+        }
         holder.mView.setTag(id);
     }
 
@@ -61,12 +73,14 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
         private View mView;
         private ImageView mCastPosterView;
         private TextView mCastNameView;
+        private TextView mWatchedView;
 
         public ListViewHolder(View itemView) {
             super(itemView);
             mView = itemView;
             mCastPosterView = itemView.findViewById(R.id.cast_poster);
             mCastNameView = itemView.findViewById(R.id.cast_name);
+            mWatchedView = itemView.findViewById(R.id.list_pct);
             mView.setOnClickListener(this);
         }
 
