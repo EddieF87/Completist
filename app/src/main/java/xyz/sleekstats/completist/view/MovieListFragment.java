@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jakewharton.rxbinding2.view.RxView;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
@@ -25,6 +26,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -54,6 +56,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private TextView mNameView;
     private TextView mBioView;
     private ImageView mPosterView;
+    private FloatingActionButton mListSaveButton;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private RecyclerView mMoviesRecyclerView;
     private MovieAdapter mMovieAdapter;
@@ -95,25 +98,44 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mPosterView = rootView.findViewById(R.id.person_poster);
         mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
         mCollapsingToolbarLayout = rootView.findViewById(R.id.collapsing_toolbar);
-        FloatingActionButton mListSaveButton = rootView.findViewById(R.id.listSaveButton);
+        mListSaveButton = rootView.findViewById(R.id.listSaveButton);
+
+
+        if (mMovieDao == null) {
+            MovieRoomDB db = MovieRoomDB.getDatabase(getActivity().getApplication());
+            this.mMovieDao = db.movieDao();
+        }
+
 
         mListSaveButton.setOnClickListener(view ->
                 listCompositeDisposable.add(mMovieDao.checkIfListExists(mPersonId)
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
                         .subscribe(
-                                success -> mMovieDao.removeList(mPersonId),
-                                error -> mMovieDao.insertList(new MyList(
-                                        Integer.parseInt(mPersonId), mPersonName, mWatchedPct, mPersonPoster)
-                                )
+                                success -> unSaveList(mPersonId),
+                                error -> saveList(mPersonId, mPersonName, mWatchedPct, mPersonPoster)
                         )
                 )
         );
-
         mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mGrids));
         setRetainInstance(true);
         return rootView;
     }
+
+    private void saveList(String id, String name, int watchedPct, String poster) {
+        mMovieDao.insertList(new MyList(Integer.parseInt(id), name, watchedPct, poster));
+        if (mListSaveButton != null) {
+            mListSaveButton.setImageResource(R.drawable.ic_done_green_24dp);
+        }
+    }
+
+    private void unSaveList(String personID) {
+        mMovieDao.removeList(personID);
+        if (mListSaveButton != null) {
+            mListSaveButton.setImageResource(R.drawable.ic_add_black_24dp);
+        }
+    }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -149,6 +171,15 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 FilmListDetails::new);
         listCompositeDisposable.add(filmListDetailsObservable.subscribe(this::setViews,
                 e -> Log.e("rxprob", "filmListDetailsObservable setViews" + e.getMessage())));
+
+
+        listCompositeDisposable.add(mMovieDao.checkIfListExists(mPersonId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(success -> mListSaveButton.setImageResource(R.drawable.ic_done_green_24dp),
+                        error -> mListSaveButton.setImageResource(R.drawable.ic_add_black_24dp)
+                )
+        );
     }
 
     //Set display with info for selected actor/director
