@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_lists"
+        android:icon="@drawable/ic_library_books_black_24dp"
+        android:title="Lists"
+        />
+
+    <item
+        android:id="@+id/navigation_actor"
+        android:icon="@drawable/ic_person_black_24dp"
+        android:title="List"
+        />
+
+    <item
+        android:id="@+id/navigation_movie"
+        android:icon="@drawable/ic_sharp_movie_24px"
+        android:title="Movie"
+        />
+
+</menu>
