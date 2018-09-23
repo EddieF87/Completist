@@ -16,9 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.jakewharton.rxbinding2.view.RxView;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
@@ -26,7 +24,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -35,7 +32,7 @@ import io.reactivex.schedulers.Schedulers;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmListDetails;
-import xyz.sleekstats.completist.model.MovieDao;
+import xyz.sleekstats.completist.service.MovieDao;
 import xyz.sleekstats.completist.model.MovieRoomDB;
 import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.MyMovie;
@@ -45,6 +42,7 @@ import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 //Shows details of, and list of films by, a specific actor/director
 public class MovieListFragment extends Fragment implements MovieAdapter.ItemClickListener {
 
+    private static final String TAG_RXERROR = "rxprob";
     private static final String ARG_ID = "id";
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
     private String mPersonId;
@@ -111,9 +109,19 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 listCompositeDisposable.add(mMovieDao.checkIfListExists(mPersonId)
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
+                        .doOnEvent((x, y)-> {
+                            if(x == null) {
+                                mMovieDao.insertList(new MyList(Integer.parseInt(
+                                        mPersonId), mPersonName, mWatchedPct, mPersonPoster));
+                            } else {
+                                mMovieDao.removeList(mPersonId);
+                            }
+                        })
+                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
-                                success -> unSaveList(mPersonId),
-                                error -> saveList(mPersonId, mPersonName, mWatchedPct, mPersonPoster)
+                                success -> mListSaveButton.setImageResource(R.drawable.ic_add_black_24dp),
+                                error -> Log.d(TAG_RXERROR, "checkIfListExists" + error.getMessage()),
+                                () -> mListSaveButton.setImageResource(R.drawable.ic_done_green_24dp)
                         )
                 )
         );
@@ -121,21 +129,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         setRetainInstance(true);
         return rootView;
     }
-
-    private void saveList(String id, String name, int watchedPct, String poster) {
-        mMovieDao.insertList(new MyList(Integer.parseInt(id), name, watchedPct, poster));
-        if (mListSaveButton != null) {
-            mListSaveButton.setImageResource(R.drawable.ic_done_green_24dp);
-        }
-    }
-
-    private void unSaveList(String personID) {
-        mMovieDao.removeList(personID);
-        if (mListSaveButton != null) {
-            mListSaveButton.setImageResource(R.drawable.ic_add_black_24dp);
-        }
-    }
-
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -170,14 +163,14 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         Observable<FilmListDetails> filmListDetailsObservable = Observable.zip(personObservable, filmRVObservable,
                 FilmListDetails::new);
         listCompositeDisposable.add(filmListDetailsObservable.subscribe(this::setViews,
-                e -> Log.e("rxprob", "filmListDetailsObservable setViews" + e.getMessage())));
-
+                e -> Log.e(TAG_RXERROR, "filmListDetailsObservable setViews" + e.getMessage())));
 
         listCompositeDisposable.add(mMovieDao.checkIfListExists(mPersonId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(success -> mListSaveButton.setImageResource(R.drawable.ic_done_green_24dp),
-                        error -> mListSaveButton.setImageResource(R.drawable.ic_add_black_24dp)
+                        error -> mListSaveButton.setImageResource(R.drawable.ic_add_black_24dp),
+                        () -> mListSaveButton.setImageResource(R.drawable.ic_add_black_24dp)
                 )
         );
     }
@@ -239,7 +232,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             ids.add(String.valueOf(movie.getMovie_id()));
         }
         mDisposable = mMovieDao.getMoviesWatched(ids).observeOn(AndroidSchedulers.mainThread()).subscribe(this::updateFilmsWatched,
-                e -> Log.e("rxprob", "getMoviesWatched updateFilmsWatched" + e.getMessage()));
+                e -> Log.e(TAG_RXERROR, "getMoviesWatched updateFilmsWatched" + e.getMessage()));
         listCompositeDisposable.add(mDisposable);
     }
 
@@ -313,6 +306,19 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
         String title = mPersonName + "   " + watchedNumbers;
         mCollapsingToolbarLayout.setTitle(title);
+
+
+        if (mMovieDao == null) {
+            MovieRoomDB db = MovieRoomDB.getDatabase(getActivity().getApplication());
+            this.mMovieDao = db.movieDao();
+        }
+
+        listCompositeDisposable.add(Observable.just(mWatchedPct)
+                .subscribeOn(Schedulers.io())
+                .subscribe(pct -> {
+                        mMovieDao.updateListWatched(pct, mPersonId);
+                })
+        );
     }
 
     private MyMovie findFilmInList(int id) {

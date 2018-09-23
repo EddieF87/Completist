@@ -19,7 +19,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import xyz.sleekstats.completist.R;
-import xyz.sleekstats.completist.model.MovieDao;
+import xyz.sleekstats.completist.service.MovieDao;
 import xyz.sleekstats.completist.model.MovieRoomDB;
 import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.PersonPOJO;

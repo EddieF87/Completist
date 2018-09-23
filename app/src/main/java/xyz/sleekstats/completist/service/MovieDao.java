@@ -1,14 +1,18 @@
-package xyz.sleekstats.completist.model;
+package xyz.sleekstats.completist.service;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
+import xyz.sleekstats.completist.model.MyList;
+import xyz.sleekstats.completist.model.MyMovie;
 
 @Dao
 public interface MovieDao {
@@ -44,5 +48,11 @@ public interface MovieDao {
     void removeList(String id);
 
     @Query("SELECT * FROM list_table WHERE list_id LIKE :id")
-    Single<MyList> checkIfListExists(String id);
+    Maybe<MyList> checkIfListExists(String id);
+
+    @Update()
+    void updateList(MyList myList);
+
+    @Query("UPDATE list_table SET list_pct=:pct WHERE list_id = :id")
+    void updateListWatched(int pct, String id);
 }
