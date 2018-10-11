@@ -11,6 +11,7 @@ import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.model.MediaQueryPOJO;
 import xyz.sleekstats.completist.model.PersonQueryPOJO;
+import xyz.sleekstats.completist.model.PopularPOJO;
 
 public interface TmdbAPI {
 
@@ -33,6 +34,10 @@ public interface TmdbAPI {
     Observable<PersonPOJO> retrievePersonInfo(
             @Path("person_id") String person_id
     );
+
+    //retrieve most popular movies from TMDB API
+    @GET("movie/popular?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&language=en-US")
+    Observable<PopularPOJO> retrievePopularMovies();
 
     @GET("https://api.themoviedb.org/3/search/multi?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2" +
             "&language=en-US&page=1&include_adult=false")

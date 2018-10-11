@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +49,13 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_my_lists, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_my_lists, container, false);
+
+        Button popularMoviesButton =  view.findViewById(R.id.popular_movies_btn);
+        popularMoviesButton.setOnClickListener(btn -> onListClick(""));
+
+        return view;
     }
 
     @Override

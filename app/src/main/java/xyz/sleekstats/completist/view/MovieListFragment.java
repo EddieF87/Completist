@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -104,7 +105,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             this.mMovieDao = db.movieDao();
         }
 
-
         mListSaveButton.setOnClickListener(view ->
                 listCompositeDisposable.add(mMovieDao.checkIfListExists(mPersonId)
                         .subscribeOn(Schedulers.io())
@@ -150,18 +150,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
         }
 
-        Observable<PersonPOJO> personObservable = movieViewModel.getFilmsByPerson(person_id);
+        Observable<FilmListDetails> filmListDetailsObservable = movieViewModel.getFilmsByPerson(person_id);
 
-        Observable<List<FilmByPerson>> filmRVObservable = personObservable.map(s -> {
-            if (s.getKnown_for_department().equals("Directing")) {
-                return movieViewModel.filterCrew(s.getMovieCredits().getCrew());
-            } else {
-                return s.getMovieCredits().getCast();
-            }
-        });
-
-        Observable<FilmListDetails> filmListDetailsObservable = Observable.zip(personObservable, filmRVObservable,
-                FilmListDetails::new);
         listCompositeDisposable.add(filmListDetailsObservable.subscribe(this::setViews,
                 e -> Log.e(TAG_RXERROR, "filmListDetailsObservable setViews" + e.getMessage())));
 
@@ -195,6 +185,13 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
         mNameView.setText(name);
         mBioView.setText(bio);
+
+
+        if(mPersonId.isEmpty()) {
+            mListSaveButton.setVisibility(View.GONE);
+        } else {
+            mListSaveButton.setVisibility(View.VISIBLE);
+        }
 
         setRecyclerView(filmByPersonList);
     }

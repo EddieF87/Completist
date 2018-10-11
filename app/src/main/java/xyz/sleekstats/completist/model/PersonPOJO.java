@@ -4,6 +4,14 @@ import com.google.gson.annotations.SerializedName;
 
 public class PersonPOJO {
 
+    public PersonPOJO(String name, String biography, String known_for_department, String profile_path, String id) {
+        this.name = name;
+        this.biography = biography;
+        this.known_for_department = known_for_department;
+        this.profile_path = profile_path;
+        this.id = id;
+    }
+
     @SerializedName("movie_credits")
     private MovieCredits movieCredits;
 

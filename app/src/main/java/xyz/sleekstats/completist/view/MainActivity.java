@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity
 
     private boolean isListView = true;
     private String movieID = "287";
-    private String personID = "287";
+    private String personID = "";
     private static final String SEARCH_TITLE = "title";
     private static final String SEARCH_ID = "search_id";
     private static final String SEARCH_TYPE = "search_type";

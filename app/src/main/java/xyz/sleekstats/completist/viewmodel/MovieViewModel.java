@@ -9,10 +9,12 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import xyz.sleekstats.completist.model.FilmByPerson;
+import xyz.sleekstats.completist.model.FilmListDetails;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.model.MediaQueryPOJO;
 import xyz.sleekstats.completist.model.PersonQueryPOJO;
+import xyz.sleekstats.completist.model.PopularPOJO;
 import xyz.sleekstats.completist.service.Repo;
 
 public class MovieViewModel extends AndroidViewModel {
@@ -28,8 +30,28 @@ public class MovieViewModel extends AndroidViewModel {
         return mRepo.getFilm(movieId);
     }
 
-    public Observable<PersonPOJO> getFilmsByPerson(String personId) {
-        return mRepo.getFilmsByPerson(personId);
+
+    public Observable<FilmListDetails> getFilmsByPerson(String personId) {
+
+        Observable<PersonPOJO> personObservable;
+        Observable<List<FilmByPerson>> filmsObservable;
+
+        if(personId.isEmpty()) {
+            personObservable = Observable.just(new PersonPOJO("Popular Movies", "", "", "", null));
+            filmsObservable = mRepo.getPopularFilms();
+        } else {
+            personObservable = mRepo.getFilmsByPerson(personId);
+            filmsObservable = personObservable
+                    .map(s -> {
+                        if (s.getKnown_for_department().equals("Directing")) {
+                            return filterCrew(s.getMovieCredits().getCrew());
+                        } else {
+                            return s.getMovieCredits().getCast();
+                        }
+                    });
+        }
+        return Observable.zip(personObservable, filmsObservable,
+                FilmListDetails::new);
     }
 
     public Observable<FilmPOJO> getShowInfo(String showId) {

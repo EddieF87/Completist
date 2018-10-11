@@ -10,10 +10,12 @@ import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.model.MediaQueryPOJO;
 import xyz.sleekstats.completist.model.PersonQueryPOJO;
+import xyz.sleekstats.completist.model.PopularPOJO;
 
 public class Repo {
 
@@ -70,6 +72,14 @@ public class Repo {
     //Get list of most popular film-people
     public Observable<PersonQueryPOJO> getPopularActors() {
         return tmdbAPI.retrievePopularActors()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    //Get list of most popular films
+    public Observable<List<FilmByPerson>> getPopularFilms() {
+        return tmdbAPI.retrievePopularMovies()
+                .map(PopularPOJO::getResults)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
