@@ -52,8 +52,9 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
 
         View view = inflater.inflate(R.layout.fragment_my_lists, container, false);
 
-        Button popularMoviesButton =  view.findViewById(R.id.popular_movies_btn);
-        popularMoviesButton.setOnClickListener(btn -> onListClick(""));
+        view.findViewById(R.id.popular_movies_btn).setOnClickListener(btn -> onListClick("pop"));
+        view.findViewById(R.id.nowshowing_movies_btn).setOnClickListener(btn -> onListClick("np"));
+        view.findViewById(R.id.top_movies_btn).setOnClickListener(btn -> onListClick("tr"));
 
         return view;
     }

@@ -109,8 +109,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 listCompositeDisposable.add(mMovieDao.checkIfListExists(mPersonId)
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
-                        .doOnEvent((x, y)-> {
-                            if(x == null) {
+                        .doOnEvent((x, y) -> {
+                            if (x == null) {
                                 mMovieDao.insertList(new MyList(Integer.parseInt(
                                         mPersonId), mPersonName, mWatchedPct, mPersonPoster));
                             } else {
@@ -187,10 +187,14 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mBioView.setText(bio);
 
 
-        if(mPersonId.isEmpty()) {
-            mListSaveButton.setVisibility(View.GONE);
-        } else {
-            mListSaveButton.setVisibility(View.VISIBLE);
+        switch (mPersonId) {
+            case "np":
+            case "tr":
+            case "pop":
+                mListSaveButton.setVisibility(View.GONE);
+                break;
+            default:
+                mListSaveButton.setVisibility(View.VISIBLE);
         }
 
         setRecyclerView(filmByPersonList);
@@ -313,7 +317,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         listCompositeDisposable.add(Observable.just(mWatchedPct)
                 .subscribeOn(Schedulers.io())
                 .subscribe(pct -> {
-                        mMovieDao.updateListWatched(pct, mPersonId);
+                    mMovieDao.updateListWatched(pct, mPersonId);
                 })
         );
     }

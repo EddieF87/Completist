@@ -15,7 +15,7 @@ import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.model.MediaQueryPOJO;
 import xyz.sleekstats.completist.model.PersonQueryPOJO;
-import xyz.sleekstats.completist.model.PopularPOJO;
+import xyz.sleekstats.completist.model.ResultsPOJO;
 
 public class Repo {
 
@@ -79,7 +79,23 @@ public class Repo {
     //Get list of most popular films
     public Observable<List<FilmByPerson>> getPopularFilms() {
         return tmdbAPI.retrievePopularMovies()
-                .map(PopularPOJO::getResults)
+                .map(ResultsPOJO::getResults)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    //Get list of films currently playing in theatres
+    public Observable<List<FilmByPerson>> getNowPlaying() {
+        return tmdbAPI.retrieveNowPlaying()
+                .map(ResultsPOJO::getResults)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    //Get list of top-rated films
+    public Observable<List<FilmByPerson>> getTopRated() {
+        return tmdbAPI.retrieveTopRated()
+                .map(ResultsPOJO::getResults)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
