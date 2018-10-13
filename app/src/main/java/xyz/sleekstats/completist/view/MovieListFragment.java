@@ -176,6 +176,9 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
         mPersonPoster = personPOJO.getProfile_path();
         String posterUrl = POSTER_BASE_URL + mPersonPoster;
+        if(posterUrl.equals(POSTER_BASE_URL)) {
+            posterUrl = null;
+        }
         mPersonName = name + " (" + known_for_department + ")";
 
         Picasso.get().load(posterUrl)

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="titleTextSize">24sp</dimen>
+    <dimen name="midTextSize">18sp</dimen>
+    <dimen name="pctTextSize">16sp</dimen>
+    <dimen name="smallTextSize">12sp</dimen>
+    <dimen name="defaultTextSize">14sp</dimen>
+
+    <dimen name="toolbarHeight">36dp</dimen>
+    <dimen name="castItemHeight">120dp</dimen>
+
+    <dimen name="defaultPadding">8dp</dimen>
+    <dimen name="smallMargin">4dp</dimen>
+    <dimen name="defaultMargin">8dp</dimen>
+    <dimen name="largeMargin">16dp</dimen>
+
+    <dimen name="defaultBtnPadding">3dp</dimen>
+    <dimen name="largeBtnPadding">6dp</dimen>
+
+    <dimen name="cardCornerRadius">8dp</dimen>
+    <dimen name="cardElevation">8dp</dimen>
+</resources>

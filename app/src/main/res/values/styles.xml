@@ -16,7 +16,7 @@
 
     <style name="CollapsedText" parent="@android:style/TextAppearance">
         <item name="android:textColor">@color/colorAccent</item>
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">@dimen/titleTextSize</item>
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -27,12 +27,22 @@
         <item name="android:layout_gravity">center</item>
         <item name="android:background">@drawable/film_default</item>
         <item name="android:textColor">@color/colorAccent</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">@dimen/defaultTextSize</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:paddingBottom">16dp</item>
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:layout_marginStart">16dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:paddingBottom">@dimen/largeMargin</item>
+        <item name="android:paddingTop">@dimen/largeMargin</item>
+        <item name="android:layout_marginStart">@dimen/largeMargin</item>
+        <item name="android:layout_marginEnd">@dimen/largeMargin</item>
     </style>
 
+
+    <style name="ListButtonStyleLandscape" parent="ListButtonStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:layout_marginBottom">@dimen/largeMargin</item>
+        <item name="android:layout_marginTop">@dimen/largeMargin</item>
+    </style>
 </resources>

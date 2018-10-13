@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/film_default"
-    android:layout_margin="4dp"
+    android:layout_margin="@dimen/smallMargin"
     android:orientation="vertical"
     >
 
@@ -27,6 +27,7 @@
         android:maxLines="2"
         android:layout_gravity="center"
         android:gravity="center"
+        android:textSize="@dimen/pctTextSize"
         />
 
     <LinearLayout
@@ -34,12 +35,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="bottom"
-        android:paddingTop="4dp"
+        android:paddingTop="@dimen/smallMargin"
         >
 
         <ImageView
             android:id="@+id/watched_btn"
-            android:paddingEnd="6dp"
+            android:paddingEnd="@dimen/largeBtnPadding"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
@@ -50,8 +51,8 @@
 
         <ImageView
             android:id="@+id/later_btn"
-            android:paddingStart="3dp"
-            android:paddingEnd="3dp"
+            android:paddingStart="@dimen/defaultBtnPadding"
+            android:paddingEnd="@dimen/defaultBtnPadding"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
@@ -62,7 +63,7 @@
 
         <ImageView
             android:id="@+id/ignore_btn"
-            android:paddingStart="6dp"
+            android:paddingStart="@dimen/largeBtnPadding"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"

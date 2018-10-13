@@ -61,7 +61,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:textSize="24sp"
+                    android:textSize="@dimen/titleTextSize"
                     android:textStyle="bold"
                     app:layout_collapseMode="pin"
                     app:layout_constraintEnd_toEndOf="@+id/collapsing_layout"
@@ -89,7 +89,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:text="--/--  --%"
-                    android:textSize="24sp"
+                    android:textSize="@dimen/titleTextSize"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -101,8 +101,8 @@
                     android:id="@+id/imageButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="@dimen/defaultMargin"
+                    android:layout_marginStart="@dimen/defaultMargin"
                     app:layout_constraintBottom_toBottomOf="@+id/watched_tracker"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/watched_tracker"
@@ -115,7 +115,7 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/ListToolBar"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
+                android:layout_height="@dimen/toolbarHeight"
                 app:layout_collapseMode="pin" />
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
