@@ -12,13 +12,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/titleTextSize"
-        android:text="My Lists" />
+        android:text="@string/my_lists" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/saved_lists_rv"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="2" />
 
     <TextView
         android:id="@+id/pop_list_label"
@@ -26,13 +26,13 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/titleTextSize"
         android:layout_marginTop="@dimen/largeMargin"
-        android:text="Popular Actors/Directors" />
+        android:text="@string/popular_actors_directors" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/pop_lists_rv"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="2" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -42,22 +42,35 @@
         >
 
         <Button
+            android:id="@+id/watched_movies_btn"
+            style="@style/ListButtonStyle"
+            android:text="@string/watched_movies" />
+
+        <Button
             android:id="@+id/popular_movies_btn"
             style="@style/ListButtonStyle"
-            android:text="Popular Movies"
+            android:text="@string/popular_movies"
             />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        >
 
         <Button
             android:id="@+id/top_movies_btn"
             style="@style/ListButtonStyle"
-            android:text="Top Rated Movies"
+            android:text="@string/top_rated_movies"
             android:layout_gravity="center"
             />
 
         <Button
             android:id="@+id/nowshowing_movies_btn"
             style="@style/ListButtonStyle"
-            android:text="Now Showing"
+            android:text="@string/now_showing"
             />
     </LinearLayout>
 

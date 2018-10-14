@@ -12,9 +12,6 @@ public class FilmPOJO {
     @SerializedName("overview")
     private String overview;
 
-    @SerializedName("popularity")
-    private String popularity;
-
     @SerializedName("poster_path")
     private String poster_path;
 
@@ -52,10 +49,6 @@ public class FilmPOJO {
 
     public String getOverview() {
         return overview;
-    }
-
-    public String getPopularity() {
-        return popularity;
     }
 
     public String getPoster_path() {

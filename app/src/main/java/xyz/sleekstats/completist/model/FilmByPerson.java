@@ -4,11 +4,14 @@ import com.google.gson.annotations.SerializedName;
 
 public class FilmByPerson {
 
+    public FilmByPerson(String title, String id, String poster_path) {
+        this.title = title;
+        this.id = id;
+        this.poster_path = poster_path;
+    }
+
     @SerializedName("title")
     private String title;
-
-    @SerializedName("popularity")
-    private String popularity;
 
     @SerializedName("id")
     private String id;
@@ -23,11 +26,6 @@ public class FilmByPerson {
     public String getTitle() {
         return title;
     }
-
-    public String getPopularity() {
-        return popularity;
-    }
-
     public String getId() {
         return id;
     }

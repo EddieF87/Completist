@@ -2,6 +2,7 @@ package xyz.sleekstats.completist.service;
 
 import android.app.Application;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -12,6 +13,8 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
+import xyz.sleekstats.completist.model.MovieRoomDB;
+import xyz.sleekstats.completist.model.MyMovie;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.model.MediaQueryPOJO;
 import xyz.sleekstats.completist.model.PersonQueryPOJO;
@@ -21,11 +24,17 @@ public class Repo {
 
     private static final String BASE_URL = "https://api.themoviedb.org/3/";
     private TmdbAPI tmdbAPI;
-
+    private MovieDao mMovieDao;
 
     public Repo(Application application) {
+
         if(tmdbAPI == null) {
             tmdbAPI = getData();
+        }
+
+        if (mMovieDao == null) {
+            MovieRoomDB db = MovieRoomDB.getDatabase(application);
+            this.mMovieDao = db.movieDao();
         }
     }
 
@@ -96,6 +105,21 @@ public class Repo {
     public Observable<List<FilmByPerson>> getTopRated() {
         return tmdbAPI.retrieveTopRated()
                 .map(ResultsPOJO::getResults)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    //Get list of top-rated films
+    public Observable<List<FilmByPerson>> getMyMovies() {
+        return mMovieDao.getSavedMovies()
+                .map(movList -> {
+                    List<FilmByPerson> films = new ArrayList<>();
+                    for (MyMovie myMovie : movList) {
+                        films.add(new FilmByPerson(myMovie.getTitle(), String.valueOf(myMovie.getMovie_id()), myMovie.getPoster()));
+                    }
+                    return films;
+                })
+                .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

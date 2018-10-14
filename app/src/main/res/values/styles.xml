@@ -27,10 +27,10 @@
         <item name="android:layout_gravity">center</item>
         <item name="android:background">@drawable/film_default</item>
         <item name="android:textColor">@color/colorAccent</item>
-        <item name="android:textSize">@dimen/defaultTextSize</item>
+        <item name="android:textSize">@dimen/smallTextSize</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:paddingBottom">@dimen/largeMargin</item>
-        <item name="android:paddingTop">@dimen/largeMargin</item>
+        <item name="android:paddingBottom">@dimen/defaultBtnPadding</item>
+        <item name="android:paddingTop">@dimen/defaultBtnPadding</item>
         <item name="android:layout_marginStart">@dimen/defaultMargin</item>
         <item name="android:layout_marginEnd">@dimen/defaultMargin</item>
     </style>

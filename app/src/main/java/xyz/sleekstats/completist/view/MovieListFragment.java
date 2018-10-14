@@ -191,6 +191,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
 
         switch (mPersonId) {
+            case "my":
             case "np":
             case "tr":
             case "pop":

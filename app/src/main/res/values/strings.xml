@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Completist</string>
     <string name="search">Search</string>
+    <string name="watched_movies">Watched Movies</string>
+    <string name="popular_movies">Popular Movies</string>
+    <string name="top_rated_movies">Top Rated Movies</string>
+    <string name="now_showing">Now Showing</string>
+    <string name="popular_actors_directors">Popular Actors/Directors</string>
+    <string name="my_lists">My Lists</string>
 </resources>

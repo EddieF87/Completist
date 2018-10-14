@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:padding="@dimen/largeMargin"
-    tools:context=".view.MyListsFragment">
+    tools:context=".view.MyListsFragment"
+    android:baselineAligned="false">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -17,7 +18,7 @@
             android:id="@+id/my_list_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="My Lists"
+            android:text="@string/my_lists"
             android:textSize="@dimen/midTextSize" />
 
         <android.support.v7.widget.RecyclerView
@@ -31,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/largeMargin"
-            android:text="Popular Actors/Directors"
+            android:text="@string/popular_actors_directors"
             android:textSize="@dimen/midTextSize" />
 
         <android.support.v7.widget.RecyclerView
@@ -51,19 +52,24 @@
         android:orientation="vertical">
 
         <Button
+            android:id="@+id/watched_movies_btn"
+            style="@style/ListButtonStyleLandscape"
+            android:text="@string/watched_movies" />
+
+        <Button
             android:id="@+id/popular_movies_btn"
             style="@style/ListButtonStyleLandscape"
-            android:text="Popular Movies" />
+            android:text="@string/popular_movies" />
 
         <Button
             android:id="@+id/top_movies_btn"
             style="@style/ListButtonStyleLandscape"
             android:layout_gravity="center"
-            android:text="Top Rated Movies" />
+            android:text="@string/top_rated_movies" />
 
         <Button
             android:id="@+id/nowshowing_movies_btn"
             style="@style/ListButtonStyleLandscape"
-            android:text="Now Showing" />
+            android:text="@string/now_showing" />
     </LinearLayout>
 </LinearLayout>

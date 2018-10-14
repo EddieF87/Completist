@@ -36,7 +36,11 @@ public class MovieViewModel extends AndroidViewModel {
         Observable<List<FilmByPerson>> filmsObservable;
 
         switch (personId) {
-            case "":
+            case "my":
+                personObservable = Observable.just(new PersonPOJO("My Watched", "", "Movies", "", null));
+                filmsObservable = mRepo.getMyMovies();
+                break;
+            case "pop":
                 personObservable = Observable.just(new PersonPOJO("Popular", "", "Movies", "", null));
                 filmsObservable = mRepo.getPopularFilms();
                 break;
