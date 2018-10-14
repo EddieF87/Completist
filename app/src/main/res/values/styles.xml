@@ -31,8 +31,8 @@
         <item name="android:textStyle">bold</item>
         <item name="android:paddingBottom">@dimen/largeMargin</item>
         <item name="android:paddingTop">@dimen/largeMargin</item>
-        <item name="android:layout_marginStart">@dimen/largeMargin</item>
-        <item name="android:layout_marginEnd">@dimen/largeMargin</item>
+        <item name="android:layout_marginStart">@dimen/defaultMargin</item>
+        <item name="android:layout_marginEnd">@dimen/defaultMargin</item>
     </style>
 
 
@@ -42,7 +42,9 @@
         <item name="android:layout_gravity">center</item>
         <item name="android:paddingBottom">0dp</item>
         <item name="android:paddingTop">0dp</item>
-        <item name="android:layout_marginBottom">@dimen/largeMargin</item>
-        <item name="android:layout_marginTop">@dimen/largeMargin</item>
+        <item name="android:layout_marginBottom">@dimen/defaultMargin</item>
+        <item name="android:layout_marginTop">@dimen/defaultMargin</item>
+        <item name="android:layout_marginStart">@dimen/largeMargin</item>
+        <item name="android:layout_marginEnd">@dimen/defaultMargin</item>
     </style>
 </resources>

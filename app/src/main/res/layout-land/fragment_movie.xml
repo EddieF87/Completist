@@ -10,11 +10,11 @@
         android:id="@+id/movie_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/defaultMargin"
+        android:layout_marginStart="@dimen/defaultMargin"
+        android:layout_marginTop="@dimen/largeMargin"
         android:textAlignment="center"
-        android:textSize="24sp"
+        android:textSize="@dimen/titleTextSize"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/movie_poster"
@@ -23,21 +23,22 @@
 
     <ImageView
         android:id="@+id/movie_poster"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/defaultMargin"
+        android:layout_marginTop="@dimen/defaultMargin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideline" />
 
 
     <TextView
         android:id="@+id/movie_genre"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:textSize="14sp"
+        android:layout_marginStart="@dimen/largeMargin"
+        android:layout_marginTop="@dimen/defaultMargin"
+        android:textSize="@dimen/defaultTextSize"
         app:layout_constraintEnd_toEndOf="@+id/movie_overview"
         app:layout_constraintStart_toEndOf="@+id/movie_rating"
         app:layout_constraintTop_toBottomOf="@+id/movie_overview" />
@@ -46,8 +47,8 @@
         android:id="@+id/movie_overview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textSize="12sp"
+        android:layout_marginTop="@dimen/defaultMargin"
+        android:textSize="@dimen/smallTextSize"
         app:layout_constraintEnd_toEndOf="@+id/movie_title"
         app:layout_constraintStart_toStartOf="@+id/movie_title"
         app:layout_constraintTop_toBottomOf="@+id/movie_title"
@@ -58,7 +59,7 @@
         style="?android:attr/ratingBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/defaultMargin"
         android:numStars="4"
         android:rating="0"
         android:stepSize=".2"
@@ -69,11 +70,11 @@
         android:id="@+id/cast_recyclerview"
         android:layout_width="0dp"
         android:layout_height="@dimen/castItemHeight"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/defaultMargin"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/person_barrier" />
+        app:layout_constraintTop_toBottomOf="@+id/guideline" />
 
 
     <android.support.constraint.Barrier
@@ -100,5 +101,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cast_recyclerview"
         android:background="@color/colorAccent"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
 
 </android.support.constraint.ConstraintLayout>
