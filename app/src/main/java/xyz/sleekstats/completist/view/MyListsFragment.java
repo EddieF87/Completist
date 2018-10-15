@@ -20,8 +20,6 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import xyz.sleekstats.completist.R;
-import xyz.sleekstats.completist.service.MovieDao;
-import xyz.sleekstats.completist.model.MovieRoomDB;
 import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
@@ -35,7 +33,6 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
     private final CompositeDisposable myListsCompositeDisposable = new CompositeDisposable();
     private MovieViewModel movieViewModel;
     private OnFragmentInteractionListener mListener;
-    private MovieDao mMovieDao;
 
     public MyListsFragment() {
         // Required empty public constructor
@@ -72,18 +69,15 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
                             List<MyList> myLists = new ArrayList<>();
                             for(PersonPOJO personPOJO : personPOJOList) {
                                 myLists.add(new MyList(Integer.parseInt(personPOJO.getId()),
-                                        personPOJO.getName(), -1, personPOJO.getProfile_path()));
+                                        personPOJO.getName(), -1, 1, personPOJO.getProfile_path()));
                             }
                             return Observable.just(myLists);
                         }
                 )
                 .subscribe(this::loadPopularRV,
                         e -> Log.e("rxprob", "queryPopular loadPopularRV" + e.getMessage())));
-        if (mMovieDao == null) {
-            MovieRoomDB db = MovieRoomDB.getDatabase(getActivity().getApplication());
-            this.mMovieDao = db.movieDao();
-        }
-        myListsCompositeDisposable.add(mMovieDao.getSavedLists()
+
+        myListsCompositeDisposable.add(movieViewModel.getSavedLists()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::loadSavedRV,
                         e -> Log.e("rxprob", "getSavedLists loadSavedRV" + e.getMessage())));

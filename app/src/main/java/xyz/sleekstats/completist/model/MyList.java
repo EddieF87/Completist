@@ -9,13 +9,15 @@ public class MyList {
     @PrimaryKey
     private int list_id;
     private String list_name;
-    private int list_pct;
+    private int watched_films;
+    private int total_films;
     private String list_img;
 
-    public MyList(int list_id, String list_name, int list_pct, String list_img) {
+    public MyList(int list_id, String list_name, int watched_films, int total_films, String list_img) {
         this.list_id = list_id;
         this.list_name = list_name;
-        this.list_pct = list_pct;
+        this.watched_films = watched_films;
+        this.total_films = total_films;
         this.list_img = list_img;
     }
 
@@ -35,12 +37,24 @@ public class MyList {
         this.list_name = list_name;
     }
 
-    public int getList_pct() {
-        return list_pct;
+    public int getWatched_films() {
+        return watched_films;
     }
 
-    public void setList_pct(int list_pct) {
-        this.list_pct = list_pct;
+    public void setWatched_films(int watched_films) {
+        this.watched_films = watched_films;
+    }
+
+    public int getTotal_films() {
+        return total_films;
+    }
+
+    public void setTotal_films(int total_films) {
+        this.total_films = total_films;
+    }
+
+    public int getList_pct() {
+        return watched_films * 100 /total_films;
     }
 
     public String getList_img() {

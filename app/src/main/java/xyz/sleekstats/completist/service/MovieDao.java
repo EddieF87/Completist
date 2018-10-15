@@ -51,9 +51,9 @@ public interface MovieDao {
     @Query("SELECT * FROM list_table WHERE list_id LIKE :id")
     Maybe<MyList> checkIfListExists(String id);
 
-    @Update()
-    void updateList(MyList myList);
+//    @Update()
+//    void updateList(MyList myList);
 
-    @Query("UPDATE list_table SET list_pct=:pct WHERE list_id = :id")
-    void updateListWatched(int pct, String id);
+    @Query("UPDATE list_table SET watched_films=:watched, total_films=:total WHERE list_id = :id")
+    void updateListWatched(int watched, int total, String id);
 }

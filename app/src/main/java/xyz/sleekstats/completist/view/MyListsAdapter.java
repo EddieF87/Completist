@@ -3,6 +3,7 @@ package xyz.sleekstats.completist.view;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
         String id = String.valueOf(myList.getList_id());
         int pct = myList.getList_pct();
 
+        Log.d("xxxx", myList.getList_name() + "  watched" + myList.getWatched_films() +  "/ " + myList.getTotal_films());
         Picasso.get().load(posterURL)
                 .placeholder(R.drawable.ic_person_92px)
                 .error(R.drawable.ic_person_92px)

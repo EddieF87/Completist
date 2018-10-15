@@ -5,15 +5,20 @@ import android.app.Application;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import xyz.sleekstats.completist.model.CastInfo;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.MovieRoomDB;
+import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.MyMovie;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.model.MediaQueryPOJO;
@@ -62,6 +67,7 @@ public class Repo {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
+
 
     //Get list of films by a specific actor/director based on Tmdb actor/director id
     public Observable<PersonPOJO> getFilmsByPerson(String person_id) {
@@ -124,4 +130,39 @@ public class Repo {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    public void insertMovie(MyMovie movie) {
+        mMovieDao.insertMovie(movie);
+    }
+
+    public void removeMovie(String id) {
+        mMovieDao.removeMovie(id);
+    }
+
+    public void insertList(MyList list) {
+        mMovieDao.insertList(list);
+    }
+
+    public void removeList(String id) {
+        mMovieDao.removeList(id);
+    }
+
+    public void updateList(int numberSeen, int numberOfMovies, String id) {
+        mMovieDao.updateListWatched(numberSeen, numberOfMovies, id);
+    }
+
+    public Single<MyMovie> checkIfMovieExists(String id) {
+        return mMovieDao.checkIfMovieExists(id);
+    }
+
+    public Maybe<MyList> checkIfListExists(String id) {
+        return mMovieDao.checkIfListExists(id);
+    }
+
+    public Flowable<List<MyMovie>> getMoviesWatched(List<String> ids) {
+        return mMovieDao.getMoviesWatched(ids);
+    }
+
+    public Flowable<List<MyList>> getSavedLists() {
+        return mMovieDao.getSavedLists();
+    }
 }

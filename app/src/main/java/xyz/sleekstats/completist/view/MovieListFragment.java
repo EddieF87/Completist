@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -33,8 +32,6 @@ import io.reactivex.schedulers.Schedulers;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmListDetails;
-import xyz.sleekstats.completist.service.MovieDao;
-import xyz.sleekstats.completist.model.MovieRoomDB;
 import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.MyMovie;
 import xyz.sleekstats.completist.model.PersonPOJO;
@@ -49,7 +46,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private String mPersonId;
     private String mPersonName;
     private String mPersonPoster;
-    private int mWatchedPct;
+    private int mWatchedFilms;
+    private int mTotalFilms;
     private int mGrids;
 
     private TextView mNameView;
@@ -60,7 +58,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private RecyclerView mMoviesRecyclerView;
     private MovieAdapter mMovieAdapter;
     private List<MyMovie> mCurrentFilmList;
-    private MovieDao mMovieDao;
 
     private MovieViewModel movieViewModel;
     private OnFragmentInteractionListener mListener;
@@ -99,22 +96,16 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mCollapsingToolbarLayout = rootView.findViewById(R.id.collapsing_toolbar);
         mListSaveButton = rootView.findViewById(R.id.listSaveButton);
 
-
-        if (mMovieDao == null) {
-            MovieRoomDB db = MovieRoomDB.getDatabase(getActivity().getApplication());
-            this.mMovieDao = db.movieDao();
-        }
-
         mListSaveButton.setOnClickListener(view ->
-                listCompositeDisposable.add(mMovieDao.checkIfListExists(mPersonId)
+                listCompositeDisposable.add(movieViewModel.checkIfListExists(mPersonId)
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
                         .doOnEvent((x, y) -> {
                             if (x == null) {
-                                mMovieDao.insertList(new MyList(Integer.parseInt(
-                                        mPersonId), mPersonName, mWatchedPct, mPersonPoster));
+                                movieViewModel.addList(new MyList(Integer.parseInt(
+                                        mPersonId), mPersonName, mWatchedFilms, mTotalFilms, mPersonPoster));
                             } else {
-                                mMovieDao.removeList(mPersonId);
+                                movieViewModel.removeList(mPersonId);
                             }
                         })
                         .observeOn(AndroidSchedulers.mainThread())
@@ -155,7 +146,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         listCompositeDisposable.add(filmListDetailsObservable.subscribe(this::setViews,
                 e -> Log.e(TAG_RXERROR, "filmListDetailsObservable setViews" + e.getMessage())));
 
-        listCompositeDisposable.add(mMovieDao.checkIfListExists(mPersonId)
+        listCompositeDisposable.add(movieViewModel.checkIfListExists(mPersonId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(success -> mListSaveButton.setImageResource(R.drawable.ic_done_green_24dp),
@@ -227,16 +218,12 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             mMovieAdapter.setCurrentMovieList(mCurrentFilmList);
         }
         mMoviesRecyclerView.setAdapter(mMovieAdapter);
-        if (mMovieDao == null) {
-            MovieRoomDB db = MovieRoomDB.getDatabase(getActivity().getApplication());
-            this.mMovieDao = db.movieDao();
-        }
 
         List<String> ids = new ArrayList<>();
         for (MyMovie movie : mCurrentFilmList) {
             ids.add(String.valueOf(movie.getMovie_id()));
         }
-        mDisposable = mMovieDao.getMoviesWatched(ids).observeOn(AndroidSchedulers.mainThread()).subscribe(this::updateFilmsWatched,
+        mDisposable = movieViewModel.getMoviesWatched(ids).observeOn(AndroidSchedulers.mainThread()).subscribe(this::updateFilmsWatched,
                 e -> Log.e(TAG_RXERROR, "getMoviesWatched updateFilmsWatched" + e.getMessage()));
         listCompositeDisposable.add(mDisposable);
     }
@@ -253,19 +240,16 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         if (mMovieAdapter == null) {
             return;
         }
-        if (mMovieDao == null) {
-            MovieRoomDB db = MovieRoomDB.getDatabase(getActivity().getApplication());
-            this.mMovieDao = db.movieDao();
-        }
+
         MyMovie film = mCurrentFilmList.get(pos);
         film.setWatchType(watchType);
 
-        listCompositeDisposable.add(mMovieDao.checkIfMovieExists(String.valueOf(film.getMovie_id()))
+        listCompositeDisposable.add(movieViewModel.checkIfMovieExists(String.valueOf(film.getMovie_id()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(
-                        success -> mMovieDao.removeMovie(String.valueOf(film.getMovie_id())),
-                        error -> mMovieDao.insertMovie(film)
+                        success -> movieViewModel.removeMovie(String.valueOf(film.getMovie_id())),
+                        error -> movieViewModel.addMovie(film)
                 )
         );
         mMovieAdapter.notifyItemChanged(pos);
@@ -283,47 +267,42 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     private void updateFilmsWatched(List<MyMovie> watchedFilms) {
 
-        int mTotalMovies = mCurrentFilmList.size();
-        int mSeenMovies = 0;
+        mTotalFilms = mCurrentFilmList.size();
+        mWatchedFilms = 0;
 
         for (MyMovie myMovie : watchedFilms) {
             MyMovie listMovie = findFilmInList(myMovie.getMovie_id());
             if (listMovie != null) {
                 listMovie.setWatchType(2);
-                mSeenMovies++;
+                mWatchedFilms++;
             }
         }
 
         mMovieAdapter.notifyDataSetChanged();
 
-        updateWatchedStatus(mSeenMovies, mTotalMovies);
+        setWatchedDisplay(mWatchedFilms, mTotalFilms);
+        updateWatchedStatus(mWatchedFilms, mTotalFilms);
     }
 
     private void updateWatchedStatus(int numberSeen, int numberOfMovies) {
+        listCompositeDisposable.add(Observable.just(numberSeen, numberOfMovies, mPersonId)
+                .subscribeOn(Schedulers.io())
+                .subscribe(x -> movieViewModel.updateList(numberSeen, numberOfMovies, mPersonId))
+        );
+    }
 
+    private void setWatchedDisplay(int numberSeen, int numberOfMovies) {
         NumberFormat f = new DecimalFormat("00");
 
-        mWatchedPct = (numberSeen * 100) / numberOfMovies;
+        int watchedPct = (numberSeen * 100) / numberOfMovies;
         TextView watchedTracker = getView().findViewById(R.id.watched_tracker);
-        String watchedNumbers = numberSeen + "/" + numberOfMovies + "  (" + f.format(mWatchedPct) + "%)";
+        String watchedNumbers = numberSeen + "/" + numberOfMovies + "  (" + f.format(watchedPct) + "%)";
         String watchedText = "Watched: " + watchedNumbers;
         watchedTracker.setText(watchedText);
 
         String title = mPersonName + "   " + watchedNumbers;
         mCollapsingToolbarLayout.setTitle(title);
 
-
-        if (mMovieDao == null) {
-            MovieRoomDB db = MovieRoomDB.getDatabase(getActivity().getApplication());
-            this.mMovieDao = db.movieDao();
-        }
-
-        listCompositeDisposable.add(Observable.just(mWatchedPct)
-                .subscribeOn(Schedulers.io())
-                .subscribe(pct -> {
-                    mMovieDao.updateListWatched(pct, mPersonId);
-                })
-        );
     }
 
     private MyMovie findFilmInList(int id) {

@@ -7,10 +7,15 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmListDetails;
 import xyz.sleekstats.completist.model.FilmPOJO;
+import xyz.sleekstats.completist.model.MyList;
+import xyz.sleekstats.completist.model.MyMovie;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.model.MediaQueryPOJO;
 import xyz.sleekstats.completist.model.PersonQueryPOJO;
@@ -29,7 +34,6 @@ public class MovieViewModel extends AndroidViewModel {
         return mRepo.getFilm(movieId);
     }
 
-
     public Observable<FilmListDetails> getFilmsByPerson(String personId) {
 
         Observable<PersonPOJO> personObservable;
@@ -37,19 +41,19 @@ public class MovieViewModel extends AndroidViewModel {
 
         switch (personId) {
             case "my":
-                personObservable = Observable.just(new PersonPOJO("My Watched", "", "Movies", "", null));
+                personObservable = Observable.just(new PersonPOJO("My Watched", "Movies that I have watched.", "Movies", "", null));
                 filmsObservable = mRepo.getMyMovies();
                 break;
             case "pop":
-                personObservable = Observable.just(new PersonPOJO("Popular", "", "Movies", "", null));
+                personObservable = Observable.just(new PersonPOJO("Popular", "Most popular movies on tmdb today.", "Movies", "", null));
                 filmsObservable = mRepo.getPopularFilms();
                 break;
             case "np":
-                personObservable = Observable.just(new PersonPOJO("Now Playing", "", "Movies", "", null));
+                personObservable = Observable.just(new PersonPOJO("Now Playing", "Movies currently playing in theaters.", "Movies", "", null));
                 filmsObservable = mRepo.getNowPlaying();
                 break;
             case "tr":
-                personObservable = Observable.just(new PersonPOJO("Top Rated", "", "Movies", "", null));
+                personObservable = Observable.just(new PersonPOJO("Top Rated", "Top-rated movies on tmdb.", "Movies", "", null));
                 filmsObservable = mRepo.getTopRated();
                 break;
             default:
@@ -88,5 +92,42 @@ public class MovieViewModel extends AndroidViewModel {
             }
         }
         return filteredList;
+    }
+
+    public void addMovie(MyMovie movie) {
+        mRepo.insertMovie(movie);
+    }
+
+    public void removeMovie(String id) {
+        mRepo.removeMovie(id);
+    }
+
+
+    public void addList(MyList list) {
+        mRepo.insertList(list);
+    }
+
+    public void removeList(String id) {
+        mRepo.removeList(id);
+    }
+
+    public void updateList(int numberSeen, int numberOfMovies, String id) {
+        mRepo.updateList(numberSeen, numberOfMovies, id);
+    }
+
+    public Single<MyMovie> checkIfMovieExists(String id) {
+        return mRepo.checkIfMovieExists(id);
+    }
+
+    public Maybe<MyList> checkIfListExists(String id) {
+        return mRepo.checkIfListExists(id);
+    }
+
+    public Flowable<List<MyMovie>> getMoviesWatched(List<String> ids) {
+        return mRepo.getMoviesWatched(ids);
+    }
+
+    public Flowable<List<MyList>> getSavedLists() {
+        return mRepo.getSavedLists();
     }
 }
