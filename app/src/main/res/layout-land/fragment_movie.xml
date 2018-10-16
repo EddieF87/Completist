@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="@dimen/defaultMargin"
     tools:context=".view.MovieDetailsFragment">
 
     <TextView
@@ -41,37 +42,42 @@
         android:textSize="@dimen/defaultTextSize"
         app:layout_constraintEnd_toEndOf="@+id/movie_overview"
         app:layout_constraintStart_toEndOf="@+id/movie_rating"
-        app:layout_constraintTop_toBottomOf="@+id/movie_overview" />
+        app:layout_constraintTop_toBottomOf="@+id/movie_overview"
+        app:layout_constraintBottom_toTopOf="@id/guideline"
+        />
 
     <TextView
         android:id="@+id/movie_overview"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginTop="@dimen/defaultMargin"
         android:textSize="@dimen/smallTextSize"
+        app:layout_constraintBottom_toTopOf="@+id/movie_genre"
         app:layout_constraintEnd_toEndOf="@+id/movie_title"
         app:layout_constraintStart_toStartOf="@+id/movie_title"
         app:layout_constraintTop_toBottomOf="@+id/movie_title"
-        tools:text=" overview overview overview overview  overview overview overview overview  overview overview overview overview  overview overview overview overview  overview overview overview overview  overview overview overview overview " />
+        tools:text="oooo" />
 
     <RatingBar
         android:id="@+id/movie_rating"
         style="?android:attr/ratingBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/defaultMargin"
         android:numStars="4"
         android:rating="0"
         android:stepSize=".2"
+        app:layout_constraintBottom_toBottomOf="@+id/movie_genre"
         app:layout_constraintStart_toStartOf="@+id/movie_title"
-        app:layout_constraintTop_toBottomOf="@+id/movie_overview" />
+        app:layout_constraintTop_toTopOf="@+id/movie_genre" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/cast_recyclerview"
         android:layout_width="0dp"
-        android:layout_height="@dimen/castItemHeight"
+        android:layout_height="0dp"
         android:layout_marginTop="@dimen/defaultMargin"
+        android:layout_marginBottom="8dp"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/cast_bottom_border"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/guideline" />
@@ -99,7 +105,7 @@
         android:layout_height="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cast_recyclerview"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:background="@color/colorAccent"/>
 
     <android.support.constraint.Guideline
