@@ -3,6 +3,7 @@ package xyz.sleekstats.completist.viewmodel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,12 +95,12 @@ public class MovieViewModel extends AndroidViewModel {
         return filteredList;
     }
 
-    public void addMovie(MyMovie movie) {
-        mRepo.insertMovie(movie);
+    public void addMovie(MyMovie movie, String personID) {
+        mRepo.insertMovie(movie, personID);
     }
 
-    public void removeMovie(String id) {
-        mRepo.removeMovie(id);
+    public void removeMovie(String movieID, String personID) {
+        mRepo.removeMovie(movieID, personID);
     }
 
 

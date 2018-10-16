@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.PersonPOJO;
@@ -78,7 +80,9 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
                         e -> Log.e("rxprob", "queryPopular loadPopularRV" + e.getMessage())));
 
         myListsCompositeDisposable.add(movieViewModel.getSavedLists()
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(x -> Log.d("xxxx", "SUBSCRIBED"))
                 .subscribe(this::loadSavedRV,
                         e -> Log.e("rxprob", "getSavedLists loadSavedRV" + e.getMessage())));
     }
@@ -106,7 +110,7 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
     }
 
     private void loadSavedRV(List<MyList> myLists) {
-
+        Log.d("xxxx", "loadSavedRV  " + myLists.size() + "  " + myLists.toString());
         if (mSavedListRV == null) {
             View rootView = getView();
             if (rootView == null) {

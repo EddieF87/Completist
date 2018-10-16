@@ -248,8 +248,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(
-                        success -> movieViewModel.removeMovie(String.valueOf(film.getMovie_id())),
-                        error -> movieViewModel.addMovie(film)
+                        success -> movieViewModel.removeMovie(String.valueOf(film.getMovie_id()), mPersonId),
+                        error -> movieViewModel.addMovie(film, mPersonId)
                 )
         );
         mMovieAdapter.notifyItemChanged(pos);
@@ -266,7 +266,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     }
 
     private void updateFilmsWatched(List<MyMovie> watchedFilms) {
-
+Log.d("xxxx", "updateFilmsWatched");
         mTotalFilms = mCurrentFilmList.size();
         mWatchedFilms = 0;
 
@@ -285,8 +285,10 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     }
 
     private void updateWatchedStatus(int numberSeen, int numberOfMovies) {
-        listCompositeDisposable.add(Observable.just(numberSeen, numberOfMovies, mPersonId)
+        listCompositeDisposable.add(Observable.just(mPersonId)
                 .subscribeOn(Schedulers.io())
+                .doOnComplete(() -> Log.d("xxxx","COMPLELELELEL"))
+                .doOnNext(x -> Log.d("xxxx","doOnNextdoOnNext" + x))
                 .subscribe(x -> movieViewModel.updateList(numberSeen, numberOfMovies, mPersonId))
         );
     }

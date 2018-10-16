@@ -1,6 +1,7 @@
 package xyz.sleekstats.completist.service;
 
 import android.app.Application;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import xyz.sleekstats.completist.model.CastCredits;
 import xyz.sleekstats.completist.model.CastInfo;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
@@ -33,7 +35,7 @@ public class Repo {
 
     public Repo(Application application) {
 
-        if(tmdbAPI == null) {
+        if (tmdbAPI == null) {
             tmdbAPI = getData();
         }
 
@@ -130,12 +132,14 @@ public class Repo {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void insertMovie(MyMovie movie) {
+    public void insertMovie(MyMovie movie, String personID) {
         mMovieDao.insertMovie(movie);
+        addRemoveAll(String.valueOf(movie.getMovie_id()), personID, true);
     }
 
-    public void removeMovie(String id) {
-        mMovieDao.removeMovie(id);
+    public void removeMovie(String movieID, String personID) {
+        mMovieDao.removeMovie(movieID);
+        addRemoveAll(movieID, personID, false);
     }
 
     public void insertList(MyList list) {
@@ -164,5 +168,52 @@ public class Repo {
 
     public Flowable<List<MyList>> getSavedLists() {
         return mMovieDao.getSavedLists();
+    }
+
+
+    private void addRemoveAll(String movieID, String personID, boolean addWatched) {
+        Log.d("xxxxx", "addRemoveAll" + movieID + "  " + personID);
+
+        Single<List<MyList>> listSingle = mMovieDao.getSavedListsToUpdate()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .doOnError(x -> Log.d("yyyy", "myListsObservable doOnError" + x.getMessage()));
+
+        Single<List<String>> castSingle = tmdbAPI.retrieveFilm(movieID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .map(FilmPOJO::getCastCredits)
+                .map(CastCredits::getCast)
+                .flatMapIterable(list -> list)
+                .map(CastInfo::getId)
+                .toList();
+
+        Single.zip(listSingle, castSingle, (x, y) -> {
+                    List<String> ids = new ArrayList<>();
+                    for (MyList myList : x) {
+                        String id = String.valueOf(myList.getList_id());
+                        if (y.contains(id)) {
+                            ids.add(id);
+                        }
+                    }
+                    if (ids.contains(personID)) {
+                        ids.remove(personID);
+                    }
+                    return ids;
+                }
+        ).subscribe(ids -> {
+            Log.d("yyyy", "zip.subscribe" + ids);
+            if (addWatched) {
+                for (String id : ids) {
+                    Log.d("yyyy", "addWatched" + id);
+                    mMovieDao.addWatchedMovie(id);
+                }
+            } else {
+                for (String id : ids) {
+                    Log.d("yyyy", "removeWatched" + id);
+                    mMovieDao.removeWatchedMovie(id);
+                }
+            }
+        });
     }
 }

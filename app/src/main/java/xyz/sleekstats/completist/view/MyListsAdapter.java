@@ -49,7 +49,7 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
         String id = String.valueOf(myList.getList_id());
         int pct = myList.getList_pct();
 
-        Log.d("xxxx", myList.getList_name() + "  watched" + myList.getWatched_films() +  "/ " + myList.getTotal_films());
+//        Log.d("xxxx", myList.getList_name() + "  watched" + myList.getWatched_films() +  "/ " + myList.getTotal_films());
         Picasso.get().load(posterURL)
                 .placeholder(R.drawable.ic_person_92px)
                 .error(R.drawable.ic_person_92px)

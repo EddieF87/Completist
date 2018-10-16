@@ -45,6 +45,9 @@ public interface MovieDao {
     @Query("SELECT * from list_table")
     Flowable<List<MyList>> getSavedLists();
 
+    @Query("SELECT * from list_table")
+    Single<List<MyList>> getSavedListsToUpdate();
+
     @Query("DELETE FROM list_table WHERE list_id LIKE :id")
     void removeList(String id);
 
@@ -56,4 +59,10 @@ public interface MovieDao {
 
     @Query("UPDATE list_table SET watched_films=:watched, total_films=:total WHERE list_id = :id")
     void updateListWatched(int watched, int total, String id);
+
+    @Query("UPDATE list_table SET watched_films = watched_films + 1 WHERE list_id = :id")
+    void addWatchedMovie(String id);
+
+    @Query("UPDATE list_table SET watched_films = watched_films - 1 WHERE list_id = :id")
+    void removeWatchedMovie(String id);
 }
