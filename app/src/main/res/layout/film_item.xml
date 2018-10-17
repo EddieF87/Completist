@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/film_default"
     android:layout_margin="@dimen/smallMargin"
-    android:orientation="vertical"
+    card_view:cardBackgroundColor="@color/colorAccent"
+    card_view:cardCornerRadius="@dimen/cardCornerRadius"
+    card_view:cardElevation="@dimen/cardElevation"
+    card_view:contentPadding="5dp"
     >
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryDark"
+    >
+
 
     <ImageView
         android:id="@+id/poster"
@@ -74,3 +84,4 @@
     </LinearLayout>
 
 </LinearLayout>
+</android.support.v7.widget.CardView>

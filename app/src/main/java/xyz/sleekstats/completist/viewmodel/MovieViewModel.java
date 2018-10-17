@@ -50,7 +50,7 @@ public class MovieViewModel extends AndroidViewModel {
                 filmsObservable = mRepo.getPopularFilms();
                 break;
             case "np":
-                personObservable = Observable.just(new PersonPOJO("Now Playing", "Movies currently playing in theaters.", "Movies", "", null));
+                personObservable = Observable.just(new PersonPOJO("Now Showing", "Movies currently playing in theaters.", "Movies", "", null));
                 filmsObservable = mRepo.getNowPlaying();
                 break;
             case "tr":

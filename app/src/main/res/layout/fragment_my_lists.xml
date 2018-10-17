@@ -11,11 +11,13 @@
         android:id="@+id/my_list_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/titleTextSize"
-        android:text="@string/my_lists" />
+        android:text="@string/my_lists"
+        android:textSize="@dimen/titleTextSize" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/saved_lists_rv"
+        android:background="@drawable/castlist_border"
+        android:requiresFadingEdge="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2" />
@@ -24,55 +26,68 @@
         android:id="@+id/pop_list_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/titleTextSize"
         android:layout_marginTop="@dimen/largeMargin"
-        android:text="@string/popular_actors_directors" />
+        android:text="@string/popular_actors_directors"
+        android:textSize="@dimen/titleTextSize" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/pop_lists_rv"
+        android:background="@drawable/castlist_border"
+        android:requiresFadingEdge="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/radio_group1"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_gravity="center"
-        >
+        android:layout_marginTop="@dimen/largeMargin"
+        android:paddingTop="@dimen/defaultBtnPadding"
+        android:paddingBottom="@dimen/defaultBtnPadding"
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
-        <Button
+        <RadioButton
             android:id="@+id/watched_movies_btn"
             style="@style/ListButtonStyle"
+            android:layout_height="match_parent"
             android:text="@string/watched_movies" />
 
-        <Button
+        <RadioButton
             android:id="@+id/popular_movies_btn"
             style="@style/ListButtonStyle"
-            android:text="@string/popular_movies"
-            />
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:text="@string/popular_movies" />
+    </RadioGroup>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/radio_group2"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_gravity="center"
-        >
+        android:paddingTop="@dimen/defaultBtnPadding"
+        android:paddingBottom="@dimen/defaultBtnPadding"
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
-        <Button
+        <RadioButton
             android:id="@+id/top_movies_btn"
             style="@style/ListButtonStyle"
-            android:text="@string/top_rated_movies"
-            android:layout_gravity="center"
-            />
+            android:layout_height="match_parent"
+            android:text="@string/top_rated_movies" />
 
-        <Button
+        <RadioButton
             android:id="@+id/nowshowing_movies_btn"
             style="@style/ListButtonStyle"
-            android:text="@string/now_showing"
-            />
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:text="@string/now_showing" />
 
-
+        <RadioButton
+            android:id="@+id/scheduled_btn"
+            style="@style/ListButtonStyle"
+            android:layout_height="match_parent"
+            android:text="To Watch" />
+    </RadioGroup>
 </LinearLayout>

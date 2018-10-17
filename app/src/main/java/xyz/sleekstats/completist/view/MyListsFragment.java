@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,8 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
     private final CompositeDisposable myListsCompositeDisposable = new CompositeDisposable();
     private MovieViewModel movieViewModel;
     private OnFragmentInteractionListener mListener;
+    private RadioGroup radioGroup1;
+    private RadioGroup radioGroup2;
 
     public MyListsFragment() {
         // Required empty public constructor
@@ -51,10 +55,13 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
 
         View view = inflater.inflate(R.layout.fragment_my_lists, container, false);
 
-        view.findViewById(R.id.watched_movies_btn).setOnClickListener(btn -> onListClick("my"));
-        view.findViewById(R.id.popular_movies_btn).setOnClickListener(btn -> onListClick("pop"));
-        view.findViewById(R.id.nowshowing_movies_btn).setOnClickListener(btn -> onListClick("np"));
-        view.findViewById(R.id.top_movies_btn).setOnClickListener(btn -> onListClick("tr"));
+        radioGroup1 = view.findViewById(R.id.radio_group1);
+        radioGroup2 = view.findViewById(R.id.radio_group2);
+        view.findViewById(R.id.watched_movies_btn).setOnClickListener(btn -> onRadioClick("my", true));
+        view.findViewById(R.id.popular_movies_btn).setOnClickListener(btn -> onRadioClick("pop", true));
+        view.findViewById(R.id.nowshowing_movies_btn).setOnClickListener(btn -> onRadioClick("np", false));
+        view.findViewById(R.id.top_movies_btn).setOnClickListener(btn -> onRadioClick("tr", false));
+        view.findViewById(R.id.scheduled_btn).setOnClickListener(btn -> onRadioClick("my", false));
 
         return view;
     }
@@ -138,6 +145,17 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
         super.onDetach();
         mListener = null;
         myListsCompositeDisposable.clear();
+    }
+
+    private void onRadioClick(String listID, boolean firstGroupChecked) {
+        if(firstGroupChecked) {
+            if(radioGroup2 != null) {
+                radioGroup2.clearCheck();
+            }
+        } else {
+            radioGroup1.clearCheck();
+        }
+        onListClick(listID);
     }
 
     @Override

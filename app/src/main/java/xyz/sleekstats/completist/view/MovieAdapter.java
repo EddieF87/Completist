@@ -3,6 +3,7 @@ package xyz.sleekstats.completist.view;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,9 +37,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
     @NonNull
     @Override
     public FilmViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext())
+        CardView cardView = (CardView) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.film_item, parent, false);
-        return new FilmViewHolder(linearLayout);
+        return new FilmViewHolder(cardView);
     }
 
     @Override
@@ -60,7 +61,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
 
     class FilmViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private View mView;
+        private CardView mView;
         private ImageView mPosterView;
         private ImageView mWatchedView;
         private ImageView mLaterView;
@@ -71,7 +72,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
 
         public FilmViewHolder(View itemView) {
             super(itemView);
-            mView = itemView;
+            mView = (CardView) itemView;
             mTitleView = itemView.findViewById(R.id.title);
             mPosterView = itemView.findViewById(R.id.poster);
             mWatchedView = itemView.findViewById(R.id.watched_btn);
@@ -106,10 +107,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
 
             int watchType= movie.getWatchType();
             if(watchType < 2) {
-                mView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.film_default));
+                mView.setCardBackgroundColor(ContextCompat.getColor(mContext, R.color.colorAccent));
                 mWatchedView.setAlpha(.3f);
             } else {
-                mView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.film_watched));
+                mView.setCardBackgroundColor(ContextCompat.getColor(mContext, R.color.colorWatched));
                 mWatchedView.setAlpha(1f);
             }
         }

@@ -25,26 +25,23 @@
         <item name="android:layout_weight">1</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center</item>
-        <item name="android:background">@drawable/film_default</item>
+        <item name="android:gravity">center</item>
+-        <item name="android:background">@drawable/btn_selector</item>
+        <item name="android:button">@android:color/transparent</item>
         <item name="android:textColor">@color/colorAccent</item>
-        <item name="android:textSize">@dimen/smallTextSize</item>
+        <item name="android:textSize">@dimen/btnTextSize</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:paddingBottom">@dimen/defaultBtnPadding</item>
-        <item name="android:paddingTop">@dimen/defaultBtnPadding</item>
+        <item name="android:padding">@dimen/smallPadding</item>
         <item name="android:layout_marginStart">@dimen/defaultMargin</item>
         <item name="android:layout_marginEnd">@dimen/defaultMargin</item>
     </style>
 
-
     <style name="ListButtonStyleLandscape" parent="ListButtonStyle">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:paddingBottom">0dp</item>
-        <item name="android:paddingTop">0dp</item>
-        <item name="android:layout_marginBottom">@dimen/defaultMargin</item>
+        <item name="android:layout_marginBottom">@dimen/defaultBtnPadding</item>
         <item name="android:layout_marginTop">@dimen/defaultMargin</item>
-        <item name="android:layout_marginStart">@dimen/largeMargin</item>
-        <item name="android:layout_marginEnd">@dimen/defaultMargin</item>
+        <item name="android:layout_marginStart">@dimen/defaultMargin</item>
+        <item name="android:layout_marginEnd">@dimen/defaultBtnPadding</item>
+        <item name="android:padding">@dimen/defaultBtnPadding</item>
     </style>
 </resources>

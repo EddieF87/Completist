@@ -1,75 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:baselineAligned="false"
     android:orientation="horizontal"
     android:padding="@dimen/largeMargin"
-    tools:context=".view.MyListsFragment"
-    android:baselineAligned="false">
+    tools:context=".view.MyListsFragment">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/my_list_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/my_lists"
+        android:textSize="@dimen/midTextSize"
+        app:layout_constraintBottom_toTopOf="@+id/saved_lists_rv"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/saved_lists_rv"
+        android:background="@drawable/castlist_border"
+        android:requiresFadingEdge="horizontal"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="7"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:layout_constraintBottom_toTopOf="@+id/pop_list_label"
+        app:layout_constraintEnd_toStartOf="@+id/my_vguideline"
+        app:layout_constraintStart_toStartOf="@+id/my_list_label"
+        app:layout_constraintTop_toBottomOf="@+id/my_list_label" />
 
-        <TextView
-            android:id="@+id/my_list_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/my_lists"
-            android:textSize="@dimen/midTextSize" />
+    <TextView
+        android:id="@+id/pop_list_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/largeMargin"
+        android:text="@string/popular_actors_directors"
+        android:textSize="@dimen/midTextSize"
+        app:layout_constraintBottom_toTopOf="@+id/pop_lists_rv"
+        app:layout_constraintStart_toStartOf="@+id/my_list_label"
+        app:layout_constraintTop_toBottomOf="@+id/saved_lists_rv" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/saved_lists_rv"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <TextView
-            android:id="@+id/pop_list_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/largeMargin"
-            android:text="@string/popular_actors_directors"
-            android:textSize="@dimen/midTextSize" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/pop_lists_rv"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-    </LinearLayout>
-
-
-    <LinearLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/pop_lists_rv"
+        android:background="@drawable/castlist_border"
+        android:requiresFadingEdge="horizontal"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="2"
-        android:layout_gravity="center"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/my_vguideline"
+        app:layout_constraintStart_toStartOf="@+id/my_list_label"
+        app:layout_constraintTop_toBottomOf="@+id/pop_list_label" />
 
-        <Button
+
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/radio_group1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/my_hguideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/my_vguideline"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
             android:id="@+id/watched_movies_btn"
             style="@style/ListButtonStyleLandscape"
             android:text="@string/watched_movies" />
 
-        <Button
+        <RadioButton
             android:id="@+id/popular_movies_btn"
             style="@style/ListButtonStyleLandscape"
             android:text="@string/popular_movies" />
+    </RadioGroup>
 
-        <Button
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/radio_group2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/my_vguideline"
+        app:layout_constraintTop_toTopOf="@+id/my_hguideline">
+
+        <RadioButton
             android:id="@+id/top_movies_btn"
             style="@style/ListButtonStyleLandscape"
             android:layout_gravity="center"
             android:text="@string/top_rated_movies" />
 
-        <Button
+        <RadioButton
             android:id="@+id/nowshowing_movies_btn"
             style="@style/ListButtonStyleLandscape"
             android:text="@string/now_showing" />
-    </LinearLayout>
-</LinearLayout>
+
+        <RadioButton
+            android:id="@+id/scheduled_btn"
+            style="@style/ListButtonStyleLandscape"
+            android:text="To Watch" />
+    </RadioGroup>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/my_hguideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".40" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/my_vguideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".77"/>
+</android.support.constraint.ConstraintLayout>

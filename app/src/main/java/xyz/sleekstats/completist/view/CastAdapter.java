@@ -2,6 +2,7 @@ package xyz.sleekstats.completist.view;
 
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,9 +33,9 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder
     @NonNull
     @Override
     public CastViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        RelativeLayout linearLayout = (RelativeLayout ) LayoutInflater.from(parent.getContext())
+        CardView cardView = (CardView) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.cast_item, parent, false);
-        return new CastViewHolder(linearLayout);
+        return new CastViewHolder(cardView);
     }
 
     //Load name and poster details for director/cast

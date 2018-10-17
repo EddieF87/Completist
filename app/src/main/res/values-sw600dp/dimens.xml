@@ -4,6 +4,7 @@
     <dimen name="midTextSize">36sp</dimen>
     <dimen name="pctTextSize">24sp</dimen>
     <dimen name="smallTextSize">16sp</dimen>
+    <dimen name="btnTextSize">16sp</dimen>
     <dimen name="defaultTextSize">18sp</dimen>
 
     <dimen name="toolbarHeight">72dp</dimen>
