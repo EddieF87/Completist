@@ -54,6 +54,7 @@ public class MyList {
     }
 
     public int getList_pct() {
+        if(total_films == 0) {return -1;}
         return watched_films * 100 /total_films;
     }
 

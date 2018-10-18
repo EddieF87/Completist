@@ -186,10 +186,10 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             case "np":
             case "tr":
             case "pop":
-                mListSaveButton.setVisibility(View.GONE);
+                mListSaveButton.hide();
                 break;
             default:
-                mListSaveButton.setVisibility(View.VISIBLE);
+                mListSaveButton.show();
         }
 
         setRecyclerView(filmByPersonList);

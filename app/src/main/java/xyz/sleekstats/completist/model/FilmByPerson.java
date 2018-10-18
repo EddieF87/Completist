@@ -2,6 +2,8 @@ package xyz.sleekstats.completist.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Objects;
+
 public class FilmByPerson {
 
     public FilmByPerson(String title, String id, String poster_path) {
@@ -40,5 +42,17 @@ public class FilmByPerson {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) {return false;}
+        FilmByPerson otherFilm = (FilmByPerson) obj;
+        return otherFilm.getTitle().equals(this.getTitle());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title);
     }
 }

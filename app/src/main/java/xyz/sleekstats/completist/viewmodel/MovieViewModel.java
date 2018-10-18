@@ -6,7 +6,9 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -61,7 +63,7 @@ public class MovieViewModel extends AndroidViewModel {
                 personObservable = mRepo.getFilmsByPerson(personId);
                 filmsObservable = personObservable
                         .map(s -> {
-                            if (s.getKnown_for_department().equals("Directing")) {
+                            if (s.getKnown_for_department().equals("Directing") || s.getKnown_for_department().equals("Writing")) {
                                 return filterCrew(s.getMovieCredits().getCrew());
                             } else {
                                 return s.getMovieCredits().getCast();
@@ -86,13 +88,13 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     private List<FilmByPerson> filterCrew(List<FilmByPerson> unfiltered) {
-        List<FilmByPerson> filteredList = new ArrayList<>();
+        Set<FilmByPerson> filteredSet = new HashSet<>();
         for (FilmByPerson film : unfiltered) {
-            if (film.getJob().equals("Director")) {
-                filteredList.add(film);
+            if (film.getJob().equals("Director") || film.getJob().equals("Writer") || film.getJob().equals("Screenplay")) {
+                filteredSet.add(film);
             }
         }
-        return filteredList;
+        return new ArrayList<>(filteredSet);
     }
 
     public void addMovie(MyMovie movie, String personID) {
