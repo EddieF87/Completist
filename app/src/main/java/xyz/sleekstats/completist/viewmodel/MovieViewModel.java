@@ -62,7 +62,7 @@ public class MovieViewModel extends AndroidViewModel {
             default:
                 personObservable = mRepo.getFilmsByPerson(personId);
                 filmsObservable = personObservable
-                        .map(s -> s.getMovieCredits().bothLists());
+                        .map(s -> new ArrayList<>(s.getMovieCredits().bothLists()));
         }
         return Observable.zip(personObservable, filmsObservable,
                 FilmListDetails::new);

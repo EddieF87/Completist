@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -172,8 +173,8 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
     //Populate recyclerview of cast names and images
     private void setCastRecyclerView(CastCredits castCredits) {
 
-        List<CastInfo> castInfos = castCredits.getCast();
-        List<CastInfo> crewInfos = castCredits.getCrew();
+        List<CastInfo> castInfos = new ArrayList<>(castCredits.getCast());
+        List<CastInfo> crewInfos = new ArrayList<>(castCredits.getCrew());
 
         CastInfo directorInfo = getDirector(crewInfos);
         if (directorInfo != null) {

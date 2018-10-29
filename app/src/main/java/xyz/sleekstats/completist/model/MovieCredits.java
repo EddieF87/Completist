@@ -10,36 +10,39 @@ import java.util.Set;
 public class MovieCredits {
 
     @SerializedName("cast")
-    private List<FilmByPerson> cast;
+    private Set<FilmByPerson> cast;
 
     @SerializedName("crew")
-    private List<FilmByPerson> crew;
+    private Set<FilmByPerson> crew;
 
-    private List<FilmByPerson> both;
+    private Set<FilmByPerson> both;
 
-    public List<FilmByPerson> getCrew() {
+    public Set<FilmByPerson> getCrew() {
         return filterCrew(crew);
     }
 
-    public List<FilmByPerson> getCast() {
+    public Set<FilmByPerson> getCast() {
         return cast;
     }
 
-    public List<FilmByPerson> bothLists() {
+    public Set<FilmByPerson> bothLists() {
         if(both == null) {
-            both = new ArrayList<>(cast);
-            both.addAll(getCrew());
+            Set<FilmByPerson> filmByPersonSet = new HashSet<>(cast);
+            filmByPersonSet.addAll(getCrew());
+//            both = new ArrayList<>(filmByPersonSet);
+            both = filmByPersonSet;
         }
         return both;
     }
 
-    private List<FilmByPerson> filterCrew(List<FilmByPerson> unfiltered) {
+    private Set<FilmByPerson> filterCrew(Set<FilmByPerson> unfiltered) {
         Set<FilmByPerson> filteredSet = new HashSet<>();
         for (FilmByPerson film : unfiltered) {
             if (film.getJob().equals("Director") || film.getJob().equals("Writer") || film.getJob().equals("Screenplay")) {
                 filteredSet.add(film);
             }
         }
-        return new ArrayList<>(filteredSet);
+//        return new ArrayList<>(filteredSet);
+        return filteredSet;
     }
 }

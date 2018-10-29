@@ -3,29 +3,31 @@ package xyz.sleekstats.completist.model;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class CastCredits {
 
     @SerializedName("cast")
-    private List<CastInfo> cast;
+    private Set<CastInfo> cast;
 
     @SerializedName("crew")
-    private List<CastInfo> crew;
+    private Set<CastInfo> crew;
 
-    private List<CastInfo> both;
+    private Set<CastInfo> both;
 
-    public List<CastInfo> getCast() {
+    public Set<CastInfo> getCast() {
         return cast;
     }
 
-    public List<CastInfo> getCrew() {
+    public Set<CastInfo> getCrew() {
         return crew;
     }
 
-    public List<CastInfo> bothLists() {
+    public Set<CastInfo> bothLists() {
         if(both == null) {
-            both = new ArrayList<>(cast);
+            both = new HashSet<>(cast);
             both.addAll(crew);
         }
         return both;
