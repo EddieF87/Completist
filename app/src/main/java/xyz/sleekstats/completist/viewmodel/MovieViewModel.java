@@ -62,14 +62,7 @@ public class MovieViewModel extends AndroidViewModel {
             default:
                 personObservable = mRepo.getFilmsByPerson(personId);
                 filmsObservable = personObservable
-                        .map(s -> {
-                            if (s.getKnown_for_department().equals("Directing") || s.getKnown_for_department().equals("Writing")) {
-                                return filterCrew(s.getMovieCredits().getCrew());
-                            } else {
-                                return s.getMovieCredits().getCast();
-                            }
-                        });
-
+                        .map(s -> s.getMovieCredits().bothLists());
         }
         return Observable.zip(personObservable, filmsObservable,
                 FilmListDetails::new);
@@ -85,16 +78,6 @@ public class MovieViewModel extends AndroidViewModel {
 
     public Observable<PersonQueryPOJO> queryPopular() {
         return mRepo.getPopularActors();
-    }
-
-    private List<FilmByPerson> filterCrew(List<FilmByPerson> unfiltered) {
-        Set<FilmByPerson> filteredSet = new HashSet<>();
-        for (FilmByPerson film : unfiltered) {
-            if (film.getJob().equals("Director") || film.getJob().equals("Writer") || film.getJob().equals("Screenplay")) {
-                filteredSet.add(film);
-            }
-        }
-        return new ArrayList<>(filteredSet);
     }
 
     public void addMovie(MyMovie movie, String personID) {

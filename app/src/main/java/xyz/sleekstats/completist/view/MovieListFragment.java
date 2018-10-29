@@ -117,7 +117,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 )
         );
         mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mGrids));
-        setRetainInstance(true);
+//        setRetainInstance(true);
         return rootView;
     }
 

@@ -183,7 +183,7 @@ public class Repo {
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .map(FilmPOJO::getCastCredits)
-                .map(CastCredits::getCast)
+                .map(CastCredits::bothLists)
                 .flatMapIterable(list -> list)
                 .map(CastInfo::getId)
                 .toList();

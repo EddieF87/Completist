@@ -78,7 +78,7 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
         mGenreView = rootView.findViewById(R.id.movie_genre);
         mCastView = rootView.findViewById(R.id.cast_recyclerview);
         mCastView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-        setRetainInstance(true);
+//        setRetainInstance(true);
         return rootView;
     }
 
