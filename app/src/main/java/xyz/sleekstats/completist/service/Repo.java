@@ -21,7 +21,6 @@ import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.MovieRoomDB;
 import xyz.sleekstats.completist.model.MyList;
-import xyz.sleekstats.completist.model.MyMovie;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.model.MediaQueryPOJO;
 import xyz.sleekstats.completist.model.PersonQueryPOJO;
@@ -120,21 +119,14 @@ public class Repo {
     //Get list of top-rated films
     public Observable<List<FilmByPerson>> getMyMovies() {
         return mMovieDao.getSavedMovies()
-                .map(movList -> {
-                    List<FilmByPerson> films = new ArrayList<>();
-                    for (MyMovie myMovie : movList) {
-                        films.add(new FilmByPerson(myMovie.getTitle(), String.valueOf(myMovie.getMovie_id()), myMovie.getPoster()));
-                    }
-                    return films;
-                })
                 .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void insertMovie(MyMovie movie, String personID) {
+    public void insertMovie(FilmByPerson movie, String personID) {
         mMovieDao.insertMovie(movie);
-        addRemoveAll(String.valueOf(movie.getMovie_id()), personID, true);
+        addRemoveAll(String.valueOf(movie.getId()), personID, true);
     }
 
     public void removeMovie(String movieID, String personID) {
@@ -154,7 +146,7 @@ public class Repo {
         mMovieDao.updateListWatched(numberSeen, numberOfMovies, id);
     }
 
-    public Single<MyMovie> checkIfMovieExists(String id) {
+    public Single<FilmByPerson> checkIfMovieExists(String id) {
         return mMovieDao.checkIfMovieExists(id);
     }
 
@@ -162,7 +154,7 @@ public class Repo {
         return mMovieDao.checkIfListExists(id);
     }
 
-    public Flowable<List<MyMovie>> getMoviesWatched(List<String> ids) {
+    public Single<List<FilmByPerson>> getMoviesWatched(List<String> ids) {
         return mMovieDao.getMoviesWatched(ids);
     }
 
@@ -172,7 +164,6 @@ public class Repo {
 
 
     private void addRemoveAll(String movieID, String personID, boolean addWatched) {
-        Log.d("xxxxx", "addRemoveAll" + movieID + "  " + personID);
 
         Single<List<MyList>> listSingle = mMovieDao.getSavedListsToUpdate()
                 .subscribeOn(Schedulers.io())
@@ -196,21 +187,18 @@ public class Repo {
                             ids.add(id);
                         }
                     }
-                    if (ids.contains(personID)) {
-                        ids.remove(personID);
-                    }
+//                    if (ids.contains(personID)) {
+//                        ids.remove(personID);
+//                    }
                     return ids;
                 }
         ).subscribe(ids -> {
-            Log.d("yyyy", "zip.subscribe" + ids);
             if (addWatched) {
                 for (String id : ids) {
-                    Log.d("yyyy", "addWatched" + id);
                     mMovieDao.addWatchedMovie(id);
                 }
             } else {
                 for (String id : ids) {
-                    Log.d("yyyy", "removeWatched" + id);
                     mMovieDao.removeWatchedMovie(id);
                 }
             }

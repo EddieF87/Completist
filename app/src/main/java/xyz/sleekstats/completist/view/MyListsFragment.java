@@ -24,6 +24,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import xyz.sleekstats.completist.R;
+import xyz.sleekstats.completist.databinding.MovieKeys;
 import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
@@ -57,11 +58,11 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
 
         radioGroup1 = view.findViewById(R.id.radio_group1);
         radioGroup2 = view.findViewById(R.id.radio_group2);
-        view.findViewById(R.id.watched_movies_btn).setOnClickListener(btn -> onRadioClick("my", true));
-        view.findViewById(R.id.popular_movies_btn).setOnClickListener(btn -> onRadioClick("pop", true));
-        view.findViewById(R.id.nowshowing_movies_btn).setOnClickListener(btn -> onRadioClick("np", false));
-        view.findViewById(R.id.top_movies_btn).setOnClickListener(btn -> onRadioClick("tr", false));
-        view.findViewById(R.id.scheduled_btn).setOnClickListener(btn -> onRadioClick("my", false));
+        view.findViewById(R.id.watched_movies_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_WATCHED, true));
+        view.findViewById(R.id.popular_movies_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_POPULAR, true));
+        view.findViewById(R.id.nowshowing_movies_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_NOWPLAYING, false));
+        view.findViewById(R.id.top_movies_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_TOPRATED, false));
+        view.findViewById(R.id.scheduled_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_WATCHED, false));
 
         return view;
     }
@@ -89,7 +90,6 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
         myListsCompositeDisposable.add(movieViewModel.getSavedLists()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(x -> Log.d("xxxx", "SUBSCRIBED"))
                 .subscribe(this::loadSavedRV,
                         e -> Log.e("rxprob", "getSavedLists loadSavedRV" + e.getMessage())));
     }
@@ -117,7 +117,6 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
     }
 
     private void loadSavedRV(List<MyList> myLists) {
-        Log.d("xxxx", "loadSavedRV  " + myLists.size() + "  " + myLists.toString());
         if (mSavedListRV == null) {
             View rootView = getView();
             if (rootView == null) {
@@ -161,6 +160,10 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
     @Override
     public void onListClick(String listID) {
         if (mListener != null) {
+            if(radioGroup1 != null && radioGroup2 != null) {
+                radioGroup1.clearCheck();
+                radioGroup2.clearCheck();
+            }
             mListener.onCastSelected(listID);
         }
     }

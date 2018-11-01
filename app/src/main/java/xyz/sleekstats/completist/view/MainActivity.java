@@ -28,6 +28,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import xyz.sleekstats.completist.R;
+import xyz.sleekstats.completist.databinding.MovieKeys;
 import xyz.sleekstats.completist.model.MediaPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
@@ -36,9 +37,8 @@ public class MainActivity extends AppCompatActivity
         MovieDetailsFragment.OnFragmentInteractionListener,
         MyListsFragment.OnFragmentInteractionListener {
 
-    private boolean isListView = true;
     private String movieID = "287";
-    private String personID = "my";
+    private String personID = MovieKeys.LIST_WATCHED;
     private static final String SEARCH_TITLE = "title";
     private static final String SEARCH_ID = "search_id";
     private static final String SEARCH_TYPE = "search_type";
@@ -58,13 +58,9 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState != null) {
-            isListView = savedInstanceState.getBoolean("isListView");
-        }
         if (movieViewModel == null) {
             movieViewModel = ViewModelProviders.of(MainActivity.this).get(MovieViewModel.class);
         }
-
         startPager();
     }
 
@@ -117,7 +113,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFilmSelected(String movieID) {
-        isListView = false;
         this.movieID = movieID;
         myViewPager.setCurrentItem(2);
         movieDetailsFragment = (MovieDetailsFragment) myPagerAdapter.getItem(2);
@@ -126,7 +121,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onCastSelected(String castID) {
-        isListView = true;
         this.personID = castID;
         myViewPager.setCurrentItem(1);
         movieListFragment = (MovieListFragment) myPagerAdapter.getItem(1);
@@ -134,17 +128,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void onShowSelected(String showID) {
-        isListView = false;
         this.movieID = showID;
         myViewPager.setCurrentItem(2);
         movieDetailsFragment = (MovieDetailsFragment) myPagerAdapter.getItem(2);
         movieDetailsFragment.getShow(showID);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean("isListView", isListView);
     }
 
     private class MyPagerAdapter extends FragmentStatePagerAdapter {
@@ -198,8 +185,6 @@ public class MainActivity extends AppCompatActivity
             }
             return createdFragment;
         }
-
-
     }
 
     @Override

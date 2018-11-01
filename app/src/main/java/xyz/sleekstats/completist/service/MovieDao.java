@@ -12,8 +12,8 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.MyList;
-import xyz.sleekstats.completist.model.MyMovie;
 
 @Dao
 public interface MovieDao {
@@ -21,19 +21,19 @@ public interface MovieDao {
     //Movies Table
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertMovie(MyMovie myMovie);
+    void insertMovie(FilmByPerson myMovie);
 
     @Query("SELECT * from movie_table")
-    Flowable<List<MyMovie>> getSavedMovies();
+    Flowable<List<FilmByPerson>> getSavedMovies();
 
-    @Query("DELETE FROM movie_table WHERE movie_id LIKE :id")
+    @Query("DELETE FROM movie_table WHERE id LIKE :id")
     void removeMovie(String id);
 
-    @Query("SELECT * FROM movie_table WHERE movie_id LIKE :id")
-    Single<MyMovie> checkIfMovieExists(String id);
+    @Query("SELECT * FROM movie_table WHERE id LIKE :id")
+    Single<FilmByPerson> checkIfMovieExists(String id);
 
-    @Query("SELECT * FROM movie_table WHERE movie_id IN (:ids)")
-    Flowable<List<MyMovie>> getMoviesWatched(List<String> ids);
+    @Query("SELECT * FROM movie_table WHERE id IN (:ids)")
+    Single<List<FilmByPerson>> getMoviesWatched(List<String> ids);
 
 
 

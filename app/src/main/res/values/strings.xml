@@ -7,4 +7,9 @@
     <string name="now_showing">Now Showing</string>
     <string name="popular_actors_directors">Popular Actors/Directors</string>
     <string name="my_lists">My Lists</string>
+    <string-array name="planets_array">
+        <item>All</item>
+        <item>Acting</item>
+        <item>Writing/Directing</item>
+    </string-array>
 </resources>
