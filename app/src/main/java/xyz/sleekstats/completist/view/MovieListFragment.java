@@ -80,6 +80,9 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        if (movieViewModel == null) {
+            movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
+        }
         fragmentListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false);
 
         mGrids = getResources().getInteger(R.integer.grid_number);
@@ -100,11 +103,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                         .doOnError(e -> Log.e(TAG_RXERROR, "Spinner error: " + e.getMessage()))
                         .subscribe(
                                 pos -> {
-//                            mPersonPojo.setName("FUCKFACE" + pos);
-
-//                            fragmentListBinding.setPerson(mPersonPojo);
+                                    movieViewModel.onSpin(pos);
                                 }
-//                        pos -> setRecyclerView(new ArrayList<>(movieViewModel.onSpin(pos)))
                         )
         );
 
@@ -134,9 +134,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
             mPersonId = savedInstanceState.getString("id", mPersonId);
-        }
-        if (movieViewModel == null) {
-            movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
         }
         getFilmsForPerson(mPersonId);
 
@@ -236,12 +233,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     @Override
     public void onFilmChecked(int pos, int watchType) {
-        if (mMovieAdapter == null) {
-            return;
-        }
 
         FilmByPerson film = mCurrentFilmList.get(pos);
-//        film.setWatchType(watchType);
 
         listCompositeDisposable.add(movieViewModel.checkIfMovieExists(film)
                 .subscribeOn(Schedulers.io())
@@ -254,6 +247,9 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     }
 
     private void setWatchType(FilmByPerson film, int i, int pos){
+        if (mMovieAdapter == null) {
+            return;
+        }
         film.setWatchType(i);
         mMovieAdapter.notifyItemChanged(pos);
     }
