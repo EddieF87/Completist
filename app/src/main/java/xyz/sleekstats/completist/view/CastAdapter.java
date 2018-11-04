@@ -17,14 +17,15 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import xyz.sleekstats.completist.R;
+import xyz.sleekstats.completist.databinding.CastItemBinding;
 import xyz.sleekstats.completist.model.CastInfo;
+import xyz.sleekstats.completist.model.FilmByPerson;
 
 //Load director and cast details for a film in a recyclerview
 public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder>{
 
     private List<CastInfo> castInfoList;
     private ItemClickListener mClickListener;
-    private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
 
     public CastAdapter(List<CastInfo> castInfoList) {
         this.castInfoList = castInfoList;
@@ -33,26 +34,15 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder
     @NonNull
     @Override
     public CastViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        CardView cardView = (CardView) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.cast_item, parent, false);
-        return new CastViewHolder(cardView);
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        CastItemBinding castItemBinding = CastItemBinding.inflate(layoutInflater, parent, false);
+        return new CastViewHolder(castItemBinding);
     }
 
     //Load name and poster details for director/cast
     @Override
     public void onBindViewHolder(@NonNull CastViewHolder holder, int position) {
-        CastInfo castInfo = castInfoList.get(position);
-        String posterURL = POSTER_BASE_URL + castInfo.getProfile_path();
-        String name = castInfo.getName();
-        String id = castInfo.getId();
-
-        Picasso.get().load(posterURL)
-                .placeholder(R.drawable.ic_person_92px)
-                .error(R.drawable.ic_person_92px)
-                .into(holder.mCastPosterView);
-
-        holder.mCastNameView.setText(name);
-        holder.mView.setTag(id);
+        holder.bind(castInfoList.get(position));
     }
 
     @Override
@@ -63,16 +53,21 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder
     class CastViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private View mView;
-        private ImageView mCastPosterView;
-        private TextView mCastNameView;
+        private final CastItemBinding castItemBinding;
 
-        public CastViewHolder(View itemView) {
-            super(itemView);
-            mView = itemView;
-            mCastPosterView = itemView.findViewById(R.id.cast_poster);
-            mCastNameView = itemView.findViewById(R.id.cast_name);
+        public CastViewHolder(CastItemBinding binding) {
+            super(binding.getRoot());
+            this.castItemBinding = binding;
+            mView = castItemBinding.getRoot();
             mView.setOnClickListener(this);
         }
+
+        public void bind(CastInfo castInfo) {
+            mView.setTag(castInfo.getId());
+            castItemBinding.setCast(castInfo);
+            castItemBinding.executePendingBindings();
+        }
+
 
         @Override
         public void onClick(View view) {
@@ -92,6 +87,6 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder
 
     //When director/actor is clicked, go to their list of films
     public interface ItemClickListener{
-        void onCastClick(String movieID);
+        void onCastClick(String castID);
     }
 }

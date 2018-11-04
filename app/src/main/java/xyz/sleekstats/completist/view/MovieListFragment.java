@@ -135,8 +135,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         if (savedInstanceState != null) {
             mPersonId = savedInstanceState.getString("id", mPersonId);
         }
-        getFilmsForPerson(mPersonId);
-
         personPublishSubject = movieViewModel.getPersonPublishSubject();
         filmListPublishSubject = movieViewModel.getFilmListPublishSubject();
         watchCountPublishSubject = movieViewModel.getWatchCountPublishSubject();
@@ -144,6 +142,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         listCompositeDisposable.add(personPublishSubject.subscribe(this::setPersonView));
         listCompositeDisposable.add(filmListPublishSubject.subscribe(this::setRecyclerView));
         listCompositeDisposable.add(watchCountPublishSubject.subscribe(count -> fragmentListBinding.setWatchCount(count)));
+
+        movieViewModel.getFilms();
     }
 
     //Retrieve person/film data from ViewModel
@@ -204,6 +204,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     //Populate recyclerview with films from actor/director
     private void setRecyclerView(List<FilmByPerson> filmByPersonList) {
+
         mCurrentFilmList = filmByPersonList;
 
         if (mMoviesRecyclerView == null) {

@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <import type="xyz.sleekstats.completist.databinding.BindingUtils"/>
+        <variable
+            name="film"
+            type="xyz.sleekstats.completist.model.FilmPOJO" />
+    </data>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,27 +18,56 @@
         android:id="@+id/movie_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginEnd="@dimen/defaultMargin"
-        android:layout_marginStart="@dimen/defaultMargin"
-        android:layout_marginTop="@dimen/largeMargin"
         android:textAlignment="center"
         android:textSize="@dimen/titleTextSize"
         android:textStyle="bold"
+        android:text="@{film.title}"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/movie_poster"
+        app:layout_constraintStart_toStartOf="@+id/v_guideline"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="TITLE" />
 
     <ImageView
         android:id="@+id/movie_poster"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/defaultMargin"
-        android:layout_marginTop="@dimen/defaultMargin"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        app:filmDetailsPoster="@{film.poster_path}"
+        app:layout_constraintBottom_toTopOf="@+id/details_watched_btn"
+        app:layout_constraintEnd_toStartOf="@+id/v_guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/guideline" />
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/details_watched_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:clickable="true"
+        android:src="@drawable/ic_add_black_24dp"
+        android:tint="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/details_queue_btn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/details_queue_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:clickable="true"
+        android:src="@drawable/ic_watch_later_gold_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/v_guideline"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/details_watched_btn" />
 
     <TextView
         android:id="@+id/movie_genre"
@@ -39,22 +75,24 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/largeMargin"
         android:layout_marginTop="@dimen/defaultMargin"
+        android:text="@{BindingUtils.buildGenreString(film.genres)}"
         android:textSize="@dimen/defaultTextSize"
+        app:layout_constraintBottom_toTopOf="@id/h_guideline"
         app:layout_constraintEnd_toEndOf="@+id/movie_overview"
         app:layout_constraintStart_toEndOf="@+id/movie_rating"
-        app:layout_constraintTop_toBottomOf="@+id/movie_overview"
-        app:layout_constraintBottom_toTopOf="@id/guideline"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/movie_overview" />
 
     <TextView
         android:id="@+id/movie_overview"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="@dimen/defaultMargin"
         android:textSize="@dimen/smallTextSize"
+        android:text="@{film.overview}"
         app:layout_constraintBottom_toTopOf="@+id/movie_genre"
         app:layout_constraintEnd_toEndOf="@+id/movie_title"
-        app:layout_constraintStart_toStartOf="@+id/movie_title"
+        app:layout_constraintStart_toStartOf="@+id/v_guideline"
         app:layout_constraintTop_toBottomOf="@+id/movie_title"
         tools:text="oooo" />
 
@@ -64,23 +102,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:numStars="4"
-        android:rating="0"
+        android:rating="@{film.vote_average*2/5}"
         android:stepSize=".2"
         app:layout_constraintBottom_toBottomOf="@+id/movie_genre"
-        app:layout_constraintStart_toStartOf="@+id/movie_title"
+        app:layout_constraintStart_toStartOf="@+id/movie_overview"
         app:layout_constraintTop_toTopOf="@+id/movie_genre" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/cast_recyclerview"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="@dimen/defaultMargin"
+        android:background="@drawable/castlist_border"
         android:orientation="horizontal"
         android:requiresFadingEdge="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/cast_bottom_border"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/guideline" />
+        app:layout_constraintStart_toStartOf="@+id/v_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/h_guideline" />
 
 
     <android.support.constraint.Barrier
@@ -88,31 +128,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="movie_poster,movie_genre,movie_rating"/>
-
-    <View
-        android:id="@+id/cast_top_border"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/cast_recyclerview"
-        android:background="@color/colorAccent"/>
-
-    <View
-        android:id="@+id/cast_bottom_border"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:background="@color/colorAccent"/>
+        app:constraint_referenced_ids="movie_poster,movie_genre,movie_rating"
+        app:layout_constraintBottom_toTopOf="@id/h_guideline" />
 
     <android.support.constraint.Guideline
-        android:id="@+id/guideline"
+        android:id="@+id/h_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.5" />
 
+    <android.support.constraint.Guideline
+        android:id="@+id/v_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.33" />
+
 </android.support.constraint.ConstraintLayout>
+</layout>

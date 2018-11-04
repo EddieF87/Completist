@@ -2,7 +2,10 @@ package xyz.sleekstats.completist.databinding;
 
 import android.support.v4.content.ContextCompat;
 
+import java.util.List;
+
 import xyz.sleekstats.completist.R;
+import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.model.WatchCount;
 
 public class BindingUtils {
@@ -15,19 +18,19 @@ public class BindingUtils {
                 + " (" + watchCount.getWatchedPct() + "%)";
     }
 
-    public static float setFilmItemButtonAlpha(int watchType) {
-        if (watchType < 2) {
-            return .3f;
-        } else {
-            return 1f;
+    public static String buildGenreString(List<Genre> genres) {
+        if(genres == null) {
+            return "";
         }
+        StringBuilder stringBuilder = new StringBuilder();
+        for(Genre genre: genres) {
+            stringBuilder.append(genre.getName()).append("/ ");
+        }
+        stringBuilder.setLength(stringBuilder.length() - 2);
+        return stringBuilder.toString();
     }
 
-    public static int setFilmItemBackground(int watchType) {
-        if (watchType < 2) {
-            return R.color.colorAccent;
-        } else {
-            return R.color.colorWatched;
-        }
+    public static String setRating(double rating) {
+        return String.valueOf(rating);
     }
 }

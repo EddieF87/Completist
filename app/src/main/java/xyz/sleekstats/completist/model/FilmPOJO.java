@@ -27,6 +27,19 @@ public class FilmPOJO {
     @SerializedName("name")
     private String name;
 
+    @SerializedName("vote_average")
+    private float vote_average;
+
+    private int watchType;
+
+    public int getWatchType() {
+        return watchType;
+    }
+
+    public void setWatchType(int watchType) {
+        this.watchType = watchType;
+    }
+
     public String getName() {
         return name;
     }
@@ -57,5 +70,9 @@ public class FilmPOJO {
 
     public CastCredits getCastCredits() {
         return castCredits;
+    }
+
+    public float getVote_average() {
+        return vote_average;
     }
 }

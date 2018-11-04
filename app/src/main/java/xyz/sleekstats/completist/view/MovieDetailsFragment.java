@@ -2,6 +2,7 @@ package xyz.sleekstats.completist.view;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,10 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +20,10 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import xyz.sleekstats.completist.R;
+import xyz.sleekstats.completist.databinding.FragmentMovieBinding;
 import xyz.sleekstats.completist.model.CastCredits;
 import xyz.sleekstats.completist.model.CastInfo;
 import xyz.sleekstats.completist.model.FilmPOJO;
-import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 //Shows details for selected film, including director/cast, rating, and summary
@@ -34,14 +31,9 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
 
     private static final String ARG_ID = "id";
     private static final String KEY_ISTV = "istv";
-    private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w500/";
 
     private boolean isTV;
     private String mMovieId;
-    private TextView mTitleView;
-    private TextView mOverviewView;
-    private ImageView mPosterView;
-    private TextView mGenreView;
     private RecyclerView mCastView;
     private CastAdapter mCastAdapter;
 
@@ -49,6 +41,7 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
     private Disposable mFilmDisposable;
 
     private OnFragmentInteractionListener mListener;
+    private FragmentMovieBinding movieBinding;
 
     public MovieDetailsFragment() {
     }
@@ -72,11 +65,8 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_movie, container, false);
-        mTitleView = rootView.findViewById(R.id.movie_title);
-        mOverviewView = rootView.findViewById(R.id.movie_overview);
-        mPosterView = rootView.findViewById(R.id.movie_poster);
-        mGenreView = rootView.findViewById(R.id.movie_genre);
+        movieBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie, container, false);
+        View rootView = movieBinding.getRoot();
         mCastView = rootView.findViewById(R.id.cast_recyclerview);
         mCastView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
 //        setRetainInstance(true);
@@ -142,32 +132,7 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
 
     //Set display of movie details
     private void setMovieInfoDisplay(FilmPOJO filmPOJO) {
-        String title = filmPOJO.getTitle();
-        mTitleView.setText(title);
-
-        String overview = filmPOJO.getOverview();
-        if (overview != null) {
-            mOverviewView.setText(overview);
-        }
-
-        String posterURL = POSTER_BASE_URL + filmPOJO.getPoster_path();
-        Picasso.get().load(posterURL)
-                .placeholder(R.drawable.ic_sharp_movie_92px)
-                .error(R.drawable.ic_sharp_movie_92px)
-                .into(mPosterView);
-
-        List<Genre> genres = filmPOJO.getGenres();
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < genres.size(); i++) {
-            String name = genres.get(i).getName();
-            stringBuilder.append(name);
-            if (i < genres.size() - 1) {
-                stringBuilder.append("/ ");
-            }
-        }
-        String genreString = stringBuilder.toString();
-        mGenreView.setText(genreString);
+        movieBinding.setFilm(filmPOJO);
     }
 
     //Populate recyclerview of cast names and images

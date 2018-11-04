@@ -42,10 +42,9 @@ public class MovieViewModel extends AndroidViewModel {
 
     private FilmListDetails mFilmListDetails;
     private MovieCredits mMovieCredits;
-    //    private List<FilmByPerson> mFilmList;
     private int mTotalFilms;
     private int mWatchedFilms;
-    private List<FilmByPerson> displayList;
+    private final List<FilmByPerson> displayList = new ArrayList<>();
     private int displayTotalFilms;
     private int displayWatchedFilms;
 
@@ -56,6 +55,16 @@ public class MovieViewModel extends AndroidViewModel {
 
     public Observable<FilmPOJO> getMovieInfo(String movieId) {
         return mRepo.getFilm(movieId);
+    }
+
+    public void getFilms() {
+        if(mFilmListDetails == null) {
+            getFilmsByPerson(MovieKeys.LIST_WATCHED);
+        } else {
+            filmListPublishSubject.onNext(displayList);
+            updateWatchCount(displayWatchedFilms, displayTotalFilms);
+            personPublishSubject.onNext(mFilmListDetails.getPersonPOJO());
+        }
     }
 
     public void getFilmsByPerson(String personId) {
@@ -132,11 +141,13 @@ public class MovieViewModel extends AndroidViewModel {
         mFilmListDetails = details;
         mTotalFilms = details.getFilmByPersonList().size();
 
-        List<String> filmIDs = getFilmIDs(details.getFilmByPersonList());
+        displayList.clear();
+        displayList.addAll(mFilmListDetails.getFilmByPersonList());
+        List<String> filmIDs = getFilmIDs(displayList);
 
         mCompositeDisposable.add(scanMoviesForWatched(filmIDs)
                 .subscribe(watchedList ->
-                        updateWatched(watchedList, mFilmListDetails.getFilmByPersonList()))
+                        updateWatched(watchedList, displayList))
         );
     }
 
@@ -288,7 +299,8 @@ public class MovieViewModel extends AndroidViewModel {
             default:
                 filmByPersonSet = mMovieCredits.bothLists();
         }
-        List<FilmByPerson> displayList = new ArrayList<>(filmByPersonSet);
+        displayList.clear();
+        displayList.addAll(filmByPersonSet);
 
         List<String> filmIDs = getFilmIDs(displayList);
 
