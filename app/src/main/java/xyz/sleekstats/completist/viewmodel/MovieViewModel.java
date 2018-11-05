@@ -41,6 +41,7 @@ public class MovieViewModel extends AndroidViewModel {
     private PublishSubject<WatchCount> watchCountPublishSubject = PublishSubject.create();
 
     private FilmListDetails mFilmListDetails;
+    private FilmByPerson mFilmDetails;
     private MovieCredits mMovieCredits;
     private int mTotalFilms;
     private int mWatchedFilms;
@@ -53,7 +54,7 @@ public class MovieViewModel extends AndroidViewModel {
         mRepo = new Repo(application);
     }
 
-    public Observable<FilmPOJO> getMovieInfo(String movieId) {
+    public Single<FilmPOJO> getMovieInfo(String movieId) {
         return mRepo.getFilm(movieId);
     }
 
@@ -189,7 +190,7 @@ public class MovieViewModel extends AndroidViewModel {
         watchCountPublishSubject.onNext(new WatchCount(watched, total));
     }
 
-    public Observable<FilmPOJO> getShowInfo(String showId) {
+    public Single<FilmPOJO> getShowInfo(String showId) {
         return mRepo.getShow(showId);
     }
 
@@ -252,6 +253,12 @@ public class MovieViewModel extends AndroidViewModel {
                         removeMovie(String.valueOf(film.getId()), mFilmListDetails.getPersonPOJO().getId());
                     }
                 });
+    }
+
+
+    public Single<FilmByPerson> checkForMovie(FilmByPerson film) {
+        return mRepo.checkIfMovieExists(film.getId())
+                .subscribeOn(Schedulers.io());
     }
 
     public Maybe<MyList> addOrRemoveList() {

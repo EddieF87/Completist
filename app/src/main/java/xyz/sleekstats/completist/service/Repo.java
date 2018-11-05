@@ -63,7 +63,7 @@ public class Repo {
     }
 
     //Get specific film details based  Tmdb film id
-    public Observable<FilmPOJO> getFilm(String movie_id) {
+    public Single<FilmPOJO> getFilm(String movie_id) {
         return tmdbAPI.retrieveFilm(movie_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -78,7 +78,7 @@ public class Repo {
     }
 
     //Get specific film details based  Tmdb film id
-    public Observable<FilmPOJO> getShow(String show_id) {
+    public Single<FilmPOJO> getShow(String show_id) {
         return tmdbAPI.retrieveShow(show_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -175,6 +175,7 @@ public class Repo {
                 .observeOn(Schedulers.io())
                 .map(FilmPOJO::getCastCredits)
                 .map(CastCredits::bothLists)
+                .toObservable()
                 .flatMapIterable(list -> list)
                 .map(CastInfo::getId)
                 .toList();

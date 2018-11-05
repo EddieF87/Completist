@@ -13,16 +13,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.databinding.FragmentMovieBinding;
 import xyz.sleekstats.completist.model.CastCredits;
 import xyz.sleekstats.completist.model.CastInfo;
+import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
@@ -34,14 +39,18 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
 
     private boolean isTV;
     private String mMovieId;
+    private FilmPOJO mFilm;
     private RecyclerView mCastView;
     private CastAdapter mCastAdapter;
+    private ImageView mWatchBtn;
+    private ImageView mQueueBtn;
 
     private MovieViewModel movieViewModel;
     private Disposable mFilmDisposable;
 
     private OnFragmentInteractionListener mListener;
     private FragmentMovieBinding movieBinding;
+    private final CompositeDisposable listCompositeDisposable = new CompositeDisposable();
 
     public MovieDetailsFragment() {
     }
@@ -66,8 +75,27 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         movieBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie, container, false);
+
+        if (movieViewModel == null) {
+            movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
+        }
         View rootView = movieBinding.getRoot();
         mCastView = rootView.findViewById(R.id.cast_recyclerview);
+        mWatchBtn = rootView.findViewById(R.id.details_watched_btn);
+        mQueueBtn = rootView.findViewById(R.id.details_queue_btn);
+        mWatchBtn.setOnClickListener(view ->
+                listCompositeDisposable.add(
+                        movieViewModel.checkIfMovieExists(new FilmByPerson(mFilm.getTitle(), mFilm.getId(), mFilm.getPoster_path()))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(
+                                        success -> setDisplay(1),
+                                        error -> setDisplay(2)
+                                )
+                )
+        );
+        mQueueBtn.setOnClickListener(view -> Log.d("hafner", "mQueueBtn"));
+
         mCastView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
 //        setRetainInstance(true);
         return rootView;
@@ -80,7 +108,7 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
             mMovieId = savedInstanceState.getString("id", mMovieId);
             isTV = savedInstanceState.getBoolean(KEY_ISTV);
         }
-        if(isTV) {
+        if (isTV) {
             getShow(mMovieId);
         } else {
             getFilm(mMovieId);
@@ -102,37 +130,28 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
     public void getFilm(String movie_id) {
         isTV = false;
         mMovieId = movie_id;
-        if (movieViewModel == null) {
-            movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
-        }
-        Observable<FilmPOJO> filmPOJOObservable = movieViewModel.getMovieInfo(movie_id);
-        mFilmDisposable = filmPOJOObservable.subscribe(s -> {
-                    setMovieInfoDisplay(s);
-                    setCastRecyclerView(s.getCastCredits());
-                },
-                e -> Log.e("rxprob", "filmPOJOObservable getMovieInfo" + e.getMessage()));
+        subscribeToFilmInfo(movieViewModel.getMovieInfo(movie_id));
     }
 
     //Retrieve tv show data from ViewModel
     public void getShow(String showID) {
         isTV = true;
         mMovieId = showID;
-        if (movieViewModel == null) {
-            movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
-        }
-        Observable<FilmPOJO> filmPOJOObservable = movieViewModel.getShowInfo(showID);
-        mFilmDisposable = filmPOJOObservable.subscribe(s -> {
-                    String name = s.getName();
-                    s.setTitle(name);
-                    setMovieInfoDisplay(s);
-                    setCastRecyclerView(s.getCastCredits());
-                },
-                e -> Log.e("rxprob", "filmPOJOObservable getShowInfo" + e.getMessage()));
+        subscribeToFilmInfo(movieViewModel.getShowInfo(showID));
+    }
+
+    private void subscribeToFilmInfo(Single<FilmPOJO> filmPOJOObservable) {
+        listCompositeDisposable.add(
+                filmPOJOObservable.subscribe(this::setMovieInfoDisplay,
+                        e -> Log.e("rxprob", "filmPOJOObservable getShowInfo" + e.getMessage()))
+        );
     }
 
     //Set display of movie details
     private void setMovieInfoDisplay(FilmPOJO filmPOJO) {
-        movieBinding.setFilm(filmPOJO);
+        mFilm = filmPOJO;
+        checkFilm();
+        setCastRecyclerView(filmPOJO.getCastCredits());
     }
 
     //Populate recyclerview of cast names and images
@@ -174,6 +193,30 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
             }
         }
         return null;
+    }
+
+    public void checkFilm() {
+        Log.d("hafner", "checkFilm");
+        if (mFilm == null) {
+            Log.d("hafner", "mFilm == null");
+            return;
+        }
+        listCompositeDisposable.add(
+                movieViewModel.checkForMovie(new FilmByPerson(mFilm.getTitle(), mFilm.getId(), mFilm.getPoster_path()))
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                success -> setDisplay(2),
+                                error -> setDisplay(1)
+                        )
+        );
+    }
+
+    private void setDisplay(int watchType) {
+        if (mFilm == null) {
+            return;
+        }
+        mFilm.setWatchType(watchType);
+        movieBinding.setFilm(mFilm);
     }
 
     @Override

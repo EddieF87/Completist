@@ -64,8 +64,8 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_done_green_24dp"
-            android:tint="@color/colorAccent"
+            android:src="@{film.watchType > 1 ? @drawable/ic_done_green_24dp : @drawable/ic_add_black_24dp}"
+            android:tint="@{film.watchType > 1 ? @color/colorWatched : @color/colorAccent}"
             android:alpha="@{film.watchType > 1 ? 1f : .3f}"
             />
 
