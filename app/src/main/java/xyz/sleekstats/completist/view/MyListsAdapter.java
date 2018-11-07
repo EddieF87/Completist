@@ -1,16 +1,12 @@
 package xyz.sleekstats.completist.view;
 
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -24,7 +20,7 @@ import xyz.sleekstats.completist.model.MyList;
 
 public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListViewHolder>{
 
-    private List<MyList> mLists;
+    private final List<MyList> mLists;
     private ItemClickListener mClickListener;
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w200/";
     private static final NumberFormat f = new DecimalFormat("00");
@@ -73,10 +69,10 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
 
     class ListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private View mView;
-        private ImageView mCastPosterView;
-        private TextView mCastNameView;
-        private TextView mWatchedView;
+        private final View mView;
+        private final ImageView mCastPosterView;
+        private final TextView mCastNameView;
+        private final TextView mWatchedView;
 
         public ListViewHolder(View itemView) {
             super(itemView);

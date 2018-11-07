@@ -1,10 +1,7 @@
 package xyz.sleekstats.completist.databinding;
 
-import android.support.v4.content.ContextCompat;
-
 import java.util.List;
 
-import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.model.WatchCount;
 
@@ -28,9 +25,5 @@ public class BindingUtils {
         }
         stringBuilder.setLength(stringBuilder.length() - 2);
         return stringBuilder.toString();
-    }
-
-    public static String setRating(double rating) {
-        return String.valueOf(rating);
     }
 }

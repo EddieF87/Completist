@@ -50,7 +50,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
 
     class FilmViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private CardView mView;
+        private final CardView mView;
         private int listPos;
         private FilmByPerson mFilm;
         private final FilmItemBinding filmItemBinding;

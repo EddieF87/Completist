@@ -1,7 +1,6 @@
 package xyz.sleekstats.completist.view;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -37,8 +36,6 @@ import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 public class MovieListFragment extends Fragment implements MovieAdapter.ItemClickListener {
 
     private static final String TAG_RXERROR = "rxprobMovieList";
-    private static final String ARG_ID = "id";
-    private String mPersonId;
     private int mGrids;
 
     private Spinner mRoleSpinner;
@@ -48,7 +45,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private List<FilmByPerson> mCurrentFilmList;
 
     private MovieViewModel movieViewModel;
-    private OnFragmentInteractionListener mListener;
 
     private final CompositeDisposable listCompositeDisposable = new CompositeDisposable();
     private FragmentListBinding fragmentListBinding;
@@ -58,22 +54,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private PublishSubject<WatchCount> watchCountPublishSubject;
 
     public MovieListFragment() {
-    }
-
-    public static MovieListFragment newInstance(String id) {
-        MovieListFragment fragment = new MovieListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_ID, id);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mPersonId = getArguments().getString(ARG_ID);
-        }
     }
 
     @Override
@@ -101,23 +81,17 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                         .observeOn(AndroidSchedulers.mainThread())
                         .skip(1)
                         .doOnError(e -> Log.e(TAG_RXERROR, "Spinner error: " + e.getMessage()))
-                        .subscribe(
-                                pos -> {
-                                    movieViewModel.onSpin(pos);
-                                }
-                        )
+                        .subscribe(pos -> movieViewModel.onSpin(pos))
         );
 
-        mListSaveButton.setOnClickListener(view -> {
-                    listCompositeDisposable.add(movieViewModel.addOrRemoveList()
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                    success -> setSaveButton(R.drawable.ic_add_black_24dp),
-                                    error -> Log.e(TAG_RXERROR, "addOrRemoveList" + error.getMessage()),
-                                    () -> setSaveButton(R.drawable.ic_done_green_24dp)
-                            )
-                    );
-                }
+        mListSaveButton.setOnClickListener(view -> listCompositeDisposable.add(movieViewModel.addOrRemoveList()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        success -> setSaveButton(R.drawable.ic_add_black_24dp),
+                        error -> Log.e(TAG_RXERROR, "addOrRemoveList" + error.getMessage()),
+                        () -> setSaveButton(R.drawable.ic_done_green_24dp)
+                )
+        )
         );
         mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mGrids));
         return rootView;
@@ -132,9 +106,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            mPersonId = savedInstanceState.getString("id", mPersonId);
-        }
         personPublishSubject = movieViewModel.getPersonPublishSubject();
         filmListPublishSubject = movieViewModel.getFilmListPublishSubject();
         watchCountPublishSubject = movieViewModel.getWatchCountPublishSubject();
@@ -146,14 +117,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         movieViewModel.getFilms();
     }
 
-    //Retrieve person/film data from ViewModel
-    public void getFilmsForPerson(String person_id) {
-        mPersonId = person_id;
-        movieViewModel.getFilmsByPerson(person_id);
-    }
-
     //Set display with info for selected actor/director
-    private void setPersonView(PersonPOJO personPOJO) throws InterruptedException {
+    private void setPersonView(PersonPOJO personPOJO) {
 
         fragmentListBinding.setPerson(personPOJO);
         setSpinner(personPOJO.getKnown_for_department());
@@ -227,9 +192,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     @Override
     public void onFilmClick(String movieID) {
-        if (mListener != null) {
-            mListener.onFilmSelected(movieID);
-        }
+        movieViewModel.getMovieInfo(movieID);
     }
 
     @Override
@@ -255,31 +218,9 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mMovieAdapter.notifyItemChanged(pos);
     }
 
-    public interface OnFragmentInteractionListener {
-        void onFilmSelected(String movieID);
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("id", mPersonId);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
         listCompositeDisposable.clear();
     }
 }

@@ -1,25 +1,15 @@
 package xyz.sleekstats.completist.view;
 
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.databinding.CastItemBinding;
 import xyz.sleekstats.completist.model.CastInfo;
-import xyz.sleekstats.completist.model.FilmByPerson;
 
 //Load director and cast details for a film in a recyclerview
 public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder>{
@@ -52,7 +42,7 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder
 
     class CastViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private View mView;
+        private final View mView;
         private final CastItemBinding castItemBinding;
 
         public CastViewHolder(CastItemBinding binding) {

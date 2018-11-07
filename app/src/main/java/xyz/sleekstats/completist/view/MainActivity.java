@@ -27,17 +27,14 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.databinding.MovieKeys;
 import xyz.sleekstats.completist.model.MediaPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
-public class MainActivity extends AppCompatActivity
-        implements MovieListFragment.OnFragmentInteractionListener,
-        MovieDetailsFragment.OnFragmentInteractionListener,
-        MyListsFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity {
 
-    private String movieID = "287";
     private String personID = MovieKeys.LIST_WATCHED;
     private static final String SEARCH_TITLE = "title";
     private static final String SEARCH_ID = "search_id";
@@ -53,6 +50,8 @@ public class MainActivity extends AppCompatActivity
     private SimpleCursorAdapter mSearchAdapter;
     private final CompositeDisposable mainCompositeDisposable = new CompositeDisposable();
 
+    private PublishSubject<Integer> viewPagerSubject;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +60,11 @@ public class MainActivity extends AppCompatActivity
         if (movieViewModel == null) {
             movieViewModel = ViewModelProviders.of(MainActivity.this).get(MovieViewModel.class);
         }
+        viewPagerSubject = movieViewModel.getViewPagerSubject();
+        mainCompositeDisposable.add(viewPagerSubject
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(i -> myViewPager.setCurrentItem(i))
+        );
         startPager();
     }
 
@@ -93,7 +97,7 @@ public class MainActivity extends AppCompatActivity
                             return false;
                     }
                     myViewPager.setCurrentItem(i);
-                    return false;
+                    return true;
                 });
 
         myViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -111,29 +115,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void onFilmSelected(String movieID) {
-        this.movieID = movieID;
-        myViewPager.setCurrentItem(2);
-        movieDetailsFragment = (MovieDetailsFragment) myPagerAdapter.getItem(2);
-        movieDetailsFragment.getFilm(movieID);
-    }
-
-    @Override
-    public void onCastSelected(String castID) {
-        this.personID = castID;
-        myViewPager.setCurrentItem(1);
-        movieListFragment = (MovieListFragment) myPagerAdapter.getItem(1);
-        movieListFragment.getFilmsForPerson(castID);
-    }
-
-    public void onShowSelected(String showID) {
-        this.movieID = showID;
-        myViewPager.setCurrentItem(2);
-        movieDetailsFragment = (MovieDetailsFragment) myPagerAdapter.getItem(2);
-        movieDetailsFragment.getShow(showID);
-    }
-
     private class MyPagerAdapter extends FragmentStatePagerAdapter {
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -144,17 +125,17 @@ public class MainActivity extends AppCompatActivity
             switch (position) {
                 case 0:
                     if (myListsFragment == null) {
-                        myListsFragment = MyListsFragment.newInstance();
+                        myListsFragment = new MyListsFragment();
                     }
                     return myListsFragment;
                 case 1:
                     if (movieListFragment == null) {
-                        movieListFragment = MovieListFragment.newInstance(personID);
+                        movieListFragment = new MovieListFragment();
                     }
                     return movieListFragment;
                 case 2:
                     if (movieDetailsFragment == null) {
-                        movieDetailsFragment = MovieDetailsFragment.newInstance(movieID);
+                        movieDetailsFragment = new MovieDetailsFragment();
                     }
                     return movieDetailsFragment;
                 default:
@@ -169,7 +150,7 @@ public class MainActivity extends AppCompatActivity
 
         @NonNull
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
             Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
 
             switch (position) {
@@ -227,13 +208,13 @@ public class MainActivity extends AppCompatActivity
 
                 switch (type) {
                     case "person":
-                        onCastSelected(id);
+                        movieViewModel.getFilmsByPerson(id);
                         break;
                     case "movie":
-                        onFilmSelected(id);
+                        movieViewModel.getMovieInfo(id);
                         break;
                     default:
-                        onShowSelected(id);
+                        movieViewModel.getShowInfo(id);
                         break;
                 }
                 return true;

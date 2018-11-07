@@ -4,8 +4,8 @@ import java.util.List;
 
 public class FilmListDetails {
 
-    private PersonPOJO personPOJO;
-    private List<FilmByPerson> filmByPersonList;
+    private final PersonPOJO personPOJO;
+    private final List<FilmByPerson> filmByPersonList;
 
     public FilmListDetails(PersonPOJO personPOJO, List<FilmByPerson> filmByPersonList) {
         this.personPOJO = personPOJO;

@@ -1,8 +1,8 @@
 package xyz.sleekstats.completist.view;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,15 +11,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -37,7 +34,6 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
     private MyListsAdapter mSavedListAdapter;
     private final CompositeDisposable myListsCompositeDisposable = new CompositeDisposable();
     private MovieViewModel movieViewModel;
-    private OnFragmentInteractionListener mListener;
     private RadioGroup radioGroup1;
     private RadioGroup radioGroup2;
 
@@ -45,13 +41,8 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
         // Required empty public constructor
     }
 
-    public static MyListsFragment newInstance() {
-        MyListsFragment fragment = new MyListsFragment();
-        return fragment;
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_my_lists, container, false);
@@ -77,7 +68,7 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
                 .flatMap(personQueryPOJO -> {
                             List<PersonPOJO> personPOJOList = personQueryPOJO.getResults();
                             List<MyList> myLists = new ArrayList<>();
-                            for(PersonPOJO personPOJO : personPOJOList) {
+                            for (PersonPOJO personPOJO : personPOJOList) {
                                 myLists.add(new MyList(Integer.parseInt(personPOJO.getId()),
                                         personPOJO.getName(), -1, 1, personPOJO.getProfile_path()));
                             }
@@ -129,26 +120,14 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
         myListsCompositeDisposable.clear();
     }
 
     private void onRadioClick(String listID, boolean firstGroupChecked) {
-        if(firstGroupChecked) {
-            if(radioGroup2 != null) {
+        if (firstGroupChecked) {
+            if (radioGroup2 != null) {
                 radioGroup2.clearCheck();
             }
         } else {
@@ -159,16 +138,10 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
 
     @Override
     public void onListClick(String listID) {
-        if (mListener != null) {
-            if(radioGroup1 != null && radioGroup2 != null) {
-                radioGroup1.clearCheck();
-                radioGroup2.clearCheck();
-            }
-            mListener.onCastSelected(listID);
+        if (radioGroup1 != null && radioGroup2 != null) {
+            radioGroup1.clearCheck();
+            radioGroup2.clearCheck();
         }
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onCastSelected(String castID);
+        movieViewModel.updateFilms(listID);
     }
 }

@@ -1,7 +1,6 @@
 package xyz.sleekstats.completist.view;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,11 +17,10 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.databinding.FragmentMovieBinding;
 import xyz.sleekstats.completist.model.CastCredits;
@@ -34,41 +32,20 @@ import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 //Shows details for selected film, including director/cast, rating, and summary
 public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemClickListener {
 
-    private static final String ARG_ID = "id";
-    private static final String KEY_ISTV = "istv";
+    private static final String TAG_RXERROR = "rxprobMovieDetails";
 
-    private boolean isTV;
-    private String mMovieId;
     private FilmPOJO mFilm;
     private RecyclerView mCastView;
     private CastAdapter mCastAdapter;
-    private ImageView mWatchBtn;
-    private ImageView mQueueBtn;
 
     private MovieViewModel movieViewModel;
-    private Disposable mFilmDisposable;
 
-    private OnFragmentInteractionListener mListener;
+    private PublishSubject<FilmPOJO> filmDetailsSubject;
+
     private FragmentMovieBinding movieBinding;
     private final CompositeDisposable listCompositeDisposable = new CompositeDisposable();
 
     public MovieDetailsFragment() {
-    }
-
-    public static MovieDetailsFragment newInstance(String id) {
-        MovieDetailsFragment fragment = new MovieDetailsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_ID, id);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mMovieId = getArguments().getString(ARG_ID);
-        }
     }
 
     @Override
@@ -79,22 +56,29 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
         if (movieViewModel == null) {
             movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
         }
+        filmDetailsSubject = movieViewModel.getFilmDetailsPublishSubject();
+        listCompositeDisposable.add(
+                filmDetailsSubject
+                        .doOnError(e -> Log.e(TAG_RXERROR, "e = " + e.getMessage()))
+                        .subscribe(this::setMovieInfoDisplay)
+        );
         View rootView = movieBinding.getRoot();
         mCastView = rootView.findViewById(R.id.cast_recyclerview);
-        mWatchBtn = rootView.findViewById(R.id.details_watched_btn);
-        mQueueBtn = rootView.findViewById(R.id.details_queue_btn);
+        ImageView mWatchBtn = rootView.findViewById(R.id.details_watched_btn);
+        ImageView mQueueBtn = rootView.findViewById(R.id.details_queue_btn);
         mWatchBtn.setOnClickListener(view ->
                 listCompositeDisposable.add(
                         movieViewModel.checkIfMovieExists(new FilmByPerson(mFilm.getTitle(), mFilm.getId(), mFilm.getPoster_path()))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
+                                .doOnError(e -> Log.e(TAG_RXERROR, "e = " + e.getMessage()))
                                 .subscribe(
                                         success -> setDisplay(1),
                                         error -> setDisplay(2)
                                 )
                 )
         );
-        mQueueBtn.setOnClickListener(view -> Log.d("hafner", "mQueueBtn"));
+        mQueueBtn.setOnClickListener(view -> movieViewModel.moveViewPager(1));
 
         mCastView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
 //        setRetainInstance(true);
@@ -104,47 +88,7 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            mMovieId = savedInstanceState.getString("id", mMovieId);
-            isTV = savedInstanceState.getBoolean(KEY_ISTV);
-        }
-        if (isTV) {
-            getShow(mMovieId);
-        } else {
-            getFilm(mMovieId);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    //Retrieve film data from ViewModel
-    public void getFilm(String movie_id) {
-        isTV = false;
-        mMovieId = movie_id;
-        subscribeToFilmInfo(movieViewModel.getMovieInfo(movie_id));
-    }
-
-    //Retrieve tv show data from ViewModel
-    public void getShow(String showID) {
-        isTV = true;
-        mMovieId = showID;
-        subscribeToFilmInfo(movieViewModel.getShowInfo(showID));
-    }
-
-    private void subscribeToFilmInfo(Single<FilmPOJO> filmPOJOObservable) {
-        listCompositeDisposable.add(
-                filmPOJOObservable.subscribe(this::setMovieInfoDisplay,
-                        e -> Log.e("rxprob", "filmPOJOObservable getShowInfo" + e.getMessage()))
-        );
+        movieViewModel.getShowOrFilm();
     }
 
     //Set display of movie details
@@ -175,11 +119,7 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
         }
         if (mCastAdapter == null) {
             mCastAdapter = new CastAdapter(castInfos);
-            mCastAdapter.setClickListener(castID -> {
-                if (mListener != null) {
-                    mListener.onCastSelected(castID);
-                }
-            });
+            mCastAdapter.setClickListener(castID -> movieViewModel.updateFilms(castID));
         } else {
             mCastAdapter.setCastInfoList(castInfos);
         }
@@ -195,15 +135,14 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
         return null;
     }
 
-    public void checkFilm() {
-        Log.d("hafner", "checkFilm");
+    private void checkFilm() {
         if (mFilm == null) {
-            Log.d("hafner", "mFilm == null");
             return;
         }
         listCompositeDisposable.add(
                 movieViewModel.checkForMovie(new FilmByPerson(mFilm.getTitle(), mFilm.getId(), mFilm.getPoster_path()))
                         .observeOn(AndroidSchedulers.mainThread())
+                        .doOnError(e -> Log.e(TAG_RXERROR, "e = " + e.getMessage()))
                         .subscribe(
                                 success -> setDisplay(2),
                                 error -> setDisplay(1)
@@ -220,30 +159,7 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-        if (mFilmDisposable != null && !mFilmDisposable.isDisposed()) {
-            mFilmDisposable.dispose();
-        }
-    }
-
-    @Override
     public void onCastClick(String castID) {
-        if (mListener != null) {
-            mListener.onCastSelected(castID);
-        }
+        movieViewModel.updateFilms(castID);
     }
-
-    public interface OnFragmentInteractionListener {
-        void onCastSelected(String castID);
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("id", mMovieId);
-        outState.putBoolean(KEY_ISTV, isTV);
-    }
-
 }

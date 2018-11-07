@@ -11,7 +11,7 @@ import java.util.Objects;
 @Entity(tableName = "movie_table")
 public class FilmByPerson {
 
-    public FilmByPerson(String title, String id, String poster_path) {
+    public FilmByPerson(String title, @NonNull String id, String poster_path) {
         this.title = title;
         this.id = id;
         this.poster_path = poster_path;
@@ -76,7 +76,7 @@ public class FilmByPerson {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (!(obj instanceof FilmByPerson)) {
             return false;
         }
         FilmByPerson otherFilm = (FilmByPerson) obj;

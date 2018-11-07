@@ -19,16 +19,16 @@ public class PersonPOJO {
     private String name;
 
     @SerializedName("biography")
-    private String biography;
+    private final String biography;
 
     @SerializedName("known_for_department")
-    private String known_for_department;
+    private final String known_for_department;
 
     @SerializedName("profile_path")
-    private String profile_path;
+    private final String profile_path;
 
     @SerializedName("id")
-    private String id;
+    private final String id;
 
     public String getId() {
         return id;
@@ -56,9 +56,5 @@ public class PersonPOJO {
 
     public String getProfile_path() {
         return profile_path;
-    }
-
-    public void setProfile_path(String profile_path) {
-        this.profile_path = profile_path;
     }
 }

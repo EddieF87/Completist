@@ -124,14 +124,14 @@ public class Repo {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void insertMovie(FilmByPerson movie, String personID) {
+    public void insertMovie(FilmByPerson movie) {
         mMovieDao.insertMovie(movie);
-        addRemoveAll(String.valueOf(movie.getId()), personID, true);
+        addRemoveAll(String.valueOf(movie.getId()), true);
     }
 
-    public void removeMovie(String movieID, String personID) {
+    public void removeMovie(String movieID) {
         mMovieDao.removeMovie(movieID);
-        addRemoveAll(movieID, personID, false);
+        addRemoveAll(movieID, false);
     }
 
     public void insertList(MyList list) {
@@ -163,7 +163,7 @@ public class Repo {
     }
 
 
-    private void addRemoveAll(String movieID, String personID, boolean addWatched) {
+    private void addRemoveAll(String movieID, boolean addWatched) {
 
         Single<List<MyList>> listSingle = mMovieDao.getSavedListsToUpdate()
                 .subscribeOn(Schedulers.io())
