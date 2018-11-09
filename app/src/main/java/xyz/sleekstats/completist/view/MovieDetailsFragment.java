@@ -68,13 +68,13 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
         ImageView mQueueBtn = rootView.findViewById(R.id.details_queue_btn);
         mWatchBtn.setOnClickListener(view ->
                 listCompositeDisposable.add(
-                        movieViewModel.checkIfMovieExists(new FilmByPerson(mFilm.getTitle(), mFilm.getId(), mFilm.getPoster_path()))
+                        movieViewModel.onMovieWatched(new FilmByPerson(mFilm.getTitle(), mFilm.getId(), mFilm.getPoster_path()))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .doOnError(e -> Log.e(TAG_RXERROR, "e = " + e.getMessage()))
                                 .subscribe(
-                                        success -> setDisplay(1),
-                                        error -> setDisplay(2)
+                                        success -> setDisplay(false),
+                                        error -> setDisplay(true)
                                 )
                 )
         );
@@ -144,17 +144,17 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnError(e -> Log.e(TAG_RXERROR, "e = " + e.getMessage()))
                         .subscribe(
-                                success -> setDisplay(2),
-                                error -> setDisplay(1)
+                                success -> setDisplay(true),
+                                error -> setDisplay(false)
                         )
         );
     }
 
-    private void setDisplay(int watchType) {
+    private void setDisplay(boolean watched) {
         if (mFilm == null) {
             return;
         }
-        mFilm.setWatchType(watchType);
+        mFilm.setWatched(watched);
         movieBinding.setFilm(mFilm);
     }
 

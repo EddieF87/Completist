@@ -11,6 +11,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -31,6 +32,7 @@ public class Repo {
     private static final String BASE_URL = "https://api.themoviedb.org/3/";
     private TmdbAPI tmdbAPI;
     private MovieDao mMovieDao;
+    private final CompositeDisposable repoCompositeDisposable = new CompositeDisposable();
 
     public Repo(Application application) {
 
@@ -117,8 +119,16 @@ public class Repo {
     }
 
     //Get list of top-rated films
-    public Observable<List<FilmByPerson>> getMyMovies() {
-        return mMovieDao.getSavedMovies()
+    public Observable<List<FilmByPerson>> getMyWatchedMovies() {
+        return mMovieDao.getSavedWatchedMovies()
+                .toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    //Get list of top-rated films
+    public Observable<List<FilmByPerson>> getMyQueuedMovies() {
+        return mMovieDao.getSavedQueuedMovies()
                 .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -126,12 +136,28 @@ public class Repo {
 
     public void insertMovie(FilmByPerson movie) {
         mMovieDao.insertMovie(movie);
-        addRemoveAll(String.valueOf(movie.getId()), true);
+        getListIDs(movie.getId()).subscribe(ids -> {
+            for (String id : ids) {
+                mMovieDao.addWatchedMovie(id);
+            }
+        });
+    }
+
+    public void insertQueuedMovie(FilmByPerson movie) {
+        mMovieDao.insertMovie(movie);
     }
 
     public void removeMovie(String movieID) {
         mMovieDao.removeMovie(movieID);
-        addRemoveAll(movieID, false);
+        getListIDs(movieID).subscribe(ids -> {
+            for (String id : ids) {
+                mMovieDao.removeWatchedMovie(id);
+            }
+        });
+    }
+
+    public void removeQueuedMovie(String movieID) {
+        mMovieDao.removeMovie(movieID);
     }
 
     public void insertList(MyList list) {
@@ -150,12 +176,41 @@ public class Repo {
         return mMovieDao.checkIfMovieExists(id);
     }
 
+    public void updateFilm(FilmByPerson film) {
+        mMovieDao.updateMovie(film);
+        if (film.isWatched()) {
+            getListIDs(film.getId()).subscribe(ids -> {
+                for (String id : ids) {
+                    mMovieDao.addWatchedMovie(id);
+                }
+            });
+        } else {
+            getListIDs(film.getId()).subscribe(ids -> {
+                for (String id : ids) {
+                    mMovieDao.removeWatchedMovie(id);
+                }
+            });
+        }
+    }
+
+    public void updateQueuedFilm(FilmByPerson film) {
+        mMovieDao.updateMovie(film);
+    }
+
     public Maybe<MyList> checkIfListExists(String id) {
         return mMovieDao.checkIfListExists(id);
     }
 
-    public Single<List<FilmByPerson>> getMoviesWatched(List<String> ids) {
-        return mMovieDao.getMoviesWatched(ids);
+    public Single<List<FilmByPerson>> getAllMovies(List<String> ids) {
+        return mMovieDao.getAllMoviesInList(ids);
+    }
+
+    public Single<List<FilmByPerson>> getWatchedMovies(List<String> ids) {
+        return mMovieDao.getWatchedMoviesInList(ids);
+    }
+
+    public Single<List<FilmByPerson>> getQueuedMovies(List<String> ids) {
+        return mMovieDao.getQueuedMoviesInList(ids);
     }
 
     public Flowable<List<MyList>> getSavedLists() {
@@ -163,7 +218,7 @@ public class Repo {
     }
 
 
-    private void addRemoveAll(String movieID, boolean addWatched) {
+    private Single<List<String>> getListIDs(String movieID) {
 
         Single<List<MyList>> listSingle = mMovieDao.getSavedListsToUpdate()
                 .subscribeOn(Schedulers.io())
@@ -180,7 +235,7 @@ public class Repo {
                 .map(CastInfo::getId)
                 .toList();
 
-        Single.zip(listSingle, castSingle, (x, y) -> {
+        return Single.zip(listSingle, castSingle, (x, y) -> {
                     List<String> ids = new ArrayList<>();
                     for (MyList myList : x) {
                         String id = String.valueOf(myList.getList_id());
@@ -188,21 +243,9 @@ public class Repo {
                             ids.add(id);
                         }
                     }
-//                    if (ids.contains(personID)) {
-//                        ids.remove(personID);
-//                    }
                     return ids;
                 }
-        ).subscribe(ids -> {
-            if (addWatched) {
-                for (String id : ids) {
-                    mMovieDao.addWatchedMovie(id);
-                }
-            } else {
-                for (String id : ids) {
-                    mMovieDao.removeWatchedMovie(id);
-                }
-            }
-        });
+        );
     }
+
 }

@@ -31,15 +31,9 @@ public class FilmByPerson {
     @SerializedName("job")
     private String job;
 
-    private int watchType;
+    private boolean isWatched;
 
-    public int getWatchType() {
-        return watchType;
-    }
-
-    public void setWatchType(int watchType) {
-        this.watchType = watchType;
-    }
+    private boolean isQueued;
 
     public String getTitle() {
         return title;
@@ -72,6 +66,30 @@ public class FilmByPerson {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public boolean isWatched() {
+        return isWatched;
+    }
+
+    public void setWatched(boolean watched) {
+        isWatched = watched;
+    }
+
+    public boolean isQueued() {
+        return isQueued;
+    }
+
+    public void setQueued(boolean queued) {
+        isQueued = queued;
+    }
+
+    public void reverseWatched() {
+        isWatched = !isWatched;
+    }
+
+    public void reverseQueued() {
+        isQueued = !isQueued;
     }
 
     @Override

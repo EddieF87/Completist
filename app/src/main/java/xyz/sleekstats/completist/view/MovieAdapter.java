@@ -92,18 +92,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
                     mClickListener.onFilmClick(id);
                     break;
                 case R.id.watched_btn:
-                    if(mFilm.getWatchType() < 2) {
-                        mClickListener.onFilmChecked(listPos, 2);
-                    } else {
-                        mClickListener.onFilmChecked(listPos, 1);
-                    }
+                    mClickListener.onFilmWatched(listPos);
                     break;
                 case R.id.later_btn:
-                    if(mFilm.getWatchType() < 2) {
-                        mClickListener.onFilmChecked(listPos, 2);
-                    } else {
-                        mClickListener.onFilmChecked(listPos, 1);
-                    }
+                    mClickListener.onFilmQueued(listPos);
                     break;
                 case R.id.ignore_btn:
                     break;
@@ -117,7 +109,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
 
     public interface ItemClickListener {
         void onFilmClick(String movieID);
-        void onFilmChecked(int pos, int watchType);
+        void onFilmWatched(int pos);
+        void onFilmQueued(int pos);
     }
 
     @Override

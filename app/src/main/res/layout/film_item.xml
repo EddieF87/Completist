@@ -12,7 +12,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/smallMargin"
-    card_view:cardBackgroundColor="@{film.watchType > 1 ? @color/colorWatched : @color/colorAccent}"
+    card_view:cardBackgroundColor="@{film.isWatched ? @color/colorWatched : @color/colorAccent}"
     card_view:cardCornerRadius="@dimen/cardCornerRadius"
     card_view:cardElevation="@dimen/cardElevation"
     card_view:contentPadding="5dp"
@@ -64,9 +64,9 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:src="@{film.watchType > 1 ? @drawable/ic_done_green_24dp : @drawable/ic_add_black_24dp}"
-            android:tint="@{film.watchType > 1 ? @color/colorWatched : @color/colorAccent}"
-            android:alpha="@{film.watchType > 1 ? 1f : .3f}"
+            android:src="@{film.isWatched ? @drawable/ic_done_green_24dp : @drawable/ic_add_black_24dp}"
+            android:tint="@{film.isWatched ? @color/colorWatched : @color/colorAccent}"
+            android:alpha="@{film.isWatched ? 1f : .3f}"
             />
 
         <ImageView
@@ -77,8 +77,8 @@
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:src="@drawable/ic_watch_later_gold_24dp"
-            android:tint="@color/colorAccent"
-            android:alpha=".3"
+            android:tint="@{film.isQueued ? @color/colorWatched : @color/colorAccent}"
+            android:alpha="@{film.isQueued ? 1f : .3f}"
             />
 
         <ImageView

@@ -196,25 +196,48 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     }
 
     @Override
-    public void onFilmChecked(int pos, int watchType) {
+    public void onFilmWatched(int pos) {
 
         FilmByPerson film = mCurrentFilmList.get(pos);
 
-        listCompositeDisposable.add(movieViewModel.checkIfMovieExists(film)
+        listCompositeDisposable.add(movieViewModel.onMovieWatched(film)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        success -> setWatchType(film, 1, pos),
-                        error -> setWatchType(film, 2, pos)
+                        success -> setItemWatched(film, film.isWatched(), pos),
+                        error -> setItemWatched(film, film.isWatched(), pos)
                 )
         );
     }
 
-    private void setWatchType(FilmByPerson film, int i, int pos){
+    @Override
+    public void onFilmQueued(int pos) {
+
+        FilmByPerson film = mCurrentFilmList.get(pos);
+
+        listCompositeDisposable.add(movieViewModel.onMovieQueued(film)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        success -> setItemQueued(film, film.isQueued(), pos),
+                        error -> setItemQueued(film, film.isQueued(), pos)
+                )
+        );
+    }
+
+    private void setItemWatched(FilmByPerson film, boolean watched, int pos){
         if (mMovieAdapter == null) {
             return;
         }
-        film.setWatchType(i);
+        film.setWatched(watched);
+        mMovieAdapter.notifyItemChanged(pos);
+    }
+
+    private void setItemQueued(FilmByPerson film, boolean queued, int pos){
+        if (mMovieAdapter == null) {
+            return;
+        }
+        film.setQueued(queued);
         mMovieAdapter.notifyItemChanged(pos);
     }
 

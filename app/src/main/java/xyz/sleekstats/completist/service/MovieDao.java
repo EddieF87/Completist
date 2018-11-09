@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import java.util.List;
 
@@ -21,8 +22,17 @@ public interface MovieDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertMovie(FilmByPerson myMovie);
 
+    @Update
+    void updateMovie(FilmByPerson film);
+
     @Query("SELECT * from movie_table")
-    Flowable<List<FilmByPerson>> getSavedMovies();
+    Single<List<FilmByPerson>> getSavedMovies();
+
+    @Query("SELECT * from movie_table WHERE isWatched == 1")
+    Single<List<FilmByPerson>> getSavedWatchedMovies();
+
+    @Query("SELECT * from movie_table WHERE isQueued == 1")
+    Single<List<FilmByPerson>> getSavedQueuedMovies();
 
     @Query("DELETE FROM movie_table WHERE id LIKE :id")
     void removeMovie(String id);
@@ -31,8 +41,13 @@ public interface MovieDao {
     Single<FilmByPerson> checkIfMovieExists(String id);
 
     @Query("SELECT * FROM movie_table WHERE id IN (:ids)")
-    Single<List<FilmByPerson>> getMoviesWatched(List<String> ids);
+    Single<List<FilmByPerson>> getAllMoviesInList(List<String> ids);
 
+    @Query("SELECT * FROM movie_table WHERE id IN (:ids) AND isWatched == 1")
+    Single<List<FilmByPerson>> getWatchedMoviesInList(List<String> ids);
+
+    @Query("SELECT * FROM movie_table WHERE id IN (:ids) AND isQueued == 1")
+    Single<List<FilmByPerson>> getQueuedMoviesInList(List<String> ids);
 
 
     //Lists Table

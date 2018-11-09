@@ -30,14 +30,23 @@ public class FilmPOJO {
     @SerializedName("vote_average")
     private float vote_average;
 
-    private int watchType;
+    private boolean isWatched;
+    private boolean isQueued;
 
-    public int getWatchType() {
-        return watchType;
+    public boolean isWatched() {
+        return isWatched;
     }
 
-    public void setWatchType(int watchType) {
-        this.watchType = watchType;
+    public void setWatched(boolean watched) {
+        isWatched = watched;
+    }
+
+    public boolean isQueued() {
+        return isQueued;
+    }
+
+    public void setQueued(boolean queued) {
+        isQueued = queued;
     }
 
     public String getName() {

@@ -53,7 +53,7 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
         view.findViewById(R.id.popular_movies_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_POPULAR, true));
         view.findViewById(R.id.nowshowing_movies_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_NOWPLAYING, false));
         view.findViewById(R.id.top_movies_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_TOPRATED, false));
-        view.findViewById(R.id.scheduled_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_WATCHED, false));
+        view.findViewById(R.id.scheduled_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_QUEUED, false));
 
         return view;
     }
