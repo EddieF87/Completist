@@ -220,10 +220,9 @@ public class MovieViewModel extends AndroidViewModel {
 
     private void updateWatched(Map<String, FilmByPerson> watchedFilms, List<FilmByPerson> totalFilms) {
 
+        mWatchedFilms = 0;
+
         for (FilmByPerson film : totalFilms) {
-//            if (watchedFilms.contains(film)) {
-//                film.setWatched(true);
-//            }
             if (watchedFilms.containsKey(film.getId())) {
                 FilmByPerson film1 = watchedFilms.get(film.getId());
                 if (film1.isQueued()) {
@@ -231,11 +230,12 @@ public class MovieViewModel extends AndroidViewModel {
                 }
                 if (film1.isWatched()) {
                     film.setWatched(true);
+                    mWatchedFilms++;
                 }
             }
         }
 
-        mWatchedFilms = watchedFilms.size();
+//        mWatchedFilms = watchedFilms.size();
 
         String id = mFilmListDetails.getPersonPOJO().getId();
         mCompositeDisposable.add(Observable.just(id)
@@ -250,10 +250,9 @@ public class MovieViewModel extends AndroidViewModel {
 
     private void updateDisplayWatched(Map<String, FilmByPerson> watchedFilms, List<FilmByPerson> totalFilms) {
 
+        displayWatchedFilms = 0;
+
         for (FilmByPerson film : totalFilms) {
-//            if (watchedFilms.contains(film)) {
-//                film.setWatched(true);
-//            }
             if (watchedFilms.containsKey(film.getId())) {
                 FilmByPerson film1 = watchedFilms.get(film.getId());
                 if (film1.isQueued()) {
@@ -261,10 +260,10 @@ public class MovieViewModel extends AndroidViewModel {
                 }
                 if (film1.isWatched()) {
                     film.setWatched(true);
+                    displayWatchedFilms++;
                 }
             }
         }
-        displayWatchedFilms = watchedFilms.size();
         displayTotalFilms = totalFilms.size();
 
         updateWatchCount(displayWatchedFilms, displayTotalFilms);
@@ -285,30 +284,35 @@ public class MovieViewModel extends AndroidViewModel {
 
     private void addWatchedMovie(FilmByPerson movie) {
         mRepo.insertMovie(movie);
+        updateWatchedMovieCount(movie.getId(), 1);
+    }
+
+    private void updateWatchedMovie(FilmByPerson movie) {
+        mRepo.updateFilm(movie);
+        if(movie.isWatched()) {
+            updateWatchedMovieCount(movie.getId(), 1);
+        } else {
+            updateWatchedMovieCount(movie.getId(), -1);
+        }
+    }
+
+    private void updateWatchedMovieCount(String filmID, int x) {
         mCompositeDisposable.add(
-                movieInListObservable(movie.getId())
+                movieInListObservable(filmID)
                         .subscribe(inList -> {
                             if (inList) {
-                                mWatchedFilms++;
+                                mWatchedFilms += x;
                             }
                         })
         );
-        displayWatchedFilms++;
+        displayWatchedFilms += x;
         updateWatchCount(displayWatchedFilms, displayTotalFilms);
+
     }
 
     private void removeWatchedMovie(String movieID) {
         mRepo.removeMovie(movieID);
-        mCompositeDisposable.add(
-                movieInListObservable(movieID)
-                        .subscribe(inList -> {
-                            if (inList) {
-                                mWatchedFilms--;
-                            }
-                        })
-        );
-        displayWatchedFilms--;
-        updateWatchCount(displayWatchedFilms, displayTotalFilms);
+        updateWatchedMovieCount(movieID, -1);
     }
 
     private Single<Boolean> movieInListObservable(String id) {
@@ -347,7 +351,7 @@ public class MovieViewModel extends AndroidViewModel {
                 addWatchedMovie(film);
             } else {
                 if (film.isQueued()) {
-                    mRepo.updateFilm(film);
+                    updateWatchedMovie(film);
                 } else {
                     removeWatchedMovie(String.valueOf(film.getId()));
                 }
@@ -357,9 +361,6 @@ public class MovieViewModel extends AndroidViewModel {
 
     public Single<FilmByPerson> onMovieQueued(FilmByPerson film) {
         film.reverseQueued();
-        Log.d("okele", film.getTitle() + " onMovieQueued ");
-        Log.d("okele", film.getTitle() + "  watched = " + film.isWatched());
-        Log.d("okele", film.getTitle() + "  queued = " + film.isQueued());
         return checkIfMovieExists(film).doOnEvent((x, y) -> {
             if (x == null) {
                 mRepo.insertQueuedMovie(film);
@@ -424,14 +425,6 @@ public class MovieViewModel extends AndroidViewModel {
         return mRepo.getAllMovies(ids);
     }
 
-    private Single<List<FilmByPerson>> getWatchedMovies(List<String> ids) {
-        return mRepo.getWatchedMovies(ids);
-    }
-
-    private Single<List<FilmByPerson>> getQueuedMovies(List<String> ids) {
-        return mRepo.getQueuedMovies(ids);
-    }
-
     public Flowable<List<MyList>> getSavedLists() {
         return mRepo.getSavedLists();
     }
@@ -463,12 +456,6 @@ public class MovieViewModel extends AndroidViewModel {
                         .subscribe(watchedList
                                 -> updateDisplayWatched(watchedList, displayList))
         );
-
-//        mCompositeDisposable.add(
-//                scanMoviesForQueued(filmIDs)
-//                        .subscribe(queuedList
-//                                -> updateQueued(queuedList, displayList))
-//        );
     }
 
     private List<String> getFilmIDs(List<FilmByPerson> films) {
@@ -488,16 +475,6 @@ public class MovieViewModel extends AndroidViewModel {
                 .doOnError(e -> Log.e(TAG_RXERROR, "getAllMoviesInList" + e.getMessage()))
                 .observeOn(AndroidSchedulers.mainThread());
     }
-
-//    private Single<List<FilmByPerson>> scanMoviesForQueued(List<String> filmIDs) {
-//        return getQueuedMovies(filmIDs)
-//                .subscribeOn(Schedulers.io())
-//                .flattenAsObservable(s -> s)
-//                .filter(film -> filmIDs.contains(film.getId()))
-//                .toList()
-//                .doOnError(e -> Log.e(TAG_RXERROR, "getAllMoviesInList" + e.getMessage()))
-//                .observeOn(AndroidSchedulers.mainThread());
-//    }
 
     @Override
     protected void onCleared() {
