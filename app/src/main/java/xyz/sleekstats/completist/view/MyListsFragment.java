@@ -90,8 +90,10 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
         if (myListsAdapter == null) {
             myListsAdapter = new MyListsAdapter(myLists);
             myListsAdapter.setClickListener(this);
+            rv.setAdapter(myListsAdapter);
+        } else {
+            myListsAdapter.notifyDataSetChanged();
         }
-        rv.setAdapter(myListsAdapter);
     }
 
     private void loadPopularRV(List<MyList> myLists) {

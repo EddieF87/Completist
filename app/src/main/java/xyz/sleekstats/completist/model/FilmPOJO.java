@@ -49,6 +49,14 @@ public class FilmPOJO {
         isQueued = queued;
     }
 
+    public void reverseWatched() {
+        isWatched = !isWatched;
+    }
+
+    public void reverseQueued() {
+        isQueued = !isQueued;
+    }
+
     public String getName() {
         return name;
     }

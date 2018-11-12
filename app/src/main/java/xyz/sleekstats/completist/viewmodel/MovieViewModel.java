@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,13 +74,12 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     private void updateShowOrFilm(FilmPOJO filmPOJO) {
-        mFilmDetails = filmPOJO;
-        filmDetailsPublishSubject.onNext(mFilmDetails);
+        checkForMovieFromDetails(filmPOJO);
     }
 
     public void getShowOrFilm() {
         if (mFilmDetails != null) {
-            filmDetailsPublishSubject.onNext(mFilmDetails);
+            checkForMovieFromDetails(mFilmDetails);
         } else {
             mCompositeDisposable.add(mRepo.getFilm(MOVIE_ID)
                     .doOnError(e -> Log.e("rxprob", "e = " + e.getMessage()))
@@ -161,10 +159,6 @@ public class MovieViewModel extends AndroidViewModel {
         );
     }
 
-    public void moveViewPager(int i) {
-        viewPagerSubject.onNext(i);
-    }
-
     public PublishSubject<PersonPOJO> getPersonPublishSubject() {
         return personPublishSubject;
     }
@@ -200,22 +194,6 @@ public class MovieViewModel extends AndroidViewModel {
                 .subscribe(watchedList ->
                         updateWatched(watchedList, displayList))
         );
-
-//        mCompositeDisposable.add(scanMoviesForQueued(filmIDs)
-//                .subscribe(queuedList ->
-//                        updateQueued(queuedList, displayList))
-//        );
-    }
-
-
-    private void updateQueued(List<FilmByPerson> queuedFilms, List<FilmByPerson> totalFilms) {
-
-        for (FilmByPerson film : totalFilms) {
-            if (queuedFilms.contains(film)) {
-                film.setQueued(true);
-            }
-        }
-        filmListPublishSubject.onNext(totalFilms);
     }
 
     private void updateWatched(Map<String, FilmByPerson> watchedFilms, List<FilmByPerson> totalFilms) {
@@ -234,8 +212,6 @@ public class MovieViewModel extends AndroidViewModel {
                 }
             }
         }
-
-//        mWatchedFilms = watchedFilms.size();
 
         String id = mFilmListDetails.getPersonPOJO().getId();
         mCompositeDisposable.add(Observable.just(id)
@@ -289,7 +265,7 @@ public class MovieViewModel extends AndroidViewModel {
 
     private void updateWatchedMovie(FilmByPerson movie) {
         mRepo.updateFilm(movie);
-        if(movie.isWatched()) {
+        if (movie.isWatched()) {
             updateWatchedMovieCount(movie.getId(), 1);
         } else {
             updateWatchedMovieCount(movie.getId(), -1);
@@ -341,37 +317,118 @@ public class MovieViewModel extends AndroidViewModel {
                 .observeOn(Schedulers.io());
     }
 
-    public Single<FilmByPerson> onMovieWatched(FilmByPerson film) {
+    public Single<FilmByPerson> onMovieWatchedFromList(FilmByPerson film) {
         film.reverseWatched();
-        Log.d("okele", film.getTitle() + " onMovieWatched ");
-        Log.d("okele", film.getTitle() + "  watched = " + film.isWatched());
-        Log.d("okele", film.getTitle() + "  queued = " + film.isQueued());
-        return checkIfMovieExists(film).doOnEvent((x, y) -> {
-            if (x == null) {
-                addWatchedMovie(film);
-            } else {
-                if (film.isQueued()) {
-                    updateWatchedMovie(film);
-                } else {
-                    removeWatchedMovie(String.valueOf(film.getId()));
-                }
-            }
-        });
+        return checkIfMovieExists(film)
+                .doOnEvent((x, y) -> {
+                    if (x == null) {
+                        addWatchedMovie(film);
+                    } else {
+                        if (film.isQueued()) {
+                            updateWatchedMovie(film);
+                        } else {
+                            removeWatchedMovie(String.valueOf(film.getId()));
+                        }
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnEvent((x, y) -> {
+                            if (detailsFilmInFilmList()) {
+                                setQueuedAndWatched(film, mFilmDetails);
+                            }
+                        }
+                );
     }
 
-    public Single<FilmByPerson> onMovieQueued(FilmByPerson film) {
+    public Single<FilmByPerson> onMovieQueuedFromList(FilmByPerson film) {
         film.reverseQueued();
-        return checkIfMovieExists(film).doOnEvent((x, y) -> {
-            if (x == null) {
-                mRepo.insertQueuedMovie(film);
-            } else {
-                if (film.isWatched()) {
-                    mRepo.updateQueuedFilm(film);
-                } else {
-                    mRepo.removeQueuedMovie(String.valueOf(film.getId()));
-                }
-            }
-        });
+        return checkIfMovieExists(film)
+                .doOnEvent((x, y) -> {
+                    if (x == null) {
+                        mRepo.insertQueuedMovie(film);
+                    } else {
+                        if (film.isWatched()) {
+                            mRepo.updateQueuedFilm(film);
+                        } else {
+                            mRepo.removeQueuedMovie(String.valueOf(film.getId()));
+                        }
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnEvent((x, y) -> {
+                            if (detailsFilmInFilmList()) {
+                                setQueuedAndWatched(film, mFilmDetails);
+                            }
+                        }
+                );
+    }
+
+    public FilmPOJO onMovieWatchedFromDetails(FilmPOJO filmPOJO) {
+        if (mFilmDetails == null) {
+            mFilmDetails = filmPOJO;
+        }
+        mFilmDetails.reverseWatched();
+        FilmByPerson film = new FilmByPerson(mFilmDetails.getTitle(), mFilmDetails.getId(), mFilmDetails.getPoster_path());
+        film.setWatched(mFilmDetails.isWatched());
+        film.setQueued(mFilmDetails.isQueued());
+        mCompositeDisposable.add(checkIfMovieExists(film)
+                .doOnEvent((x, y) -> {
+                    if (x == null) {
+                        mRepo.insertMovie(film);
+                    } else {
+                        if (film.isQueued()) {
+                            mRepo.updateFilm(film);
+                        } else {
+                            mRepo.removeMovie(String.valueOf(film.getId()));
+                        }
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((x, y) -> {
+                            if (detailsFilmInFilmList()) {
+                                displayList.get(displayList.indexOf(film)).setWatched(film.isWatched());
+                                filmListPublishSubject.onNext(displayList);
+                                if (film.isWatched()) {
+                                    updateWatchedMovieCount(film.getId(), 1);
+                                } else {
+                                    updateWatchedMovieCount(film.getId(), -1);
+                                }
+                            }
+                        }
+                )
+        );
+        return mFilmDetails;
+    }
+
+    public FilmPOJO onMovieQueuedFromDetails(FilmPOJO filmPOJO) {
+        if (mFilmDetails == null) {
+            mFilmDetails = filmPOJO;
+        }
+        mFilmDetails.reverseQueued();
+        FilmByPerson film = new FilmByPerson(mFilmDetails.getTitle(), mFilmDetails.getId(), mFilmDetails.getPoster_path());
+        film.setWatched(mFilmDetails.isWatched());
+        film.setQueued(mFilmDetails.isQueued());
+        mCompositeDisposable.add(checkIfMovieExists(film)
+                .doOnEvent((x, y) -> {
+                    if (x == null) {
+                        mRepo.insertQueuedMovie(film);
+                    } else {
+                        if (film.isWatched()) {
+                            mRepo.updateQueuedFilm(film);
+                        } else {
+                            mRepo.removeQueuedMovie(String.valueOf(film.getId()));
+                        }
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((x, y) -> {
+                    if (detailsFilmInFilmList()) {
+                        displayList.get(displayList.indexOf(film)).setQueued(film.isQueued());
+                        filmListPublishSubject.onNext(displayList);
+                    }
+                })
+        );
+        return mFilmDetails;
     }
 
     public Single<FilmByPerson> checkIfMovieExistsFromDetails(FilmByPerson film) {
@@ -387,18 +444,40 @@ public class MovieViewModel extends AndroidViewModel {
                 });
     }
 
-
-    public Single<FilmByPerson> checkForMovie(FilmByPerson film) {
-        return mRepo.checkIfMovieExists(film.getId())
-                .subscribeOn(Schedulers.io());
+    public boolean detailsFilmInFilmList() {
+        if (mFilmDetails == null) {
+            return false;
+        }
+        List<String> filmIDs = getFilmIDs(displayList);
+        return filmIDs.contains(mFilmDetails.getId());
     }
 
-    private void checkIfInDisplayList(FilmByPerson film) {
-        if (displayList.contains(film)) {
-            Log.d("haffy", "displayList.contains " + film.getTitle());
-        } else {
-            Log.d("haffy", "there is no " + film.getTitle());
-        }
+    private Single<FilmByPerson> checkMovie(FilmPOJO filmPOJO) {
+        return mRepo.checkIfMovieExists(filmPOJO.getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(e -> Log.e(TAG_RXERROR, "e = " + e.getMessage()));
+    }
+
+
+    private void checkForMovieFromDetails(FilmPOJO filmPOJO) {
+        mCompositeDisposable.add(checkMovie(filmPOJO)
+                .subscribe(
+                        film -> setQueuedAndWatched(film, filmPOJO),
+                        error -> publishFilmDetails(filmPOJO)
+                )
+        );
+    }
+
+    private void setQueuedAndWatched(FilmByPerson film, FilmPOJO filmPOJO) {
+        filmPOJO.setWatched(film.isWatched());
+        filmPOJO.setQueued(film.isQueued());
+        publishFilmDetails(filmPOJO);
+    }
+
+    private void publishFilmDetails(FilmPOJO filmPOJO) {
+        mFilmDetails = filmPOJO;
+        filmDetailsPublishSubject.onNext(mFilmDetails);
     }
 
     public Maybe<MyList> addOrRemoveList() {

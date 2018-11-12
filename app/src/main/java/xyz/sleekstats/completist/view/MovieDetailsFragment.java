@@ -63,25 +63,15 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
                         .subscribe(this::setMovieInfoDisplay)
         );
         View rootView = movieBinding.getRoot();
-        mCastView = rootView.findViewById(R.id.cast_recyclerview);
-        ImageView mWatchBtn = rootView.findViewById(R.id.details_watched_btn);
-        ImageView mQueueBtn = rootView.findViewById(R.id.details_queue_btn);
-        mWatchBtn.setOnClickListener(view ->
-                listCompositeDisposable.add(
-                        movieViewModel.onMovieWatched(new FilmByPerson(mFilm.getTitle(), mFilm.getId(), mFilm.getPoster_path()))
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .doOnError(e -> Log.e(TAG_RXERROR, "e = " + e.getMessage()))
-                                .subscribe(
-                                        success -> setDisplay(false),
-                                        error -> setDisplay(true)
-                                )
-                )
-        );
-        mQueueBtn.setOnClickListener(view -> movieViewModel.moveViewPager(1));
 
+        mCastView = rootView.findViewById(R.id.cast_recyclerview);
         mCastView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-//        setRetainInstance(true);
+
+        rootView.findViewById(R.id.details_watched_btn).setOnClickListener(view ->
+                setMovieInfoDisplay(movieViewModel.onMovieWatchedFromDetails(mFilm)));
+        rootView.findViewById(R.id.details_queue_btn).setOnClickListener(view ->
+                setMovieInfoDisplay(movieViewModel.onMovieQueuedFromDetails(mFilm)));
+
         return rootView;
     }
 
@@ -94,7 +84,7 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
     //Set display of movie details
     private void setMovieInfoDisplay(FilmPOJO filmPOJO) {
         mFilm = filmPOJO;
-        checkFilm();
+        movieBinding.setFilm(mFilm);
         setCastRecyclerView(filmPOJO.getCastCredits());
     }
 
@@ -120,10 +110,11 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
         if (mCastAdapter == null) {
             mCastAdapter = new CastAdapter(castInfos);
             mCastAdapter.setClickListener(castID -> movieViewModel.updateFilms(castID));
+            mCastView.setAdapter(mCastAdapter);
         } else {
             mCastAdapter.setCastInfoList(castInfos);
+            mCastAdapter.notifyDataSetChanged();
         }
-        mCastView.setAdapter(mCastAdapter);
     }
 
     private CastInfo getDirector(List<CastInfo> crewInfo) {
@@ -135,28 +126,12 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
         return null;
     }
 
-    private void checkFilm() {
-        if (mFilm == null) {
-            return;
-        }
-        listCompositeDisposable.add(
-                movieViewModel.checkForMovie(new FilmByPerson(mFilm.getTitle(), mFilm.getId(), mFilm.getPoster_path()))
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnError(e -> Log.e(TAG_RXERROR, "e = " + e.getMessage()))
-                        .subscribe(
-                                success -> setDisplay(true),
-                                error -> setDisplay(false)
-                        )
-        );
-    }
-
-    private void setDisplay(boolean watched) {
-        if (mFilm == null) {
-            return;
-        }
-        mFilm.setWatched(watched);
-        movieBinding.setFilm(mFilm);
-    }
+//    private void setDisplay(boolean watched) {
+//        if (mFilm == null) {
+//            return;
+//        }
+//        movieBinding.setFilm(mFilm);
+//    }
 
     @Override
     public void onCastClick(String castID) {

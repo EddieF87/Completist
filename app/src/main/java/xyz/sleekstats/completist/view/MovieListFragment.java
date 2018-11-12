@@ -184,10 +184,11 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         if (mMovieAdapter == null) {
             mMovieAdapter = new MovieAdapter(mCurrentFilmList);
             mMovieAdapter.setClickListener(this);
+            mMoviesRecyclerView.setAdapter(mMovieAdapter);
         } else {
             mMovieAdapter.setCurrentMovieList(mCurrentFilmList);
+            mMovieAdapter.notifyDataSetChanged();
         }
-        mMoviesRecyclerView.setAdapter(mMovieAdapter);
     }
 
     @Override
@@ -200,7 +201,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
         FilmByPerson film = mCurrentFilmList.get(pos);
 
-        listCompositeDisposable.add(movieViewModel.onMovieWatched(film)
+        listCompositeDisposable.add(movieViewModel.onMovieWatchedFromList(film)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -215,7 +216,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
         FilmByPerson film = mCurrentFilmList.get(pos);
 
-        listCompositeDisposable.add(movieViewModel.onMovieQueued(film)
+        listCompositeDisposable.add(movieViewModel.onMovieQueuedFromList(film)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

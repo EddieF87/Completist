@@ -64,6 +64,7 @@
         android:layout_marginBottom="8dp"
         android:clickable="true"
         android:src="@drawable/ic_watch_later_gold_24dp"
+        android:tint="@{film.isQueued ? @color/colorWatched : @color/colorAccent}"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/v_guideline"
         app:layout_constraintHorizontal_bias="0.5"

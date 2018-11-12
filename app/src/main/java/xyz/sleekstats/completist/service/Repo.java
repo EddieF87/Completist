@@ -223,7 +223,7 @@ public class Repo {
         Single<List<MyList>> listSingle = mMovieDao.getSavedListsToUpdate()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .doOnError(x -> Log.d("yyyy", "myListsObservable doOnError" + x.getMessage()));
+                .doOnError(x -> Log.d("rxprob", "myListsObservable doOnError" + x.getMessage()));
 
         Single<List<String>> castSingle = tmdbAPI.retrieveFilm(movieID)
                 .subscribeOn(Schedulers.io())
