@@ -1,5 +1,9 @@
 package xyz.sleekstats.completist.databinding;
 
+import android.databinding.BindingAdapter;
+import android.text.method.ScrollingMovementMethod;
+import android.widget.TextView;
+
 import java.util.List;
 
 import xyz.sleekstats.completist.model.Genre;
@@ -23,7 +27,16 @@ public class BindingUtils {
         for(Genre genre: genres) {
             stringBuilder.append(genre.getName()).append("/ ");
         }
-        stringBuilder.setLength(stringBuilder.length() - 2);
+        if(stringBuilder.length() > 1) {
+            stringBuilder.setLength(stringBuilder.length() - 2);
+        }
         return stringBuilder.toString();
+    }
+
+
+    @BindingAdapter("detailsText")
+    public static void setDetailsText(TextView textView, String text) {
+        textView.setText(text);
+        textView.setMovementMethod(new ScrollingMovementMethod());
     }
 }

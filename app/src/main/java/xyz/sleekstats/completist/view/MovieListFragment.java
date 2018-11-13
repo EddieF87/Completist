@@ -1,7 +1,9 @@
 package xyz.sleekstats.completist.view;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,12 +11,19 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 
@@ -43,6 +52,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private RecyclerView mMoviesRecyclerView;
     private MovieAdapter mMovieAdapter;
     private List<FilmByPerson> mCurrentFilmList;
+    private TextView summaryTextView;
 
     private MovieViewModel movieViewModel;
 
@@ -93,6 +103,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 )
         )
         );
+        summaryTextView = rootView.findViewById(R.id.person_summary);
         mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mGrids));
         return rootView;
     }
@@ -101,6 +112,11 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mListSaveButton.hide();
         mListSaveButton.setImageResource(drawable);
         mListSaveButton.show();
+        if(drawable == R.drawable.ic_done_green_24dp) {
+            getView().findViewById(R.id.saved_note).setVisibility(View.VISIBLE);
+        } else {
+            getView().findViewById(R.id.saved_note).setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -121,6 +137,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private void setPersonView(PersonPOJO personPOJO) {
 
         fragmentListBinding.setPerson(personPOJO);
+        setSummaryText(personPOJO.getBiography());
         setSpinner(personPOJO.getKnown_for_department());
 
         String id = personPOJO.getId();
@@ -246,5 +263,37 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     public void onDetach() {
         super.onDetach();
         listCompositeDisposable.clear();
+    }
+
+    private void setSummaryText(String text) {
+
+        summaryTextView.setText(text);
+        if (summaryTextView.getLineCount() > 2) {
+
+            int end = (2 * summaryTextView.getOffsetForPosition(summaryTextView.getWidth(), 0) + 1);
+            end = Math.min(end, text.length());
+
+            String readMoreText = "... (Read More)";
+            int readMoreLength = readMoreText.length();
+            if(end > readMoreLength) {
+                String displayed = text.substring(0, end-readMoreLength) + readMoreText;
+                SpannableString ss = new SpannableString(displayed);
+                ClickableSpan clickableSpan = new ClickableSpan() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(getActivity(), "test click", Toast.LENGTH_SHORT).show();
+                    }
+                    @Override
+                    public void updateDrawState(TextPaint ds) {
+                        super.updateDrawState(ds);
+                        ds.setUnderlineText(false);
+                    }
+                };
+                ss.setSpan(clickableSpan, (displayed.length() - readMoreLength + 4), displayed.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                summaryTextView.setText(ss);
+                summaryTextView.setMovementMethod(LinkMovementMethod.getInstance());
+                summaryTextView.setHighlightColor(Color.TRANSPARENT);
+            }
+        }
     }
 }

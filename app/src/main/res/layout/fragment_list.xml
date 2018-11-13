@@ -91,7 +91,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/person_name"
                     app:layout_constraintTop_toBottomOf="@+id/person_name"
-                    android:text="@{person.biography}"
+                    android:textColorLink="@color/colorWatched"
                     tools:text="ipsum lepsum tesidifdsdnachusuibsvvefipsum lepsum tesidifdsdnachusuibsvvefipsum lepsum tesidifdsdnachusuibsvvef" />
 
                 <android.support.constraint.Barrier
@@ -118,7 +118,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/person_barrier" />
 
                 <ImageButton
-                    android:id="@+id/imageButton"
+                    android:id="@+id/saved_note"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/defaultMargin"

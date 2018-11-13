@@ -12,20 +12,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.databinding.FragmentMovieBinding;
 import xyz.sleekstats.completist.model.CastCredits;
 import xyz.sleekstats.completist.model.CastInfo;
-import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
@@ -71,7 +67,6 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
                 setMovieInfoDisplay(movieViewModel.onMovieWatchedFromDetails(mFilm)));
         rootView.findViewById(R.id.details_queue_btn).setOnClickListener(view ->
                 setMovieInfoDisplay(movieViewModel.onMovieQueuedFromDetails(mFilm)));
-
         return rootView;
     }
 

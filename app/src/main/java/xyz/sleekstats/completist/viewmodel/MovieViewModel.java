@@ -51,6 +51,7 @@ public class MovieViewModel extends AndroidViewModel {
     private final List<FilmByPerson> displayList = new ArrayList<>();
     private int displayTotalFilms;
     private int displayWatchedFilms;
+    private boolean initialSpin = true;
 
     public MovieViewModel(@NonNull Application application) {
         super(application);
@@ -78,6 +79,7 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public void getShowOrFilm() {
+        initialSpin = true;
         if (mFilmDetails != null) {
             checkForMovieFromDetails(mFilmDetails);
         } else {
@@ -510,7 +512,12 @@ public class MovieViewModel extends AndroidViewModel {
 
     public void onSpin(int pos) {
 
-        if (mMovieCredits == null) {
+        if (initialSpin) {
+            initialSpin = false;
+            return;
+        }
+
+        if (mMovieCredits == null ) {
             return;
         }
 
