@@ -63,7 +63,7 @@ public class MovieViewModel extends AndroidViewModel {
                 .subscribe(this::updateShowOrFilm,
                         e -> {
                             Log.e(TAG_RXERROR, "getMovieInfo mRepo.getFilm e = " + e.getMessage());
-                            updateShowOrFilm(new FilmPOJO());
+//                            updateShowOrFilm(new FilmPOJO());
                         })
         );
         viewPagerSubject.onNext(2);
@@ -74,7 +74,7 @@ public class MovieViewModel extends AndroidViewModel {
                 .subscribe(this::updateShowOrFilm,
                         e -> {
                             Log.e(TAG_RXERROR, "mRepo.getShow e = " + e.getMessage());
-                            updateShowOrFilm(new FilmPOJO());
+//                            updateShowOrFilm(new FilmPOJO());
                         })
         );
         viewPagerSubject.onNext(2);
@@ -94,7 +94,7 @@ public class MovieViewModel extends AndroidViewModel {
                             .subscribe(this::updateShowOrFilm,
                                     e -> {
                                         Log.e(TAG_RXERROR, "getShowOrFilm mRepo.getFilm = " + e.getMessage());
-                                        updateShowOrFilm(new FilmPOJO());
+//                                        updateShowOrFilm(new FilmPOJO());
                                     })
             );
         }
@@ -172,7 +172,7 @@ public class MovieViewModel extends AndroidViewModel {
                         .subscribe(this::publishNewDetails,
                                 e -> {
                                     Log.e(TAG_RXERROR, "movieCreditsObservable e: " + e.getMessage());
-                                    mMovieCredits = new MovieCredits();
+//                                    mMovieCredits = new MovieCredits();
                                 })
         );
     }
@@ -388,6 +388,9 @@ public class MovieViewModel extends AndroidViewModel {
     public FilmPOJO onMovieWatchedFromDetails(FilmPOJO filmPOJO) {
         if (mFilmDetails == null) {
             mFilmDetails = filmPOJO;
+            if(mFilmDetails == null) {
+                return new FilmPOJO();
+            }
         }
         mFilmDetails.reverseWatched();
         FilmByPerson film = new FilmByPerson(mFilmDetails.getTitle(), mFilmDetails.getId(), mFilmDetails.getPoster_path());
@@ -423,8 +426,12 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public FilmPOJO onMovieQueuedFromDetails(FilmPOJO filmPOJO) {
+
         if (mFilmDetails == null) {
             mFilmDetails = filmPOJO;
+            if(mFilmDetails == null) {
+                return new FilmPOJO();
+            }
         }
         mFilmDetails.reverseQueued();
         FilmByPerson film = new FilmByPerson(mFilmDetails.getTitle(), mFilmDetails.getId(), mFilmDetails.getPoster_path());

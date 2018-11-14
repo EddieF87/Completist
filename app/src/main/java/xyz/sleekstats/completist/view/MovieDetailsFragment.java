@@ -79,6 +79,10 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
 
     //Set display of movie details
     private void setMovieInfoDisplay(FilmPOJO filmPOJO) {
+
+        if (filmPOJO == null) {
+            return;
+        }
         mFilm = filmPOJO;
         movieBinding.setFilm(mFilm);
         setCastRecyclerView(filmPOJO.getCastCredits());
@@ -87,6 +91,9 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
     //Populate recyclerview of cast names and images
     private void setCastRecyclerView(CastCredits castCredits) {
 
+        if (castCredits == null) {
+            return;
+        }
         List<CastInfo> castInfos = new ArrayList<>(castCredits.getCast());
         List<CastInfo> crewInfos = new ArrayList<>(castCredits.getCrew());
 
