@@ -90,8 +90,9 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                         .subscribeOn(AndroidSchedulers.mainThread())
                         .observeOn(AndroidSchedulers.mainThread())
                         .skip(1)
-                        .doOnError(e -> Log.e(TAG_RXERROR, "Spinner error: " + e.getMessage()))
-                        .subscribe(pos -> movieViewModel.onSpin(pos))
+                        .subscribe(pos -> movieViewModel.onSpin(pos),
+                                e -> Log.e(TAG_RXERROR, "Spinner error: " + e.getMessage())
+                        )
         );
 
         mListSaveButton.setOnClickListener(view -> listCompositeDisposable.add(movieViewModel.addOrRemoveList()
@@ -126,9 +127,12 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         filmListPublishSubject = movieViewModel.getFilmListPublishSubject();
         watchCountPublishSubject = movieViewModel.getWatchCountPublishSubject();
 
-        listCompositeDisposable.add(personPublishSubject.subscribe(this::setPersonView));
-        listCompositeDisposable.add(filmListPublishSubject.subscribe(this::setRecyclerView));
-        listCompositeDisposable.add(watchCountPublishSubject.subscribe(count -> fragmentListBinding.setWatchCount(count)));
+        listCompositeDisposable.add(personPublishSubject.subscribe(this::setPersonView,
+                e -> Log.e(TAG_RXERROR, "personPublishSubject e=" + e.getMessage())));
+        listCompositeDisposable.add(filmListPublishSubject.subscribe(this::setRecyclerView,
+                e -> Log.e(TAG_RXERROR, "filmListPublishSubject e=" + e.getMessage())));
+        listCompositeDisposable.add(watchCountPublishSubject.subscribe(count -> fragmentListBinding.setWatchCount(count),
+                e -> Log.e(TAG_RXERROR, "watchCountPublishSubject e=" + e.getMessage())));
 
         movieViewModel.getFilms();
     }

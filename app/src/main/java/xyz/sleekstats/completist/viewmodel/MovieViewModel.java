@@ -60,16 +60,22 @@ public class MovieViewModel extends AndroidViewModel {
 
     public void getMovieInfo(String movieId) {
         mCompositeDisposable.add(mRepo.getFilm(movieId)
-                .doOnError(e -> Log.e("rxprob", "e = " + e.getMessage()))
-                .subscribe(this::updateShowOrFilm)
+                .subscribe(this::updateShowOrFilm,
+                        e -> {
+                            Log.e(TAG_RXERROR, "getMovieInfo mRepo.getFilm e = " + e.getMessage());
+                            updateShowOrFilm(new FilmPOJO());
+                        })
         );
         viewPagerSubject.onNext(2);
     }
 
     public void getShowInfo(String movieId) {
         mCompositeDisposable.add(mRepo.getShow(movieId)
-                .doOnError(e -> Log.e("rxprob", "e = " + e.getMessage()))
-                .subscribe(this::updateShowOrFilm)
+                .subscribe(this::updateShowOrFilm,
+                        e -> {
+                            Log.e(TAG_RXERROR, "mRepo.getShow e = " + e.getMessage());
+                            updateShowOrFilm(new FilmPOJO());
+                        })
         );
         viewPagerSubject.onNext(2);
     }
@@ -83,9 +89,13 @@ public class MovieViewModel extends AndroidViewModel {
         if (mFilmDetails != null) {
             checkForMovieFromDetails(mFilmDetails);
         } else {
-            mCompositeDisposable.add(mRepo.getFilm(MOVIE_ID)
-                    .doOnError(e -> Log.e("rxprob", "e = " + e.getMessage()))
-                    .subscribe(this::updateShowOrFilm)
+            mCompositeDisposable.add(
+                    mRepo.getFilm(MOVIE_ID)
+                            .subscribe(this::updateShowOrFilm,
+                                    e -> {
+                                        Log.e(TAG_RXERROR, "getShowOrFilm mRepo.getFilm = " + e.getMessage());
+                                        updateShowOrFilm(new FilmPOJO());
+                                    })
             );
         }
     }
@@ -142,8 +152,11 @@ public class MovieViewModel extends AndroidViewModel {
                         .flatMap(s -> Observable.just(s.getMovieCredits()));
                 mCompositeDisposable.add(
                         movieCreditsObservable
-                                .doOnError(e -> Log.e(TAG_RXERROR, "Error: " + e.getMessage()))
-                                .subscribe(credits -> mMovieCredits = credits)
+                                .subscribe(credits -> mMovieCredits = credits,
+                                        e -> {
+                                            Log.e(TAG_RXERROR, "movieCreditsObservable e: " + e.getMessage());
+                                            mMovieCredits = new MovieCredits();
+                                        })
                 );
                 filmsObservable = personObservable
                         .map(s -> {
@@ -156,8 +169,11 @@ public class MovieViewModel extends AndroidViewModel {
         }
         mCompositeDisposable.add(
                 Observable.zip(personObservable, filmsObservable, FilmListDetails::new)
-                        .doOnError(e -> Log.e(TAG_RXERROR, "Error: " + e.getMessage()))
-                        .subscribe(this::publishNewDetails)
+                        .subscribe(this::publishNewDetails,
+                                e -> {
+                                    Log.e(TAG_RXERROR, "movieCreditsObservable e: " + e.getMessage());
+                                    mMovieCredits = new MovieCredits();
+                                })
         );
     }
 
@@ -194,7 +210,8 @@ public class MovieViewModel extends AndroidViewModel {
 
         mCompositeDisposable.add(scanMoviesForWatched(filmIDs)
                 .subscribe(watchedList ->
-                        updateWatched(watchedList, displayList))
+                        updateWatched(watchedList, displayList),
+                        e -> Log.e(TAG_RXERROR, "scanMoviesForWatched e=" + e.getMessage()))
         );
     }
 
@@ -218,7 +235,8 @@ public class MovieViewModel extends AndroidViewModel {
         String id = mFilmListDetails.getPersonPOJO().getId();
         mCompositeDisposable.add(Observable.just(id)
                 .subscribeOn(Schedulers.io())
-                .subscribe(s -> updateList(mWatchedFilms, mTotalFilms, id))
+                .subscribe(s -> updateList(mWatchedFilms, mTotalFilms, id),
+                        e -> Log.e(TAG_RXERROR, "updateList e=" + e.getMessage()))
         );
         displayWatchedFilms = mWatchedFilms;
         displayTotalFilms = mTotalFilms;
@@ -277,11 +295,14 @@ public class MovieViewModel extends AndroidViewModel {
     private void updateWatchedMovieCount(String filmID, int x) {
         mCompositeDisposable.add(
                 movieInListObservable(filmID)
-                        .subscribe(inList -> {
-                            if (inList) {
-                                mWatchedFilms += x;
-                            }
-                        })
+                        .subscribe(
+                                inList -> {
+                                    if (inList) {
+                                        mWatchedFilms += x;
+                                    }
+                                },
+                                e -> Log.e(TAG_RXERROR, "rrroh movieInListObservable" + e.getMessage())
+                        )
         );
         displayWatchedFilms += x;
         updateWatchCount(displayWatchedFilms, displayTotalFilms);
@@ -297,8 +318,7 @@ public class MovieViewModel extends AndroidViewModel {
         return Observable.just(mFilmListDetails.getFilmByPersonList())
                 .flatMapIterable(list -> list)
                 .map(FilmByPerson::getId)
-                .contains(id)
-                .doOnError(e -> Log.e(TAG_RXERROR, "rrroh movieInListObservable" + e.getMessage()));
+                .contains(id);
     }
 
     private void addList(MyList list) {
@@ -455,19 +475,28 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     private Single<FilmByPerson> checkMovie(FilmPOJO filmPOJO) {
+        if (filmPOJO.getId() == null) {
+            filmPOJO.setId("");
+        }
+        Log.d("rxprob", "checkMovie filmpojo = " + filmPOJO.getName() + filmPOJO.getId());
+
         return mRepo.checkIfMovieExists(filmPOJO.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(e -> Log.e(TAG_RXERROR, "e = " + e.getMessage()));
+                .doOnError(e -> {
+                    Log.e(TAG_RXERROR, "checkMovie e = " + e.getMessage());
+                });
     }
 
 
     private void checkForMovieFromDetails(FilmPOJO filmPOJO) {
-        mCompositeDisposable.add(checkMovie(filmPOJO)
-                .subscribe(
-                        film -> setQueuedAndWatched(film, filmPOJO),
-                        error -> publishFilmDetails(filmPOJO)
-                )
+        Log.d("rxprob", "checkForMovieFromDetails filmpojo = " + filmPOJO.getName() + filmPOJO.getId());
+        mCompositeDisposable.add(
+                checkMovie(filmPOJO)
+                        .subscribe(
+                                film -> setQueuedAndWatched(film, filmPOJO),
+                                error -> publishFilmDetails(filmPOJO)
+                        )
         );
     }
 
@@ -517,7 +546,7 @@ public class MovieViewModel extends AndroidViewModel {
             return;
         }
 
-        if (mMovieCredits == null ) {
+        if (mMovieCredits == null) {
             return;
         }
 
@@ -539,8 +568,9 @@ public class MovieViewModel extends AndroidViewModel {
 
         mCompositeDisposable.add(
                 scanMoviesForWatched(filmIDs)
-                        .subscribe(watchedList
-                                -> updateDisplayWatched(watchedList, displayList))
+                        .subscribe(watchedList -> updateDisplayWatched(watchedList, displayList),
+                                e -> Log.e(TAG_RXERROR, "scanMoviesForWatched" + e.getMessage())
+                        )
         );
     }
 
@@ -558,7 +588,6 @@ public class MovieViewModel extends AndroidViewModel {
                 .flattenAsObservable(s -> s)
                 .filter(film -> filmIDs.contains(film.getId()))
                 .toMap(FilmByPerson::getId)
-                .doOnError(e -> Log.e(TAG_RXERROR, "getAllMoviesInList" + e.getMessage()))
                 .observeOn(AndroidSchedulers.mainThread());
     }
 

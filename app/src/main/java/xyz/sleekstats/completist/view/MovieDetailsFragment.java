@@ -55,8 +55,9 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
         filmDetailsSubject = movieViewModel.getFilmDetailsPublishSubject();
         listCompositeDisposable.add(
                 filmDetailsSubject
-                        .doOnError(e -> Log.e(TAG_RXERROR, "e = " + e.getMessage()))
-                        .subscribe(this::setMovieInfoDisplay)
+                        .subscribe(this::setMovieInfoDisplay,
+                                e -> Log.e(TAG_RXERROR, " getFilmDetailsPublishSubject e = " + e.getMessage())
+                        )
         );
         View rootView = movieBinding.getRoot();
 

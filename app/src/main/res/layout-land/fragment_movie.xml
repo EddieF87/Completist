@@ -20,7 +20,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@{film.title}"
-        android:textAlignment="center"
         android:textSize="@dimen/titleTextSize"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

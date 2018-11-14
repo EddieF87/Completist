@@ -137,10 +137,11 @@ public class Repo {
     public void insertMovie(FilmByPerson movie) {
         mMovieDao.insertMovie(movie);
         getListIDs(movie.getId()).subscribe(ids -> {
-            for (String id : ids) {
-                mMovieDao.addWatchedMovie(id);
-            }
-        });
+                    for (String id : ids) {
+                        mMovieDao.addWatchedMovie(id);
+                    }
+                },
+                e -> Log.e("rxprob", "getListIDs e=" + e.getMessage()));
     }
 
     public void insertQueuedMovie(FilmByPerson movie) {
@@ -150,10 +151,11 @@ public class Repo {
     public void removeMovie(String movieID) {
         mMovieDao.removeMovie(movieID);
         getListIDs(movieID).subscribe(ids -> {
-            for (String id : ids) {
-                mMovieDao.removeWatchedMovie(id);
-            }
-        });
+                    for (String id : ids) {
+                        mMovieDao.removeWatchedMovie(id);
+                    }
+                },
+                e -> Log.e("rxprob", "getListIDs e=" + e.getMessage()));
     }
 
     public void removeQueuedMovie(String movieID) {
@@ -180,16 +182,18 @@ public class Repo {
         mMovieDao.updateMovie(film);
         if (film.isWatched()) {
             getListIDs(film.getId()).subscribe(ids -> {
-                for (String id : ids) {
-                    mMovieDao.addWatchedMovie(id);
-                }
-            });
+                        for (String id : ids) {
+                            mMovieDao.addWatchedMovie(id);
+                        }
+                    },
+                    e -> Log.e("rxprob", "getListIDs e=" + e.getMessage()));
         } else {
             getListIDs(film.getId()).subscribe(ids -> {
-                for (String id : ids) {
-                    mMovieDao.removeWatchedMovie(id);
-                }
-            });
+                        for (String id : ids) {
+                            mMovieDao.removeWatchedMovie(id);
+                        }
+                    },
+                    e -> Log.e("rxprob", "getListIDs e=" + e.getMessage()));
         }
     }
 
@@ -222,8 +226,7 @@ public class Repo {
 
         Single<List<MyList>> listSingle = mMovieDao.getSavedListsToUpdate()
                 .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .doOnError(x -> Log.d("rxprob", "myListsObservable doOnError" + x.getMessage()));
+                .observeOn(Schedulers.io());
 
         Single<List<String>> castSingle = tmdbAPI.retrieveFilm(movieID)
                 .subscribeOn(Schedulers.io())

@@ -16,6 +16,7 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.ViewGroup;
 
@@ -63,7 +64,9 @@ public class MainActivity extends AppCompatActivity {
         viewPagerSubject = movieViewModel.getViewPagerSubject();
         mainCompositeDisposable.add(viewPagerSubject
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(i -> myViewPager.setCurrentItem(i))
+                .subscribe(i -> myViewPager.setCurrentItem(i),
+                        e -> Log.e("rxprob", "viewPagerSubject e=" + e.getMessage())
+                )
         );
         startPager();
     }
@@ -102,7 +105,8 @@ public class MainActivity extends AppCompatActivity {
 
         myViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
 
             @Override
             public void onPageSelected(int position) {
@@ -110,7 +114,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrollStateChanged(int state) {
+            }
         });
 
     }
@@ -184,7 +189,8 @@ public class MainActivity extends AppCompatActivity {
                 .observeOn(Schedulers.io())
                 .switchMap(query -> movieViewModel.queryMedia(query))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(s -> populateAdapter(s.getResults()))
+                .subscribe(s -> populateAdapter(s.getResults()),
+                        e -> Log.e("rxprob", "RxSearchView.queryTextChanges e=" + e.getMessage()))
         );
 
         final String[] from = new String[]{SEARCH_TITLE, SEARCH_ID};

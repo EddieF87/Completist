@@ -92,4 +92,8 @@ public class FilmPOJO {
     public float getVote_average() {
         return vote_average;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }
