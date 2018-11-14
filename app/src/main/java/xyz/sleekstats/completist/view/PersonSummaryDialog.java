@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -45,6 +46,7 @@ public class PersonSummaryDialog extends DialogFragment {
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_person_summary, null);
         TextView textView = rootView.findViewById(R.id.dialog_person_summary);
         textView.setText(summary);
+        textView.setMovementMethod(new ScrollingMovementMethod());
 
         AlertDialog alertDialog = new AlertDialog.Builder(getActivity(), AlertDialog.THEME_HOLO_DARK)
                 .setView(rootView)
