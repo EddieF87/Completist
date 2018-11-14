@@ -8,7 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
@@ -271,10 +274,12 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     private void setSummaryText(String text) {
 
+        int lines = getResources().getInteger(R.integer.lines);
         summaryTextView.setText(text);
-        if (summaryTextView.getLineCount() > 2) {
 
-            int end = (2 * summaryTextView.getOffsetForPosition(summaryTextView.getWidth(), 0) + 1);
+        if (summaryTextView.getLineCount() > lines) {
+
+            int end = (lines * (summaryTextView.getOffsetForPosition(summaryTextView.getWidth(), 0) + 1));
             end = Math.min(end, text.length());
 
             String readMoreText = "... (Read More)";
@@ -285,7 +290,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 ClickableSpan clickableSpan = new ClickableSpan() {
                     @Override
                     public void onClick(View view) {
-                        Toast.makeText(getActivity(), "test click", Toast.LENGTH_SHORT).show();
+                        openSummaryDialog(text);
                     }
                     @Override
                     public void updateDrawState(TextPaint ds) {
@@ -299,5 +304,12 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 summaryTextView.setHighlightColor(Color.TRANSPARENT);
             }
         }
+    }
+
+    private void openSummaryDialog(String text){
+        FragmentManager fragmentManager = (requireActivity()).getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        DialogFragment newFragment = PersonSummaryDialog.newInstance(text);
+        newFragment.show(fragmentTransaction, "");
     }
 }
