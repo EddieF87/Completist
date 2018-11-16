@@ -129,13 +129,6 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
         return null;
     }
 
-//    private void setDisplay(boolean watched) {
-//        if (mFilm == null) {
-//            return;
-//        }
-//        movieBinding.setFilm(mFilm);
-//    }
-
     @Override
     public void onCastClick(String castID) {
         movieViewModel.updateFilms(castID);

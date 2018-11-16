@@ -6,7 +6,7 @@ import java.util.List;
 
 public class FilmPOJO {
 
-    @SerializedName("title")
+    @SerializedName(value = "title", alternate = "name")
     private String title;
 
     @SerializedName("overview")
@@ -24,11 +24,27 @@ public class FilmPOJO {
     @SerializedName("id")
     private String id;
 
-    @SerializedName("name")
-    private String name;
-
     @SerializedName("vote_average")
     private float vote_average;
+
+    @SerializedName("media_type")
+    private String media_type;
+
+    public String getMedia_type() { return media_type; }
+
+    public void setMedia_type(String media_type) {
+        this.media_type = media_type;
+    }
+
+    private boolean isFilm;
+
+    public boolean isFilm() {
+        return isFilm;
+    }
+
+    public void setIsFilm(boolean film) {
+        isFilm = film;
+    }
 
     private boolean isWatched;
     private boolean isQueued;
@@ -55,10 +71,6 @@ public class FilmPOJO {
 
     public void reverseQueued() {
         isQueued = !isQueued;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getId() {

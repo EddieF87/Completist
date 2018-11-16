@@ -17,7 +17,7 @@ public class FilmByPerson {
         this.poster_path = poster_path;
     }
 
-    @SerializedName("title")
+    @SerializedName(value = "title", alternate = "name")
     private String title;
 
     @NonNull
@@ -30,6 +30,16 @@ public class FilmByPerson {
 
     @SerializedName("job")
     private String job;
+
+    private boolean isFilm;
+
+    public boolean isFilm() {
+        return isFilm;
+    }
+
+    public void setIsFilm(boolean film) {
+        isFilm = film;
+    }
 
     private boolean isWatched;
 

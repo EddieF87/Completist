@@ -1,7 +1,6 @@
 package xyz.sleekstats.completist.view;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 
@@ -216,8 +214,12 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     }
 
     @Override
-    public void onFilmClick(String movieID) {
-        movieViewModel.getMovieInfo(movieID);
+    public void onFilmClick(String movieID, boolean isFilm) {
+        if(isFilm) {
+            movieViewModel.getMovieInfo(movieID);
+        } else {
+            movieViewModel.getShowInfo(movieID);
+        }
     }
 
     @Override

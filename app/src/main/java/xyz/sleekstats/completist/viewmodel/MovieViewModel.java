@@ -60,27 +60,29 @@ public class MovieViewModel extends AndroidViewModel {
 
     public void getMovieInfo(String movieId) {
         mCompositeDisposable.add(mRepo.getFilm(movieId)
-                .subscribe(this::updateShowOrFilm,
-                        e -> {
-                            Log.e(TAG_RXERROR, "getMovieInfo mRepo.getFilm e = " + e.getMessage());
-//                            updateShowOrFilm(new FilmPOJO());
-                        })
+                .subscribe(this::updateFilm,
+                        e -> Log.e(TAG_RXERROR, "getMovieInfo mRepo.getFilm e = " + e.getMessage()))
         );
         viewPagerSubject.onNext(2);
     }
 
     public void getShowInfo(String movieId) {
         mCompositeDisposable.add(mRepo.getShow(movieId)
-                .subscribe(this::updateShowOrFilm,
-                        e -> {
-                            Log.e(TAG_RXERROR, "mRepo.getShow e = " + e.getMessage());
-//                            updateShowOrFilm(new FilmPOJO());
-                        })
+                .subscribe(this::updateShow,
+                        e -> Log.e(TAG_RXERROR, "mRepo.getShow e = " + e.getMessage()))
         );
         viewPagerSubject.onNext(2);
     }
 
-    private void updateShowOrFilm(FilmPOJO filmPOJO) {
+    private void updateShow(FilmPOJO filmPOJO) {
+        filmPOJO.setIsFilm(false);
+        Log.d("loko",  "title = " + filmPOJO.getTitle() + "  " + filmPOJO.isFilm());
+        checkForMovieFromDetails(filmPOJO);
+    }
+
+    private void updateFilm(FilmPOJO filmPOJO) {
+        filmPOJO.setIsFilm(true);
+        Log.d("loko",  "title = " + filmPOJO.getTitle() + "  " + filmPOJO.isFilm());
         checkForMovieFromDetails(filmPOJO);
     }
 
@@ -91,10 +93,9 @@ public class MovieViewModel extends AndroidViewModel {
         } else {
             mCompositeDisposable.add(
                     mRepo.getFilm(MOVIE_ID)
-                            .subscribe(this::updateShowOrFilm,
+                            .subscribe(this::updateFilm,
                                     e -> {
                                         Log.e(TAG_RXERROR, "getShowOrFilm mRepo.getFilm = " + e.getMessage());
-//                                        updateShowOrFilm(new FilmPOJO());
                                     })
             );
         }
@@ -155,7 +156,7 @@ public class MovieViewModel extends AndroidViewModel {
                                 .subscribe(credits -> mMovieCredits = credits,
                                         e -> {
                                             Log.e(TAG_RXERROR, "movieCreditsObservable e: " + e.getMessage());
-                                            mMovieCredits = new MovieCredits();
+//                                            mMovieCredits = new MovieCredits();
                                         })
                 );
                 filmsObservable = personObservable
@@ -396,6 +397,7 @@ public class MovieViewModel extends AndroidViewModel {
         FilmByPerson film = new FilmByPerson(mFilmDetails.getTitle(), mFilmDetails.getId(), mFilmDetails.getPoster_path());
         film.setWatched(mFilmDetails.isWatched());
         film.setQueued(mFilmDetails.isQueued());
+        film.setIsFilm(mFilmDetails.isFilm());
         mCompositeDisposable.add(checkIfMovieExists(film)
                 .doOnEvent((x, y) -> {
                     if (x == null) {
@@ -437,6 +439,7 @@ public class MovieViewModel extends AndroidViewModel {
         FilmByPerson film = new FilmByPerson(mFilmDetails.getTitle(), mFilmDetails.getId(), mFilmDetails.getPoster_path());
         film.setWatched(mFilmDetails.isWatched());
         film.setQueued(mFilmDetails.isQueued());
+        film.setIsFilm(mFilmDetails.isFilm());
         mCompositeDisposable.add(checkIfMovieExists(film)
                 .doOnEvent((x, y) -> {
                     if (x == null) {
@@ -485,19 +488,14 @@ public class MovieViewModel extends AndroidViewModel {
         if (filmPOJO.getId() == null) {
             filmPOJO.setId("");
         }
-        Log.d("rxprob", "checkMovie filmpojo = " + filmPOJO.getName() + filmPOJO.getId());
 
         return mRepo.checkIfMovieExists(filmPOJO.getId())
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(e -> {
-                    Log.e(TAG_RXERROR, "checkMovie e = " + e.getMessage());
-                });
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
 
     private void checkForMovieFromDetails(FilmPOJO filmPOJO) {
-        Log.d("rxprob", "checkForMovieFromDetails filmpojo = " + filmPOJO.getName() + filmPOJO.getId());
         mCompositeDisposable.add(
                 checkMovie(filmPOJO)
                         .subscribe(

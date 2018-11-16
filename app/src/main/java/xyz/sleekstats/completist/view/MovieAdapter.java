@@ -89,7 +89,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
             switch (viewId) {
                 case R.id.title:
                 case R.id.poster:
-                    mClickListener.onFilmClick(id);
+                    mClickListener.onFilmClick(id, mFilm.isFilm());
                     break;
                 case R.id.watched_btn:
                     mClickListener.onFilmWatched(listPos);
@@ -108,7 +108,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
     }
 
     public interface ItemClickListener {
-        void onFilmClick(String movieID);
+        void onFilmClick(String movieID, boolean isFilm);
         void onFilmWatched(int pos);
         void onFilmQueued(int pos);
     }
