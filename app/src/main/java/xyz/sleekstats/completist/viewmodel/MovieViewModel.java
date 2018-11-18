@@ -19,6 +19,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.databinding.MovieKeys;
+import xyz.sleekstats.completist.model.CastInfo;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmListDetails;
 import xyz.sleekstats.completist.model.FilmPOJO;
@@ -76,13 +77,13 @@ public class MovieViewModel extends AndroidViewModel {
 
     private void updateShow(FilmPOJO filmPOJO) {
         filmPOJO.setIsFilm(false);
-        Log.d("loko",  "title = " + filmPOJO.getTitle() + "  " + filmPOJO.isFilm());
+        Log.d("loko", "title = " + filmPOJO.getTitle() + "  " + filmPOJO.isFilm());
         checkForMovieFromDetails(filmPOJO);
     }
 
     private void updateFilm(FilmPOJO filmPOJO) {
         filmPOJO.setIsFilm(true);
-        Log.d("loko",  "title = " + filmPOJO.getTitle() + "  " + filmPOJO.isFilm());
+        Log.d("loko", "title = " + filmPOJO.getTitle() + "  " + filmPOJO.isFilm());
         checkForMovieFromDetails(filmPOJO);
     }
 
@@ -135,17 +136,35 @@ public class MovieViewModel extends AndroidViewModel {
             case MovieKeys.LIST_POPULAR:
                 mMovieCredits = null;
                 personObservable = Observable.just(new PersonPOJO("Popular", "Most popular movies on tmdb today.", "Movies", "", personId));
-                filmsObservable = mRepo.getPopularFilms();
+                filmsObservable = mRepo.getPopularFilms()
+                        .flatMap(list -> {
+                            for (FilmByPerson film : list) {
+                                film.setIsFilm(true);
+                            }
+                            return Observable.just(list);
+                        });
                 break;
             case MovieKeys.LIST_NOWPLAYING:
                 mMovieCredits = null;
                 personObservable = Observable.just(new PersonPOJO("Now Showing", "Movies currently playing in theaters.", "Movies", "", personId));
-                filmsObservable = mRepo.getNowPlaying();
+                filmsObservable = mRepo.getNowPlaying()
+                        .flatMap(list -> {
+                            for (FilmByPerson film : list) {
+                                film.setIsFilm(true);
+                            }
+                            return Observable.just(list);
+                        });
                 break;
             case MovieKeys.LIST_TOPRATED:
                 mMovieCredits = null;
                 personObservable = Observable.just(new PersonPOJO("Top Rated", "Top-rated movies on tmdb.", "Movies", "", personId));
-                filmsObservable = mRepo.getTopRated();
+                filmsObservable = mRepo.getTopRated()
+                        .flatMap(list -> {
+                            for (FilmByPerson film : list) {
+                                film.setIsFilm(true);
+                            }
+                            return Observable.just(list);
+                        });
                 break;
             default:
                 personObservable = mRepo.getFilmsByPerson(personId);
@@ -166,6 +185,12 @@ public class MovieViewModel extends AndroidViewModel {
                             } else {
                                 return new ArrayList<>(s.getMovieCredits().getCast());
                             }
+                        })
+                        .flatMap(list -> {
+                            for (FilmByPerson film : list) {
+                                film.setIsFilm(true);
+                            }
+                            return Observable.just(list);
                         });
         }
         mCompositeDisposable.add(
@@ -203,7 +228,8 @@ public class MovieViewModel extends AndroidViewModel {
         personPublishSubject.onNext(details.getPersonPOJO());
 
         mFilmListDetails = details;
-        mTotalFilms = details.getFilmByPersonList().size();
+        List<FilmByPerson> films = details.getFilmByPersonList();
+        mTotalFilms = films.size();
 
         displayList.clear();
         displayList.addAll(mFilmListDetails.getFilmByPersonList());
@@ -211,7 +237,7 @@ public class MovieViewModel extends AndroidViewModel {
 
         mCompositeDisposable.add(scanMoviesForWatched(filmIDs)
                 .subscribe(watchedList ->
-                        updateWatched(watchedList, displayList),
+                                updateWatched(watchedList, displayList),
                         e -> Log.e(TAG_RXERROR, "scanMoviesForWatched e=" + e.getMessage()))
         );
     }
@@ -389,7 +415,7 @@ public class MovieViewModel extends AndroidViewModel {
     public FilmPOJO onMovieWatchedFromDetails(FilmPOJO filmPOJO) {
         if (mFilmDetails == null) {
             mFilmDetails = filmPOJO;
-            if(mFilmDetails == null) {
+            if (mFilmDetails == null) {
                 return new FilmPOJO();
             }
         }
@@ -431,7 +457,7 @@ public class MovieViewModel extends AndroidViewModel {
 
         if (mFilmDetails == null) {
             mFilmDetails = filmPOJO;
-            if(mFilmDetails == null) {
+            if (mFilmDetails == null) {
                 return new FilmPOJO();
             }
         }
