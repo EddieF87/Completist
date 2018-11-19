@@ -83,7 +83,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mRoleSpinner = rootView.findViewById(R.id.role_spinner);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireActivity(),
-                R.array.planets_array, android.R.layout.simple_spinner_item);
+                R.array.list_options_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         mRoleSpinner.setAdapter(adapter);

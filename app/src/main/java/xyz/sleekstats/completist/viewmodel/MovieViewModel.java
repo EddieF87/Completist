@@ -173,10 +173,7 @@ public class MovieViewModel extends AndroidViewModel {
                 mCompositeDisposable.add(
                         movieCreditsObservable
                                 .subscribe(credits -> mMovieCredits = credits,
-                                        e -> {
-                                            Log.e(TAG_RXERROR, "movieCreditsObservable e: " + e.getMessage());
-//                                            mMovieCredits = new MovieCredits();
-                                        })
+                                        e -> Log.e(TAG_RXERROR, "movieCreditsObservable e: " + e.getMessage()))
                 );
                 filmsObservable = personObservable
                         .map(s -> {
@@ -196,10 +193,7 @@ public class MovieViewModel extends AndroidViewModel {
         mCompositeDisposable.add(
                 Observable.zip(personObservable, filmsObservable, FilmListDetails::new)
                         .subscribe(this::publishNewDetails,
-                                e -> {
-                                    Log.e(TAG_RXERROR, "movieCreditsObservable e: " + e.getMessage());
-//                                    mMovieCredits = new MovieCredits();
-                                })
+                                e -> Log.e(TAG_RXERROR, "movieCreditsObservable e: " + e.getMessage()))
         );
     }
 
@@ -228,6 +222,7 @@ public class MovieViewModel extends AndroidViewModel {
         personPublishSubject.onNext(details.getPersonPOJO());
 
         mFilmListDetails = details;
+
         List<FilmByPerson> films = details.getFilmByPersonList();
         mTotalFilms = films.size();
 
@@ -588,6 +583,9 @@ public class MovieViewModel extends AndroidViewModel {
                 break;
             case 2:
                 filmByPersonSet = mMovieCredits.getCrew();
+                break;
+            case 3:
+                filmByPersonSet = mFilmListDetails.getPersonPOJO().getTvCredits().bothLists();
                 break;
             default:
                 filmByPersonSet = mMovieCredits.bothLists();
