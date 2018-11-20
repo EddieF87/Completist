@@ -4,7 +4,10 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,11 +25,14 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.databinding.MovieKeys;
+import xyz.sleekstats.completist.model.Genre;
+import xyz.sleekstats.completist.model.GenreList;
 import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
-public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClickListener {
+public class MyListsFragment extends Fragment
+        implements MyListsAdapter.ItemClickListener, GenresDialog.GenreSelector {
 
     private RecyclerView mPopularListRV;
     private RecyclerView mSavedListRV;
@@ -49,11 +55,12 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
 
         radioGroup1 = view.findViewById(R.id.radio_group1);
         radioGroup2 = view.findViewById(R.id.radio_group2);
-        view.findViewById(R.id.watched_movies_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_WATCHED, true));
-        view.findViewById(R.id.popular_movies_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_POPULAR, true));
-        view.findViewById(R.id.nowshowing_movies_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_NOWPLAYING, false));
-        view.findViewById(R.id.top_movies_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_TOPRATED, false));
-        view.findViewById(R.id.scheduled_btn).setOnClickListener(btn -> onRadioClick(MovieKeys.LIST_QUEUED, false));
+        view.findViewById(R.id.watched_movies_btn).setOnClickListener(btn -> onListClick(MovieKeys.LIST_WATCHED));
+        view.findViewById(R.id.popular_movies_btn).setOnClickListener(btn -> onListClick(MovieKeys.LIST_POPULAR));
+        view.findViewById(R.id.genres_btn).setOnClickListener(btn -> onGenreClick());
+        view.findViewById(R.id.nowshowing_movies_btn).setOnClickListener(btn -> onListClick(MovieKeys.LIST_NOWPLAYING));
+        view.findViewById(R.id.top_movies_btn).setOnClickListener(btn -> onListClick(MovieKeys.LIST_TOPRATED));
+        view.findViewById(R.id.scheduled_btn).setOnClickListener(btn -> onListClick(MovieKeys.LIST_QUEUED));
 
         return view;
     }
@@ -127,23 +134,39 @@ public class MyListsFragment extends Fragment implements MyListsAdapter.ItemClic
         myListsCompositeDisposable.clear();
     }
 
-    private void onRadioClick(String listID, boolean firstGroupChecked) {
-        if (firstGroupChecked) {
-            if (radioGroup2 != null) {
-                radioGroup2.clearCheck();
-            }
-        } else {
-            radioGroup1.clearCheck();
-        }
-        onListClick(listID);
+    private void onGenreClick() {
+        clearRadioGroups();
+        myListsCompositeDisposable.add(movieViewModel.getGenreList(true)
+                .subscribe(this::openGenresDialog)
+        );
+    }
+
+    private void openGenresDialog(GenreList genres){
+        if(genres == null) { return;}
+        FragmentManager fragmentManager = (requireActivity()).getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        GenresDialog newFragment = GenresDialog.newInstance(genres);
+        newFragment.show(fragmentTransaction, "");
+        newFragment.setGenreSelector(this);
     }
 
     @Override
     public void onListClick(String listID) {
-        if (radioGroup1 != null && radioGroup2 != null) {
+        clearRadioGroups();
+        movieViewModel.updateFilms(listID);
+    }
+
+    private void clearRadioGroups() {
+        if (radioGroup1 != null) {
             radioGroup1.clearCheck();
+        }
+        if (radioGroup2 != null) {
             radioGroup2.clearCheck();
         }
-        movieViewModel.updateFilms(listID);
+    }
+
+    @Override
+    public void onGenreSelected(Genre genre) {
+        movieViewModel.getFilmsByGenre(genre, true);
     }
 }

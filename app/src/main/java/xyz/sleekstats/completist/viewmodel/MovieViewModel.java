@@ -23,6 +23,7 @@ import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmListDetails;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.Genre;
+import xyz.sleekstats.completist.model.GenreList;
 import xyz.sleekstats.completist.model.MediaQueryPOJO;
 import xyz.sleekstats.completist.model.MovieCredits;
 import xyz.sleekstats.completist.model.MyList;
@@ -77,7 +78,6 @@ public class MovieViewModel extends AndroidViewModel {
 
     private void updateShow(FilmPOJO filmPOJO) {
         filmPOJO.setIsFilm(false);
-        Log.d("loko", "title = " + filmPOJO.getTitle() + "  " + filmPOJO.isFilm());
         checkForMovieFromDetails(filmPOJO);
     }
 
@@ -87,7 +87,6 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public void getShowOrFilm() {
-        Log.d("loko", "getShowOrFilm");
 //        initialSpin = true;
         if (mFilmDetails != null) {
             checkForMovieFromDetails(mFilmDetails);
@@ -111,13 +110,11 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public void updateFilms(String personID) {
-        Log.d("boko", "updateFilms " + personID);
         getFilmsByPerson(personID);
         viewPagerSubject.onNext(1);
     }
 
     public void getFilmsByPerson(String personID) {
-        Log.d("boko", "getFilmsByPerson " + personID);
 
         Observable<PersonPOJO> personObservable;
         Observable<List<FilmByPerson>> filmsObservable;
@@ -167,7 +164,6 @@ public class MovieViewModel extends AndroidViewModel {
                         });
                 break;
             default:
-                Log.d("boko", "default " + personID);
                 personObservable = mRepo.getFilmsByPerson(personID);
                 Observable<MovieCredits> movieCreditsObservable = personObservable
                         .flatMap(s -> Observable.just(s.getMovieCredits()));
@@ -185,10 +181,8 @@ public class MovieViewModel extends AndroidViewModel {
                             }
                         })
                         .flatMap(list -> {
-                            Log.d("boko", "flatmap list " + list.size() + "  " + personID);
                             for (FilmByPerson film : list) {
                                 film.setIsFilm(true);
-                                Log.d("boko", "name = " + film.getTitle() + "  " + film.isFilm());
                             }
                             return Observable.just(list);
                         });
@@ -242,8 +236,6 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     private void publishNewDetails(FilmListDetails details) {
-        Log.d("boko", "publishNewDetails");
-//        initialSpin = true;
 
         personPublishSubject.onNext(details.getPersonPOJO());
 
@@ -559,7 +551,6 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     private void publishFilmDetails(FilmPOJO filmPOJO) {
-        Log.d("boko", "publishFilmDetails");
         mFilmDetails = filmPOJO;
         filmDetailsPublishSubject.onNext(mFilmDetails);
     }
@@ -579,6 +570,10 @@ public class MovieViewModel extends AndroidViewModel {
                 });
     }
 
+    public Single<GenreList> getGenreList(boolean tvOrMovie) {
+        String tvOrMovieString = tvOrMovie ? "movie" : "tv";
+        return mRepo.getGenreList(tvOrMovieString);
+    }
 
     public Maybe<MyList> checkIfListExists(String id) {
         return mRepo.checkIfListExists(id);
@@ -594,21 +589,16 @@ public class MovieViewModel extends AndroidViewModel {
 
     public void setInitialSpin(boolean initial) {
         initialSpin = initial;
-        Log.d("boko", "setInitialSpin  " + initialSpin);
     }
 
     public void onSpin(int pos) {
 
-        Log.d("boko", "onSpin " + pos);
-
         if (initialSpin) {
-            Log.d("boko", "initialSpin");
             setInitialSpin(false);
             return;
         }
 
         if (mMovieCredits == null) {
-            Log.d("boko", "mMovieCredits == null");
             return;
         }
 

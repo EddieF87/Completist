@@ -60,6 +60,12 @@
             style="@style/ListButtonStyle"
             android:layout_height="match_parent"
             android:text="@string/popular_movies" />
+
+        <RadioButton
+            android:id="@+id/genres_btn"
+            style="@style/ListButtonStyle"
+            android:layout_height="match_parent"
+            android:text="@string/genres" />
     </RadioGroup>
 
     <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"

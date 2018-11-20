@@ -20,6 +20,8 @@ import xyz.sleekstats.completist.model.CastCredits;
 import xyz.sleekstats.completist.model.CastInfo;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
+import xyz.sleekstats.completist.model.Genre;
+import xyz.sleekstats.completist.model.GenreList;
 import xyz.sleekstats.completist.model.MovieRoomDB;
 import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.PersonPOJO;
@@ -143,6 +145,13 @@ public class Repo {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
+
+    public Single<GenreList> getGenreList(String tvOrMovie) {
+        return tmdbAPI.getGenreList(tvOrMovie)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
 
     public void insertMovie(FilmByPerson movie) {
         mMovieDao.insertMovie(movie);

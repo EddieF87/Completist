@@ -9,6 +9,7 @@
     <string name="my_lists">My Lists</string>
     <string name="cancel">Cancel</string>
     <string name="back">Back</string>
+    <string name="genres">Genres</string>
     <string-array name="list_options_array">
         <item>All Movies</item>
         <item>Acting</item>

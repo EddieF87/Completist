@@ -170,16 +170,13 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
         int oldPos = mRoleSpinner.getSelectedItemPosition();
         int currentPos;
-        Log.d("boko", "setSpinner" + "oldPos" +  oldPos + " knownFor" + knownFor);
         movieViewModel.setInitialSpin(true);
 
         if (mRoleSpinner == null) {
-            Log.d("boko", "RoleSpinner == nul");
             return;
         }
         switch (knownFor) {
             case "Movies":
-                Log.d("boko", "Movies ");
                 mRoleSpinner.setVisibility(View.INVISIBLE);
                 return;
             case "Acting":
@@ -193,9 +190,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             default:
                 currentPos = 0;
         }
-        Log.d("boko", "Pos " + currentPos + "=" + oldPos);
         if(currentPos == oldPos) {
-            Log.d("boko", "currentPos == oldPos " + currentPos + "=" + oldPos);
             movieViewModel.setInitialSpin(false);
             return;
         }
@@ -229,7 +224,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     @Override
     public void onFilmClick(String movieID, boolean isFilm) {
-        Log.d("bokocl", movieID + " " + isFilm);
         if(isFilm) {
             movieViewModel.getMovieInfo(movieID);
         } else {
