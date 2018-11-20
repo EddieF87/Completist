@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +24,14 @@ import xyz.sleekstats.completist.databinding.FragmentMovieBinding;
 import xyz.sleekstats.completist.model.CastCredits;
 import xyz.sleekstats.completist.model.CastInfo;
 import xyz.sleekstats.completist.model.FilmPOJO;
+import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 //Shows details for selected film, including director/cast, rating, and summary
-public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemClickListener {
+public class MovieDetailsFragment extends Fragment
+        implements CastAdapter.ItemClickListener
+        , View.OnClickListener
+{
 
     private static final String TAG_RXERROR = "rxprobMovieDetails";
 
@@ -48,6 +53,7 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         movieBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie, container, false);
+        movieBinding.setGenreClick(this);
 
         if (movieViewModel == null) {
             movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
@@ -132,5 +138,16 @@ public class MovieDetailsFragment extends Fragment implements CastAdapter.ItemCl
     @Override
     public void onCastClick(String castID) {
         movieViewModel.updateFilms(castID);
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view.getTag() == null) {
+            return;
+        }
+
+        Genre genre = (Genre) view.getTag();
+        Toast.makeText(getActivity(), genre.getId(), Toast.LENGTH_SHORT).show();
+        movieViewModel.getFilmsByGenre(genre, mFilm.isFilm());
     }
 }

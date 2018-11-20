@@ -32,7 +32,7 @@ public class Repo {
     private static final String BASE_URL = "https://api.themoviedb.org/3/";
     private TmdbAPI tmdbAPI;
     private MovieDao mMovieDao;
-    private final CompositeDisposable repoCompositeDisposable = new CompositeDisposable();
+//    private final CompositeDisposable repoCompositeDisposable = new CompositeDisposable();
 
     public Repo(Application application) {
 
@@ -75,6 +75,7 @@ public class Repo {
     //Get list of films by a specific actor/director based on Tmdb actor/director id
     public Observable<PersonPOJO> getFilmsByPerson(String person_id) {
         return tmdbAPI.retrievePersonInfo(person_id)
+                .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -96,40 +97,49 @@ public class Repo {
 
     //Get list of most popular films
     public Observable<List<FilmByPerson>> getPopularFilms() {
-        return tmdbAPI.retrievePopularMovies()
-                .map(ResultsPOJO::getResults)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        return singleToObservable(
+                tmdbAPI.retrievePopularMovies()
+                        .map(ResultsPOJO::getResults)
+        );
     }
 
     //Get list of films currently playing in theatres
     public Observable<List<FilmByPerson>> getNowPlaying() {
-        return tmdbAPI.retrieveNowPlaying()
-                .map(ResultsPOJO::getResults)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        return singleToObservable(
+                tmdbAPI.retrieveNowPlaying()
+                        .map(ResultsPOJO::getResults)
+        );
     }
 
     //Get list of top-rated films
     public Observable<List<FilmByPerson>> getTopRated() {
-        return tmdbAPI.retrieveTopRated()
-                .map(ResultsPOJO::getResults)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        return singleToObservable(
+                tmdbAPI.retrieveTopRated()
+                        .map(ResultsPOJO::getResults)
+        );
     }
+
+    //Get list of popular films/shows by genre
+    public Observable<List<FilmByPerson>> getMoviesByGenre(String tvOrMovie, String genre) {
+        return singleToObservable(
+                tmdbAPI.retrieveByGenre(tvOrMovie, genre)
+                        .map(ResultsPOJO::getResults)
+        );
+    }
+
 
     //Get list of top-rated films
     public Observable<List<FilmByPerson>> getMyWatchedMovies() {
-        return mMovieDao.getSavedWatchedMovies()
-                .toObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        return singleToObservable(mMovieDao.getSavedWatchedMovies());
     }
 
     //Get list of top-rated films
     public Observable<List<FilmByPerson>> getMyQueuedMovies() {
-        return mMovieDao.getSavedQueuedMovies()
-                .toObservable()
+        return singleToObservable(mMovieDao.getSavedQueuedMovies());
+    }
+
+    private Observable<List<FilmByPerson>> singleToObservable(Single<List<FilmByPerson>> single) {
+        return single.toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="bottom"
-        android:paddingTop="@dimen/smallMargin"
+        android:padding="@dimen/smallMargin"
         >
 
         <ImageView
@@ -79,17 +79,6 @@
             android:src="@drawable/ic_watch_later_gold_24dp"
             android:tint="@{film.isQueued ? @color/colorWatched : @color/colorAccent}"
             android:alpha="@{film.isQueued ? 1f : .3f}"
-            />
-
-        <ImageView
-            android:id="@+id/ignore_btn"
-            android:paddingStart="@dimen/largeBtnPadding"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_delete_black_24dp"
-            android:tint="@color/colorAccent"
-            android:alpha=".3"
             />
     </LinearLayout>
 

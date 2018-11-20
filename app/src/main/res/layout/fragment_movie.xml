@@ -5,6 +5,10 @@
         <variable
             name="film"
             type="xyz.sleekstats.completist.model.FilmPOJO" />
+
+        <variable
+            name="genreClick"
+            type="android.view.View.OnClickListener"/>
     </data>
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -53,7 +57,8 @@
             app:layout_constraintEnd_toStartOf="@+id/details_queue_btn"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            android:focusable="true" />
 
         <ImageView
             android:id="@+id/details_queue_btn"
@@ -66,14 +71,17 @@
             app:layout_constraintBottom_toTopOf="@id/hguideline"
             app:layout_constraintEnd_toStartOf="@+id/movie_overview"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/details_watched_btn" />
+            app:layout_constraintStart_toEndOf="@+id/details_watched_btn"
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/movie_genre"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/largeMargin"
-            android:text="@{BindingUtils.buildGenreString(film.genres)}"
+            app:genresContent="@{film.genres}"
+            app:genresClickable="@{genreClick}"
+            android:textColorLink="@color/colorWatched"
             android:textSize="@dimen/defaultTextSize"
             app:layout_constraintBottom_toBottomOf="@+id/details_queue_btn"
             app:layout_constraintEnd_toEndOf="@+id/movie_overview"

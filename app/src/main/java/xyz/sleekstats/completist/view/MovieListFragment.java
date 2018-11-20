@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 
 import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -90,7 +91,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         listCompositeDisposable.add(RxAdapterView.itemSelections(mRoleSpinner)
                         .subscribeOn(AndroidSchedulers.mainThread())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .skip(1)
                         .subscribe(pos -> movieViewModel.onSpin(pos),
                                 e -> Log.e(TAG_RXERROR, "Spinner error: " + e.getMessage())
                         )
@@ -115,9 +115,9 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mListSaveButton.setImageResource(drawable);
         mListSaveButton.show();
         if(drawable == R.drawable.ic_done_green_24dp) {
-            getView().findViewById(R.id.saved_note).setVisibility(View.VISIBLE);
+            Objects.requireNonNull(getView()).findViewById(R.id.saved_note).setVisibility(View.VISIBLE);
         } else {
-            getView().findViewById(R.id.saved_note).setVisibility(View.INVISIBLE);
+            Objects.requireNonNull(getView()).findViewById(R.id.saved_note).setVisibility(View.INVISIBLE);
         }
     }
 
@@ -168,24 +168,38 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     private void setSpinner(String knownFor) {
 
+        int oldPos = mRoleSpinner.getSelectedItemPosition();
+        int currentPos;
+        Log.d("boko", "setSpinner" + "oldPos" +  oldPos + " knownFor" + knownFor);
+        movieViewModel.setInitialSpin(true);
+
         if (mRoleSpinner == null) {
+            Log.d("boko", "RoleSpinner == nul");
             return;
         }
         switch (knownFor) {
             case "Movies":
+                Log.d("boko", "Movies ");
                 mRoleSpinner.setVisibility(View.INVISIBLE);
                 return;
             case "Acting":
-                mRoleSpinner.setSelection(1);
+                currentPos = 1;
                 break;
             case "Directing":
             case "Writing":
             case "Screenplay":
-                mRoleSpinner.setSelection(2);
+                currentPos = 2;
                 break;
             default:
-                mRoleSpinner.setSelection(0);
+                currentPos = 0;
         }
+        Log.d("boko", "Pos " + currentPos + "=" + oldPos);
+        if(currentPos == oldPos) {
+            Log.d("boko", "currentPos == oldPos " + currentPos + "=" + oldPos);
+            movieViewModel.setInitialSpin(false);
+            return;
+        }
+        mRoleSpinner.setSelection(currentPos);
         mRoleSpinner.setVisibility(View.VISIBLE);
     }
 
@@ -215,6 +229,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     @Override
     public void onFilmClick(String movieID, boolean isFilm) {
+        Log.d("bokocl", movieID + " " + isFilm);
         if(isFilm) {
             movieViewModel.getMovieInfo(movieID);
         } else {
@@ -281,21 +296,21 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
         if (summaryTextView.getLineCount() > lines) {
 
-            int end = (lines * (summaryTextView.getOffsetForPosition(summaryTextView.getWidth(), 0) + 1));
+            int end = (lines * (summaryTextView.getOffsetForPosition(summaryTextView.getWidth(), 0)));
             end = Math.min(end, text.length());
 
             String readMoreText = "... (Read More)";
             int readMoreLength = readMoreText.length();
             if(end > readMoreLength) {
-                String displayed = text.substring(0, end-readMoreLength) + readMoreText;
+                String displayed = (text.substring(0, end-readMoreLength) + readMoreText).replaceAll("\n", " ");
                 SpannableString ss = new SpannableString(displayed);
                 ClickableSpan clickableSpan = new ClickableSpan() {
                     @Override
-                    public void onClick(View view) {
+                    public void onClick(@NonNull View view) {
                         openSummaryDialog(text);
                     }
                     @Override
-                    public void updateDrawState(TextPaint ds) {
+                    public void updateDrawState(@NonNull TextPaint ds) {
                         super.updateDrawState(ds);
                         ds.setUnderlineText(false);
                     }

@@ -29,21 +29,27 @@ public interface TmdbAPI {
 
     //Query for list of films by a specific actor/director based on Tmdb actor/director id
     @GET("person/{person_id}?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&append_to_response=movie_credits,tv_credits")
-    Observable<PersonPOJO> retrievePersonInfo(
+    Single<PersonPOJO> retrievePersonInfo(
             @Path("person_id") String person_id
     );
 
     //retrieve most popular movies from TMDB API
     @GET("movie/popular?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&language=en-US")
-    Observable<ResultsPOJO> retrievePopularMovies();
+    Single<ResultsPOJO> retrievePopularMovies();
 
     //retrieve movies currently playing in theatres from TMDB API
     @GET("movie/now_playing?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&language=en-US&page=1")
-    Observable<ResultsPOJO> retrieveNowPlaying();
+    Single<ResultsPOJO> retrieveNowPlaying();
 
     //retrieve  top-rated movies from TMDB API
     @GET("movie/top_rated?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&language=en-US&page=1")
-    Observable<ResultsPOJO> retrieveTopRated();
+    Single<ResultsPOJO> retrieveTopRated();
+
+    @GET("discover/{tvOrMovie}?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&sort_by=popularity.desc")
+    Single<ResultsPOJO> retrieveByGenre(
+            @Path("tvOrMovie") String tvOrMovie,
+            @Query("with_genres") String genre
+    );
 
     @GET("search/multi?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2" +
             "&language=en-US&page=1&include_adult=false")
@@ -53,6 +59,4 @@ public interface TmdbAPI {
 
     @GET("person/popular?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&language=en-US&page=1")
     Observable<PersonQueryPOJO> retrievePopularActors();
-
-
 }

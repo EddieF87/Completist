@@ -63,7 +63,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
             itemView.findViewById(R.id.poster).setOnClickListener(this);
             itemView.findViewById(R.id.watched_btn).setOnClickListener(this);
             itemView.findViewById(R.id.later_btn).setOnClickListener(this);
-            itemView.findViewById(R.id.ignore_btn).setOnClickListener(this);
         }
 
         public void bind(FilmByPerson film) {
@@ -96,8 +95,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
                     break;
                 case R.id.later_btn:
                     mClickListener.onFilmQueued(listPos);
-                    break;
-                case R.id.ignore_btn:
                     break;
             }
         }
