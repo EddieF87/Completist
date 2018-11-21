@@ -198,7 +198,7 @@ public class MovieViewModel extends AndroidViewModel {
         String tvOrMovieString = tvOrMovie ? "movie" : "tv";
         Observable<PersonPOJO> personObservable = Observable.just(
                 new PersonPOJO(genre.getName() + " (" + tvOrMovieString.substring(0,1).toUpperCase() + tvOrMovieString.substring(1) + ")",
-                        "", "Movies", "", genre.getId()));
+                        "", "Movies", "", MovieKeys.LIST_GENRE));
         Observable<List<FilmByPerson>> filmsObservable = mRepo.getMoviesByGenre(tvOrMovieString, genre.getId())
                 .flatMap(list -> {
                     for (FilmByPerson film : list) {

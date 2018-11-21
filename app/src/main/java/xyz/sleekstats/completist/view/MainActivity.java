@@ -36,7 +36,6 @@ import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String personID = MovieKeys.LIST_WATCHED;
     private static final String SEARCH_TITLE = "title";
     private static final String SEARCH_ID = "search_id";
     private static final String SEARCH_TYPE = "search_type";

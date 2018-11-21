@@ -152,6 +152,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             case MovieKeys.LIST_POPULAR:
             case MovieKeys.LIST_QUEUED:
             case MovieKeys.LIST_TOPRATED:
+            case MovieKeys.LIST_GENRE:
                 mListSaveButton.hide();
                 break;
             default:
