@@ -107,7 +107,7 @@
         <RadioButton
             android:id="@+id/scheduled_btn"
             style="@style/ListButtonStyleLandscape"
-            android:text="To Watch" />
+            android:text="@string/to_watch" />
     </RadioGroup>
 
     <android.support.constraint.Guideline

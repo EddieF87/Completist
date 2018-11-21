@@ -2,16 +2,21 @@ package xyz.sleekstats.completist.databinding;
 
 import android.databinding.BindingAdapter;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
+import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import java.util.List;
 
+import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.model.WatchCount;
 import xyz.sleekstats.completist.view.GenreClickableSpan;
@@ -45,7 +50,6 @@ public class BindingUtils {
         textView.setMovementMethod(LinkMovementMethod.getInstance());
         textView.setHighlightColor(Color.TRANSPARENT);
     }
-
 
     @BindingAdapter("detailsText")
     public static void setDetailsText(TextView textView, String text) {

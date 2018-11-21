@@ -10,6 +10,7 @@
     <string name="cancel">Cancel</string>
     <string name="back">Back</string>
     <string name="genres">Genres</string>
+    <string name="to_watch">To Watch</string>
     <string-array name="list_options_array">
         <item>All Movies</item>
         <item>Acting</item>

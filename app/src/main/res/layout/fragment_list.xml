@@ -10,6 +10,10 @@
         <variable
             name="watchCount"
             type="xyz.sleekstats.completist.model.WatchCount" />
+
+        <!--<variable-->
+            <!--name="readMoreClick"-->
+            <!--type="android.view.View.OnClickListener"/>-->
     </data>
 <android.support.design.widget.CoordinatorLayout
     android:layout_width="match_parent"

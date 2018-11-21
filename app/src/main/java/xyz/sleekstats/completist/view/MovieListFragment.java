@@ -22,9 +22,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 
@@ -76,6 +78,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
         }
         fragmentListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false);
+//        fragmentListBinding.setReadMoreClick(this);
 
         mGrids = getResources().getInteger(R.integer.grid_number);
         View rootView = fragmentListBinding.getRoot();
@@ -288,33 +291,42 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
         int lines = getResources().getInteger(R.integer.lines);
         summaryTextView.setText(text);
-
-        if (summaryTextView.getLineCount() > lines) {
-
-            int end = (lines * (summaryTextView.getOffsetForPosition(summaryTextView.getWidth(), 0)));
-            end = Math.min(end, text.length());
-
-            String readMoreText = "... (Read More)";
-            int readMoreLength = readMoreText.length();
-            if(end > readMoreLength) {
-                String displayed = (text.substring(0, end-readMoreLength) + readMoreText).replaceAll("\n", " ");
-                SpannableString ss = new SpannableString(displayed);
-                ClickableSpan clickableSpan = new ClickableSpan() {
-                    @Override
-                    public void onClick(@NonNull View view) {
-                        openSummaryDialog(text);
-                    }
-                    @Override
-                    public void updateDrawState(@NonNull TextPaint ds) {
-                        super.updateDrawState(ds);
-                        ds.setUnderlineText(false);
-                    }
-                };
-                ss.setSpan(clickableSpan, (displayed.length() - readMoreLength + 4), displayed.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                summaryTextView.setText(ss);
-                summaryTextView.setMovementMethod(LinkMovementMethod.getInstance());
-                summaryTextView.setHighlightColor(Color.TRANSPARENT);
+        summaryTextView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (summaryTextView.getLineCount() > lines) {
+                    summaryTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    setReadMore(summaryTextView.getText().toString());
+                }
             }
+        });
+    }
+
+    private void setReadMore(String text){
+        int lines = getResources().getInteger(R.integer.lines);
+        int end = (lines * (summaryTextView.getOffsetForPosition(summaryTextView.getWidth(), 0)));
+        end = Math.min(end, text.length());
+
+        String readMoreText = "... (Read More)";
+        int readMoreLength = readMoreText.length();
+        if(end > readMoreLength) {
+            String displayed = (text.substring(0, end-readMoreLength) + readMoreText).replaceAll("\n", " ");
+            SpannableString ss = new SpannableString(displayed);
+            ClickableSpan clickableSpan = new ClickableSpan() {
+                @Override
+                public void onClick(@NonNull View view) {
+                    openSummaryDialog(text);
+                }
+                @Override
+                public void updateDrawState(@NonNull TextPaint ds) {
+                    super.updateDrawState(ds);
+                    ds.setUnderlineText(false);
+                }
+            };
+            ss.setSpan(clickableSpan, (displayed.length() - readMoreLength + 4), displayed.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            summaryTextView.setText(ss);
+            summaryTextView.setMovementMethod(LinkMovementMethod.getInstance());
+            summaryTextView.setHighlightColor(Color.TRANSPARENT);
         }
     }
 
