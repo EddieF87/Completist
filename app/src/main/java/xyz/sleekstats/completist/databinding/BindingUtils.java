@@ -40,10 +40,10 @@ public class BindingUtils {
         for(Genre genre: genres) {
             SpannableString ss = new SpannableString(genre.getName());
             ss.setSpan(new GenreClickableSpan(genre, clickListener), 0, genre.getName().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            stringBuilder.append(ss).append("/ ");
+            stringBuilder.append(ss).append(" / ");
         }
-        if(stringBuilder.length() > 1) {
-            stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
+        if(stringBuilder.length() > 2) {
+            stringBuilder.delete(stringBuilder.length() - 3, stringBuilder.length());
         }
 
         textView.setText(stringBuilder, TextView.BufferType.SPANNABLE);

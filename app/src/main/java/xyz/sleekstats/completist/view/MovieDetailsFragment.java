@@ -1,7 +1,9 @@
 package xyz.sleekstats.completist.view;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -74,6 +76,10 @@ public class MovieDetailsFragment extends Fragment
                 setMovieInfoDisplay(movieViewModel.onMovieWatchedFromDetails(mFilm)));
         rootView.findViewById(R.id.details_queue_btn).setOnClickListener(view ->
                 setMovieInfoDisplay(movieViewModel.onMovieQueuedFromDetails(mFilm)));
+        rootView.findViewById(R.id.tmdb_view).setOnClickListener(view -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themoviedb.org/movie/" + mFilm.getId()));
+            startActivity(browserIntent);
+        });
         return rootView;
     }
 

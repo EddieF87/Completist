@@ -6,6 +6,7 @@
     <dimen name="smallTextSize">12sp</dimen>
     <dimen name="btnTextSize">12sp</dimen>
     <dimen name="defaultTextSize">14sp</dimen>
+    <dimen name="spinnerTextSize">18sp</dimen>
 
     <dimen name="toolbarHeight">36dp</dimen>
     <dimen name="castItemHeight">120dp</dimen>

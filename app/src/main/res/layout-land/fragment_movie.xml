@@ -31,6 +31,17 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="TITLE" />
 
+    <TextView
+        android:id="@+id/tmdb_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/tmdb"
+        android:textSize="@dimen/smallTextSize"
+        android:textColor="@color/colorLink"
+        app:layout_constraintTop_toBottomOf="@+id/movie_title"
+        app:layout_constraintStart_toStartOf="@+id/movie_title"
+        />
+
     <ImageView
         android:id="@+id/movie_poster"
         android:layout_width="0dp"
@@ -101,7 +112,7 @@
         app:layout_constraintBottom_toTopOf="@+id/movie_genre"
         app:layout_constraintEnd_toEndOf="@+id/movie_title"
         app:layout_constraintStart_toStartOf="@+id/v_guideline"
-        app:layout_constraintTop_toBottomOf="@+id/movie_title"
+        app:layout_constraintTop_toBottomOf="@+id/tmdb_view"
         tools:text="oooo" />
 
     <RatingBar

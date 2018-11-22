@@ -60,6 +60,19 @@ public class MainActivity extends AppCompatActivity {
         if (movieViewModel == null) {
             movieViewModel = ViewModelProviders.of(MainActivity.this).get(MovieViewModel.class);
         }
+        startPager();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("oooo", "onResume");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("oooo", "onStart");
         viewPagerSubject = movieViewModel.getViewPagerSubject();
         mainCompositeDisposable.add(viewPagerSubject
                 .observeOn(AndroidSchedulers.mainThread())
@@ -67,9 +80,7 @@ public class MainActivity extends AppCompatActivity {
                         e -> Log.e("rxprob", "viewPagerSubject e=" + e.getMessage())
                 )
         );
-        startPager();
     }
-
 
     private void startPager() {
         myViewPager = findViewById(R.id.my_view_pager);
@@ -263,6 +274,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        Log.d("oooo", "onStop");
         mainCompositeDisposable.clear();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("oooo", "onPause");
+//        mainCompositeDisposable.clear();
+    }
+
 }

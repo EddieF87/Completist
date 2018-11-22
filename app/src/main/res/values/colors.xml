@@ -8,5 +8,6 @@
     <color name="colorGreen">#0cca12</color>
     <color name="colorRed">#ca160c</color>
     <color name="colorGray">#a9a9a9</color>
+    <color name="colorLink">#689899</color>
     <color name="colorNavPress">#fae385</color>
 </resources>

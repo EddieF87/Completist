@@ -87,26 +87,26 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mRoleSpinner = rootView.findViewById(R.id.role_spinner);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireActivity(),
-                R.array.list_options_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.array.list_options_array, R.layout.spinner_item);
+        adapter.setDropDownViewResource(R.layout.spinner_item);
 
         mRoleSpinner.setAdapter(adapter);
         listCompositeDisposable.add(RxAdapterView.itemSelections(mRoleSpinner)
-                        .subscribeOn(AndroidSchedulers.mainThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(pos -> movieViewModel.onSpin(pos),
-                                e -> Log.e(TAG_RXERROR, "Spinner error: " + e.getMessage())
-                        )
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(pos -> movieViewModel.onSpin(pos),
+                        e -> Log.e(TAG_RXERROR, "Spinner error: " + e.getMessage())
+                )
         );
 
         mListSaveButton.setOnClickListener(view -> listCompositeDisposable.add(movieViewModel.addOrRemoveList()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        success -> setSaveButton(R.drawable.ic_add_black_24dp),
-                        error -> Log.e(TAG_RXERROR, "addOrRemoveList" + error.getMessage()),
-                        () -> setSaveButton(R.drawable.ic_done_green_24dp)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                success -> setSaveButton(R.drawable.ic_add_black_24dp),
+                                error -> Log.e(TAG_RXERROR, "addOrRemoveList" + error.getMessage()),
+                                () -> setSaveButton(R.drawable.ic_done_green_24dp)
+                        )
                 )
-        )
         );
         summaryTextView = rootView.findViewById(R.id.person_summary);
         mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mGrids));
@@ -117,10 +117,11 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mListSaveButton.hide();
         mListSaveButton.setImageResource(drawable);
         mListSaveButton.show();
-        if(drawable == R.drawable.ic_done_green_24dp) {
-            Objects.requireNonNull(getView()).findViewById(R.id.saved_note).setVisibility(View.VISIBLE);
+        TextView textView = Objects.requireNonNull(getView()).findViewById(R.id.person_name);
+        if (drawable == R.drawable.ic_done_green_24dp) {
+            textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_done_green_24dp, 0);
         } else {
-            Objects.requireNonNull(getView()).findViewById(R.id.saved_note).setVisibility(View.INVISIBLE);
+            textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
         }
     }
 
@@ -194,7 +195,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             default:
                 currentPos = 0;
         }
-        if(currentPos == oldPos) {
+        if (currentPos == oldPos) {
             movieViewModel.setInitialSpin(false);
             return;
         }
@@ -228,7 +229,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     @Override
     public void onFilmClick(String movieID, boolean isFilm) {
-        if(isFilm) {
+        if (isFilm) {
             movieViewModel.getMovieInfo(movieID);
         } else {
             movieViewModel.getShowInfo(movieID);
@@ -265,7 +266,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         );
     }
 
-    private void setItemWatched(FilmByPerson film, boolean watched, int pos){
+    private void setItemWatched(FilmByPerson film, boolean watched, int pos) {
         if (mMovieAdapter == null) {
             return;
         }
@@ -273,7 +274,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mMovieAdapter.notifyItemChanged(pos);
     }
 
-    private void setItemQueued(FilmByPerson film, boolean queued, int pos){
+    private void setItemQueued(FilmByPerson film, boolean queued, int pos) {
         if (mMovieAdapter == null) {
             return;
         }
@@ -298,25 +299,27 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                     summaryTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     setReadMore(summaryTextView.getText().toString());
                 }
+                summaryTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
     }
 
-    private void setReadMore(String text){
+    private void setReadMore(String text) {
         int lines = getResources().getInteger(R.integer.lines);
         int end = (lines * (summaryTextView.getOffsetForPosition(summaryTextView.getWidth(), 0)));
         end = Math.min(end, text.length());
 
         String readMoreText = "... (Read More)";
         int readMoreLength = readMoreText.length();
-        if(end > readMoreLength) {
-            String displayed = (text.substring(0, end-readMoreLength) + readMoreText).replaceAll("\n", " ");
+        if (end > readMoreLength) {
+            String displayed = (text.substring(0, end - readMoreLength) + readMoreText).replaceAll("\n", " ");
             SpannableString ss = new SpannableString(displayed);
             ClickableSpan clickableSpan = new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View view) {
                     openSummaryDialog(text);
                 }
+
                 @Override
                 public void updateDrawState(@NonNull TextPaint ds) {
                     super.updateDrawState(ds);
@@ -330,7 +333,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         }
     }
 
-    private void openSummaryDialog(String text){
+    private void openSummaryDialog(String text) {
         FragmentManager fragmentManager = (requireActivity()).getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         DialogFragment newFragment = PersonSummaryDialog.newInstance(text);

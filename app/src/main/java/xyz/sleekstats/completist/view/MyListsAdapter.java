@@ -47,8 +47,8 @@ public class MyListsAdapter extends RecyclerView.Adapter<MyListsAdapter.ListView
         int pct = myList.getList_pct();
 
         Picasso.get().load(posterURL)
-                .placeholder(R.drawable.ic_person_92px)
-                .error(R.drawable.ic_person_92px)
+                .placeholder(R.drawable.ic_person_gold_24dp)
+                .error(R.drawable.ic_person_gold_24dp)
                 .into(holder.mCastPosterView);
 
         holder.mCastNameView.setText(name);

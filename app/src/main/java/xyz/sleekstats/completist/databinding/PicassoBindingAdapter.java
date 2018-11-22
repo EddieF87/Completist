@@ -16,7 +16,7 @@ public class PicassoBindingAdapter {
 
     @BindingAdapter("profilePoster")
     public static void setProfileImage(ImageView posterView, String posterUrl) {
-        loadImage(posterView, PROFILE_POSTER_BASE_URL + posterUrl, R.drawable.ic_sharp_account_box_92px);
+        loadImage(posterView, PROFILE_POSTER_BASE_URL + posterUrl, R.drawable.ic_person_gold_24dp);
     }
 
     @BindingAdapter("filmItemPoster")
@@ -31,7 +31,7 @@ public class PicassoBindingAdapter {
 
     @BindingAdapter("castPoster")
     public static void setCastImage(ImageView posterView, String posterUrl) {
-        loadImage(posterView, CAST_POSTER_BASE_URL + posterUrl, R.drawable.ic_sharp_account_box_92px);
+        loadImage(posterView, CAST_POSTER_BASE_URL + posterUrl, R.drawable.ic_person_gold_92dp);
     }
 
     private static void loadImage(ImageView posterView, String posterUrl, int drawable) {
