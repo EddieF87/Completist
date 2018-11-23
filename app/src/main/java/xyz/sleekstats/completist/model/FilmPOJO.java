@@ -24,12 +24,14 @@ public class FilmPOJO {
     @SerializedName("id")
     private String id;
 
+    @SerializedName("imdb_id")
+    private String imdb_id;
+
     @SerializedName("vote_average")
     private float vote_average;
 
     @SerializedName("media_type")
     private String media_type;
-
     public String getMedia_type() { return media_type; }
 
     public void setMedia_type(String media_type) {
@@ -107,5 +109,9 @@ public class FilmPOJO {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getImdb_id() {
+        return imdb_id;
     }
 }

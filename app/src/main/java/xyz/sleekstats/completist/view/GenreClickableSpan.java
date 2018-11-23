@@ -25,6 +25,6 @@ public class GenreClickableSpan extends ClickableSpan {
 
     public void updateDrawState(@NonNull TextPaint ds) {
         ds.setColor(Color.parseColor("#689899"));
-        ds.setUnderlineText(true); // set to false to remove underline
+//        ds.setUnderlineText(true);
     }
 }

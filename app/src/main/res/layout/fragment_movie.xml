@@ -2,6 +2,7 @@
 <layout>
     <data>
         <import type="xyz.sleekstats.completist.databinding.BindingUtils"/>
+        <import type="android.view.View"/>
         <variable
             name="film"
             type="xyz.sleekstats.completist.model.FilmPOJO" />
@@ -40,8 +41,27 @@
             android:text="@string/tmdb"
             android:textSize="@dimen/smallTextSize"
             android:textColor="@color/colorLink"
+            app:mediaID="@{film.id}"
+            app:tvOrMovie="@{film.isFilm}"
+            app:siteClickable="@{genreClick}"
             app:layout_constraintTop_toBottomOf="@+id/movie_title"
             app:layout_constraintStart_toStartOf="@+id/movie_title"
+            />
+
+        <TextView
+            android:id="@+id/imdb_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/imdb"
+            android:textSize="@dimen/smallTextSize"
+            android:textColor="@color/colorLink"
+            app:mediaID="@{film.imdb_id}"
+            app:tvOrMovie="@{film.isFilm}"
+            app:siteClickable="@{genreClick}"
+            android:visibility="@{film.isFilm ? View.VISIBLE : View.GONE}"
+            android:layout_marginStart="@dimen/largeMargin"
+            app:layout_constraintTop_toBottomOf="@+id/movie_title"
+            app:layout_constraintStart_toEndOf="@+id/tmdb_view"
             />
 
         <ImageView

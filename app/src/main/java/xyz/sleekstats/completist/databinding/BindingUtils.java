@@ -2,15 +2,11 @@ package xyz.sleekstats.completist.databinding;
 
 import android.databinding.BindingAdapter;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
-import android.text.style.ClickableSpan;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -49,6 +45,13 @@ public class BindingUtils {
         textView.setText(stringBuilder, TextView.BufferType.SPANNABLE);
         textView.setMovementMethod(LinkMovementMethod.getInstance());
         textView.setHighlightColor(Color.TRANSPARENT);
+    }
+
+    @BindingAdapter(value = {"mediaID", "tvOrMovie", "siteClickable"})
+    public static void buildIdClickable(TextView textView, String id, boolean tvOrMovie, final View.OnClickListener clickListener) {
+        textView.setTag(R.id.id, id);
+        textView.setTag(R.id.tvOrMovie, tvOrMovie);
+        textView.setOnClickListener(clickListener);
     }
 
     @BindingAdapter("detailsText")

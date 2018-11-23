@@ -12,10 +12,13 @@
     <string name="genres">Genres</string>
     <string name="to_watch">To Watch</string>
     <string name="tmdb">TMDB</string>
+    <string name="imdb">IMDB</string>
     <string-array name="list_options_array">
         <item>All Movies</item>
         <item>Acting</item>
         <item>Writing/Directing</item>
         <item>TV</item>
     </string-array>
+    <item type="id" name="id"/>
+    <item type="id" name="tvOrMovie"/>
 </resources>

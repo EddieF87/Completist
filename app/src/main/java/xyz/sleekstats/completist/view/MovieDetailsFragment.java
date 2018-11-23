@@ -32,8 +32,7 @@ import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 //Shows details for selected film, including director/cast, rating, and summary
 public class MovieDetailsFragment extends Fragment
         implements CastAdapter.ItemClickListener
-        , View.OnClickListener
-{
+        , View.OnClickListener {
 
     private static final String TAG_RXERROR = "rxprobMovieDetails";
 
@@ -76,10 +75,10 @@ public class MovieDetailsFragment extends Fragment
                 setMovieInfoDisplay(movieViewModel.onMovieWatchedFromDetails(mFilm)));
         rootView.findViewById(R.id.details_queue_btn).setOnClickListener(view ->
                 setMovieInfoDisplay(movieViewModel.onMovieQueuedFromDetails(mFilm)));
-        rootView.findViewById(R.id.tmdb_view).setOnClickListener(view -> {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themoviedb.org/movie/" + mFilm.getId()));
-            startActivity(browserIntent);
-        });
+//        rootView.findViewById(R.id.tmdb_view).setOnClickListener(view -> {
+//            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themoviedb.org/movie/" + mFilm.getId()));
+//            startActivity(browserIntent);
+//        });
         return rootView;
     }
 
@@ -148,12 +147,36 @@ public class MovieDetailsFragment extends Fragment
 
     @Override
     public void onClick(View view) {
-        if(view.getTag() == null) {
-            return;
-        }
+        String id;
 
-        Genre genre = (Genre) view.getTag();
-        Toast.makeText(getActivity(), genre.getId(), Toast.LENGTH_SHORT).show();
-        movieViewModel.getFilmsByGenre(genre, mFilm.isFilm());
+        switch (view.getId()) {
+            case R.id.movie_genre:
+                if (view.getTag() == null) {
+                    return;
+                }
+                Genre genre = (Genre) view.getTag();
+                movieViewModel.getFilmsByGenre(genre, mFilm.isFilm());
+                break;
+
+            case R.id.tmdb_view:
+                id = view.getTag(R.id.id).toString();
+                String tvOrMovieString = (boolean) view.getTag(R.id.tvOrMovie) ? "movie" : "tv";
+                goToSite("https://www.themoviedb.org/" + tvOrMovieString + "/" + id);
+                break;
+
+            case R.id.imdb_view:
+                boolean tvOrMovie = (boolean) view.getTag(R.id.tvOrMovie);
+                if (!tvOrMovie) {
+                    return;
+                }
+                id = view.getTag(R.id.id).toString();
+                goToSite("https://www.imdb.com/title/" + id);
+                break;
+        }
+    }
+
+    private void goToSite(String site) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(site));
+        startActivity(browserIntent);
     }
 }
