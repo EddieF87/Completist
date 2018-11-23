@@ -19,6 +19,13 @@ import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.model.WatchCount;
 import xyz.sleekstats.completist.view.GenreClickableSpan;
 
+import static xyz.sleekstats.completist.databinding.MovieKeys.LIST_GENRE;
+import static xyz.sleekstats.completist.databinding.MovieKeys.LIST_NOWPLAYING;
+import static xyz.sleekstats.completist.databinding.MovieKeys.LIST_POPULAR;
+import static xyz.sleekstats.completist.databinding.MovieKeys.LIST_QUEUED;
+import static xyz.sleekstats.completist.databinding.MovieKeys.LIST_TOPRATED;
+import static xyz.sleekstats.completist.databinding.MovieKeys.LIST_WATCHED;
+
 public class BindingUtils {
 
     public static String setCollapsingToolBarText(String name, WatchCount watchCount) {
@@ -29,18 +36,18 @@ public class BindingUtils {
                 + " (" + watchCount.getWatchedPct() + "%)";
     }
 
-    @BindingAdapter(value = {"genresContent", "genresClickable"})
+    @BindingAdapter(value = {"detailsContent", "detailsClickable"})
     public static void buildGenreString(TextView textView, List<Genre> genres, final View.OnClickListener clickListener) {
-        if(genres == null) {
+        if (genres == null) {
             return;
         }
         SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
-        for(Genre genre: genres) {
+        for (Genre genre : genres) {
             SpannableString ss = new SpannableString(genre.getName());
             ss.setSpan(new GenreClickableSpan(genre, clickListener), 0, genre.getName().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             stringBuilder.append(ss).append(" / ");
         }
-        if(stringBuilder.length() > 2) {
+        if (stringBuilder.length() > 2) {
             stringBuilder.delete(stringBuilder.length() - 3, stringBuilder.length());
         }
 
@@ -56,6 +63,28 @@ public class BindingUtils {
         textView.setOnClickListener(clickListener);
     }
 
+    @BindingAdapter(value = {"personID", "personSiteClickable"})
+    public static void buildIdClickable(TextView textView, String id, final View.OnClickListener clickListener) {
+        if (id == null) {
+            textView.setVisibility(View.INVISIBLE);
+            return;
+        }
+        switch (id) {
+            case LIST_WATCHED:
+            case LIST_QUEUED:
+            case LIST_NOWPLAYING:
+            case LIST_POPULAR:
+            case LIST_TOPRATED:
+            case LIST_GENRE:
+                textView.setVisibility(View.INVISIBLE);
+                return;
+            default:
+                textView.setTag(R.id.id, id);
+                textView.setOnClickListener(clickListener);
+                textView.setVisibility(View.VISIBLE);
+        }
+    }
+
     @BindingAdapter("detailsText")
     public static void setDetailsText(TextView textView, String text) {
         textView.setText(text);
@@ -66,12 +95,12 @@ public class BindingUtils {
     public static void setReleaseText(TextView textView, String releaseDate, String lastDate) {
         try {
             String text;
-            if(lastDate == null) {
-                text = releaseDate.substring(0,4);
+            if (lastDate == null) {
+                text = releaseDate.substring(0, 4);
             } else {
-                releaseDate = releaseDate.substring(0,4);
-                lastDate = lastDate.substring(0,4);
-                if(releaseDate.equals(lastDate)) {
+                releaseDate = releaseDate.substring(0, 4);
+                lastDate = lastDate.substring(0, 4);
+                if (releaseDate.equals(lastDate)) {
                     text = releaseDate;
                 } else {
                     text = releaseDate + "-" + lastDate;
@@ -86,7 +115,7 @@ public class BindingUtils {
     @BindingAdapter({"tvOrMovie", "runtime", "number_of_seasons", "number_of_episodes"})
     public static void setRunTimeText(TextView textView, boolean tvOrMovie, int runtime, int number_of_seasons, int number_of_episodes) {
         String text;
-        if(tvOrMovie) {
+        if (tvOrMovie) {
             text = runtime + " minutes";
         } else {
             text = number_of_seasons + " seasons, " + number_of_episodes + " episodes";

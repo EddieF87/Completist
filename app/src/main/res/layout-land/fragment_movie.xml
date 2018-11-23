@@ -10,7 +10,7 @@
             type="xyz.sleekstats.completist.model.FilmPOJO" />
 
         <variable
-            name="genreClick"
+            name="detailsClick"
             type="android.view.View.OnClickListener"/>
     </data>
 <android.support.constraint.ConstraintLayout
@@ -61,14 +61,15 @@
         android:id="@+id/tmdb_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="@dimen/largeMargin"
         android:text="@string/tmdb"
         android:textColor="@color/colorLink"
         android:textSize="@dimen/smallTextSize"
-        app:layout_constraintStart_toStartOf="@+id/movie_title"
-        app:layout_constraintTop_toBottomOf="@+id/release_view"
+        app:layout_constraintBottom_toBottomOf="@+id/release_view"
+        app:layout_constraintStart_toEndOf="@+id/runtime_view"
+        app:layout_constraintTop_toTopOf="@+id/release_view"
         app:mediaID="@{film.id}"
-        app:siteClickable="@{genreClick}"
+        app:siteClickable="@{detailsClick}"
         app:tvOrMovie="@{film.isFilm}" />
 
     <TextView
@@ -83,7 +84,7 @@
         app:layout_constraintStart_toEndOf="@+id/tmdb_view"
         app:layout_constraintTop_toTopOf="@+id/tmdb_view"
         app:mediaID="@{film.imdb_id}"
-        app:siteClickable="@{genreClick}"
+        app:siteClickable="@{detailsClick}"
         app:tvOrMovie="@{film.isFilm}" />
 
     <ImageView
@@ -140,8 +141,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/largeMargin"
         android:layout_marginTop="@dimen/defaultMargin"
-        app:genresContent="@{film.genres}"
-        app:genresClickable="@{genreClick}"
+        app:detailsContent="@{film.genres}"
+        app:detailsClickable="@{detailsClick}"
         android:textColorLink="@color/colorWatched"
         android:textSize="@dimen/defaultTextSize"
         app:layout_constraintBottom_toTopOf="@id/h_guideline"

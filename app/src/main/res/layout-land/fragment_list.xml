@@ -50,11 +50,11 @@
             android:text="@{person.name}"
             android:textSize="@dimen/titleTextSize"
             android:textStyle="bold"
-            app:layout_constraintWidth_default="wrap"
             app:layout_constraintEnd_toStartOf="@+id/watched_tracker"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_default="wrap"
             tools:text="Brad Pitt" />
 
         <TextView
@@ -82,11 +82,11 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginEnd="8dp"
-            android:text="@{watchCount.toString()}"
-            android:textSize="@dimen/titleTextSize"
-            android:textStyle="bold"
             android:gravity="end"
+            android:text="@{watchCount.toString()}"
             android:textAlignment="viewEnd"
+            android:textSize="@dimen/watchedTextSize"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/person_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -130,6 +130,39 @@
             android:src="@drawable/ic_done_green_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tmdb_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/tmdb"
+            android:textColor="@color/colorLink"
+            android:textSize="@dimen/smallTextSize"
+            app:layout_constraintBottom_toTopOf="@+id/imdb_view"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/person_poster"
+            app:layout_constraintTop_toBottomOf="@+id/role_spinner"
+            app:layout_constraintVertical_bias="0.100000024"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:personID="@{person.id}"
+            app:personSiteClickable="@{listClick}" />
+
+        <TextView
+            android:id="@+id/imdb_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/imdb"
+            android:textColor="@color/colorLink"
+            android:textSize="@dimen/smallTextSize"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/person_poster"
+            app:layout_constraintTop_toBottomOf="@+id/tmdb_view"
+            app:personID="@{person.imdb_id}"
+            app:personSiteClickable="@{listClick}" />
 
     </android.support.constraint.ConstraintLayout>
 

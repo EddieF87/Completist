@@ -10,6 +10,10 @@
         <variable
             name="watchCount"
             type="xyz.sleekstats.completist.model.WatchCount" />
+
+        <variable
+            name="listClick"
+            type="android.view.View.OnClickListener"/>
     </data>
 <android.support.design.widget.CoordinatorLayout
     android:layout_width="match_parent"
@@ -60,11 +64,12 @@
                     android:scaleType="fitXY"
                     android:src="@drawable/ic_person_gold_24dp"
                     app:layout_collapseMode="parallax"
-                    app:layout_constraintDimensionRatio="2:3"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="2:3"
                     app:layout_constraintEnd_toStartOf="@+id/list_v_guideline"
                     app:layout_constraintStart_toStartOf="@+id/collapsing_layout"
                     app:layout_constraintTop_toTopOf="@+id/collapsing_layout"
+                    app:layout_constraintVertical_bias="0.13"
                     app:profilePoster="@{person.profile_path}" />
 
                 <TextView
@@ -94,7 +99,7 @@
                     app:layout_collapseMode="parallax"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/person_name"
-                    app:layout_constraintTop_toBottomOf="@+id/role_spinner"
+                    app:layout_constraintTop_toBottomOf="@+id/tmdb_view"
                     tools:text="ipsum lepsum tesidifdsdnachusuibsvvefipsum lepsum tesidifdsdnachusuibsvvefipsum lepsum tesidifdsdnachusuibsvvef" />
 
                 <android.support.constraint.Guideline
@@ -102,7 +107,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_constraintGuide_percent=".33" />
+                    app:layout_constraintGuide_percent="0.4" />
 
                 <android.support.constraint.Barrier
                     android:id="@+id/person_barrier"
@@ -111,18 +116,25 @@
                     app:barrierDirection="bottom"
                     app:constraint_referenced_ids="person_summary,person_poster,role_spinner,watched_tracker" />
 
+                <android.support.constraint.Barrier
+                    android:id="@+id/name_barrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="person_name, role_spinner" />
+
                 <TextView
                     android:id="@+id/watched_tracker"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:text="@{watchCount.toString()}"
-                    android:textSize="@dimen/titleTextSize"
+                    android:textSize="@dimen/watchedTextSize"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/person_name"
                     app:layout_constraintTop_toBottomOf="@+id/person_summary"
-                    tools:text="WATCHED 1/99" />
+                    tools:text="WATCHED 100/199" />
 
                 <Spinner
                     android:id="@+id/role_spinner"
@@ -132,6 +144,35 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/person_name"
                     app:layout_constraintTop_toBottomOf="@+id/person_name" />
+
+                <TextView
+                    android:id="@+id/tmdb_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/tmdb"
+                    android:textColor="@color/colorLink"
+                    android:textSize="@dimen/smallTextSize"
+                    app:layout_constraintStart_toStartOf="@+id/person_name"
+                    app:layout_constraintTop_toBottomOf="@+id/name_barrier"
+                    app:personID="@{person.id}"
+                    app:personSiteClickable="@{listClick}"
+                    />
+
+                <TextView
+                    android:id="@+id/imdb_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/largeMargin"
+                    android:text="@string/imdb"
+                    android:textColor="@color/colorLink"
+                    android:textSize="@dimen/smallTextSize"
+                    app:layout_constraintStart_toEndOf="@+id/tmdb_view"
+                    app:layout_constraintTop_toTopOf="@+id/tmdb_view"
+                    app:personID="@{person.imdb_id}"
+                    app:personSiteClickable="@{listClick}"
+                    />
+
 
             </android.support.constraint.ConstraintLayout>
 

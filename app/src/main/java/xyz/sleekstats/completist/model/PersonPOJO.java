@@ -33,8 +33,15 @@ public class PersonPOJO {
     @SerializedName("id")
     private final String id;
 
+    @SerializedName("imdb_id")
+    private String imdb_id;
+
     public String getId() {
         return id;
+    }
+
+    public String getImdb_id() {
+        return imdb_id;
     }
 
     public MovieCredits getMovieCredits() {

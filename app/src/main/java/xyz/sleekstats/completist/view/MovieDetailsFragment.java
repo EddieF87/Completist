@@ -54,7 +54,7 @@ public class MovieDetailsFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         movieBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie, container, false);
-        movieBinding.setGenreClick(this);
+        movieBinding.setDetailsClick(this);
 
         if (movieViewModel == null) {
             movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);

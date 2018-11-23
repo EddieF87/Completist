@@ -1,8 +1,10 @@
 package xyz.sleekstats.completist.view;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -46,7 +48,8 @@ import xyz.sleekstats.completist.model.WatchCount;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 //Shows details of, and list of films by, a specific actor/director
-public class MovieListFragment extends Fragment implements MovieAdapter.ItemClickListener {
+public class MovieListFragment extends Fragment implements MovieAdapter.ItemClickListener
+        , View.OnClickListener {
 
     private static final String TAG_RXERROR = "rxprobMovieList";
     private int mGrids;
@@ -78,7 +81,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
         }
         fragmentListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false);
-//        fragmentListBinding.setReadMoreClick(this);
+        fragmentListBinding.setListClick(this);
 
         mGrids = getResources().getInteger(R.integer.grid_number);
         View rootView = fragmentListBinding.getRoot();
@@ -182,7 +185,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         }
         switch (knownFor) {
             case "Movies":
-                mRoleSpinner.setVisibility(View.INVISIBLE);
+                mRoleSpinner.setVisibility(View.GONE);
                 return;
             case "Acting":
                 currentPos = 1;
@@ -338,5 +341,22 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         DialogFragment newFragment = PersonSummaryDialog.newInstance(text);
         newFragment.show(fragmentTransaction, "");
+    }
+
+    @Override
+    public void onClick(View view) {
+        try {
+            String id = view.getTag(R.id.id).toString();
+            if(view.getId() == R.id.tmdb_view) {
+                goToSite("https://www.themoviedb.org/person/" + id);
+            } else if (view.getId() == R.id.imdb_view) {
+                goToSite("https://www.imdb.com/name/" + id);
+            }
+        } catch (Exception ignored) { }
+    }
+
+    private void goToSite(String site) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(site));
+        startActivity(browserIntent);
     }
 }

@@ -10,7 +10,7 @@
             type="xyz.sleekstats.completist.model.FilmPOJO" />
 
         <variable
-            name="genreClick"
+            name="detailsClick"
             type="android.view.View.OnClickListener"/>
     </data>
 
@@ -68,7 +68,7 @@
             app:layout_constraintStart_toStartOf="@+id/movie_title"
             app:layout_constraintTop_toBottomOf="@+id/release_view"
             app:mediaID="@{film.id}"
-            app:siteClickable="@{genreClick}"
+            app:siteClickable="@{detailsClick}"
             app:tvOrMovie="@{film.isFilm}" />
 
         <TextView
@@ -83,7 +83,7 @@
             app:layout_constraintStart_toEndOf="@+id/tmdb_view"
             app:layout_constraintTop_toTopOf="@+id/tmdb_view"
             app:mediaID="@{film.imdb_id}"
-            app:siteClickable="@{genreClick}"
+            app:siteClickable="@{detailsClick}"
             app:tvOrMovie="@{film.isFilm}" />
 
         <ImageView
@@ -139,8 +139,8 @@
             android:layout_marginStart="@dimen/largeMargin"
             android:textColorLink="@color/colorWatched"
             android:textSize="@dimen/defaultTextSize"
-            app:genresClickable="@{genreClick}"
-            app:genresContent="@{film.genres}"
+            app:detailsClickable="@{detailsClick}"
+            app:detailsContent="@{film.genres}"
             app:layout_constraintBottom_toBottomOf="@+id/details_queue_btn"
             app:layout_constraintEnd_toEndOf="@+id/movie_overview"
             app:layout_constraintStart_toEndOf="@+id/movie_rating"

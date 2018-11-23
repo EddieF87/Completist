@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="titleTextSize">48sp</dimen>
+    <dimen name="watchedTextSize">48sp</dimen>
     <dimen name="midTextSize">36sp</dimen>
     <dimen name="pctTextSize">24sp</dimen>
     <dimen name="smallTextSize">20sp</dimen>
