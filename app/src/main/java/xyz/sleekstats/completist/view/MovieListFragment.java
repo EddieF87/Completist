@@ -195,12 +195,12 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             default:
                 currentPos = 0;
         }
+        mRoleSpinner.setVisibility(View.VISIBLE);
         if (currentPos == oldPos) {
             movieViewModel.setInitialSpin(false);
             return;
         }
         mRoleSpinner.setSelection(currentPos);
-        mRoleSpinner.setVisibility(View.VISIBLE);
     }
 
     //Populate recyclerview with films from actor/director
