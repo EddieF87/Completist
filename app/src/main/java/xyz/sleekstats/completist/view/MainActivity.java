@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.R;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private MovieViewModel movieViewModel;
     private SimpleCursorAdapter mSearchAdapter;
     private final CompositeDisposable mainCompositeDisposable = new CompositeDisposable();
+    private Disposable mSearchDisposable;
 
     private PublishSubject<Integer> viewPagerSubject;
 
@@ -62,17 +64,9 @@ public class MainActivity extends AppCompatActivity {
         }
         startPager();
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("oooo", "onResume");
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("oooo", "onStart");
         viewPagerSubject = movieViewModel.getViewPagerSubject();
         mainCompositeDisposable.add(viewPagerSubject
                 .observeOn(AndroidSchedulers.mainThread())
@@ -190,7 +184,8 @@ public class MainActivity extends AppCompatActivity {
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setIconifiedByDefault(true);
 
-        mainCompositeDisposable.add(RxSearchView.queryTextChanges(searchView)
+        mSearchDisposable = RxSearchView
+                .queryTextChanges(searchView)
                 .skip(1)
                 .debounce(600, TimeUnit.MILLISECONDS)
                 .filter(charSequence -> !TextUtils.isEmpty(charSequence))
@@ -200,8 +195,8 @@ public class MainActivity extends AppCompatActivity {
                 .switchMap(query -> movieViewModel.queryMedia(query))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(s -> populateAdapter(s.getResults()),
-                        e -> Log.e("rxprob", "RxSearchView.queryTextChanges e=" + e.getMessage()))
-        );
+                        e -> Log.e("rxprob", "RxSearchView.queryTextChanges e=" + e.getMessage())
+                );
 
         final String[] from = new String[]{SEARCH_TITLE, SEARCH_ID};
         final int[] to = new int[]{R.id.search_title};
@@ -274,15 +269,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("oooo", "onStop");
         mainCompositeDisposable.clear();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d("oooo", "onPause");
-//        mainCompositeDisposable.clear();
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mSearchDisposable != null) {mSearchDisposable.dispose();}
     }
-
 }
