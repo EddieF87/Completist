@@ -10,6 +10,8 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import xyz.sleekstats.completist.R;
@@ -58,5 +60,37 @@ public class BindingUtils {
     public static void setDetailsText(TextView textView, String text) {
         textView.setText(text);
         textView.setMovementMethod(new ScrollingMovementMethod());
+    }
+
+    @BindingAdapter({"releaseDate", "lastDate"})
+    public static void setReleaseText(TextView textView, String releaseDate, String lastDate) {
+        try {
+            String text;
+            if(lastDate == null) {
+                text = releaseDate.substring(0,4);
+            } else {
+                releaseDate = releaseDate.substring(0,4);
+                lastDate = lastDate.substring(0,4);
+                if(releaseDate.equals(lastDate)) {
+                    text = releaseDate;
+                } else {
+                    text = releaseDate + "-" + lastDate;
+                }
+            }
+            textView.setText(text);
+        } catch (Exception e) {
+            textView.setText("");
+        }
+    }
+
+    @BindingAdapter({"tvOrMovie", "runtime", "number_of_seasons", "number_of_episodes"})
+    public static void setRunTimeText(TextView textView, boolean tvOrMovie, int runtime, int number_of_seasons, int number_of_episodes) {
+        String text;
+        if(tvOrMovie) {
+            text = runtime + " minutes";
+        } else {
+            text = number_of_seasons + " seasons, " + number_of_episodes + " episodes";
+        }
+        textView.setText(text);
     }
 }

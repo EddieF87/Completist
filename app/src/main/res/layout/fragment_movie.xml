@@ -25,7 +25,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/defaultMargin"
-            android:layout_marginTop="@dimen/largeMargin"
             android:text="@{film.title}"
             android:textSize="@dimen/titleTextSize"
             android:textStyle="bold"
@@ -35,50 +34,74 @@
             tools:text="TITLE" />
 
         <TextView
+            android:id="@+id/release_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/smallMargin"
+            app:releaseDate="@{film.release_date}"
+            app:lastDate="@{film.last_date}"
+            app:layout_constraintStart_toStartOf="@+id/movie_title"
+            app:layout_constraintTop_toBottomOf="@+id/movie_title"
+            tools:text="TextView" />
+
+
+        <TextView
+            android:id="@+id/runtime_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            app:tvOrMovie="@{film.isFilm}"
+            app:runtime="@{film.runtime}"
+            app:number_of_seasons="@{film.number_of_seasons}"
+            app:number_of_episodes="@{film.number_of_episodes}"
+            app:layout_constraintStart_toEndOf="@+id/release_view"
+            app:layout_constraintTop_toTopOf="@+id/release_view" />
+
+        <TextView
             android:id="@+id/tmdb_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="@string/tmdb"
-            android:textSize="@dimen/smallTextSize"
             android:textColor="@color/colorLink"
-            app:mediaID="@{film.id}"
-            app:tvOrMovie="@{film.isFilm}"
-            app:siteClickable="@{genreClick}"
-            app:layout_constraintTop_toBottomOf="@+id/movie_title"
+            android:textSize="@dimen/smallTextSize"
             app:layout_constraintStart_toStartOf="@+id/movie_title"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/release_view"
+            app:mediaID="@{film.id}"
+            app:siteClickable="@{genreClick}"
+            app:tvOrMovie="@{film.isFilm}" />
 
         <TextView
             android:id="@+id/imdb_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/imdb"
-            android:textSize="@dimen/smallTextSize"
-            android:textColor="@color/colorLink"
-            app:mediaID="@{film.imdb_id}"
-            app:tvOrMovie="@{film.isFilm}"
-            app:siteClickable="@{genreClick}"
-            android:visibility="@{film.isFilm ? View.VISIBLE : View.GONE}"
             android:layout_marginStart="@dimen/largeMargin"
-            app:layout_constraintTop_toBottomOf="@+id/movie_title"
+            android:text="@string/imdb"
+            android:textColor="@color/colorLink"
+            android:textSize="@dimen/smallTextSize"
+            android:visibility="@{film.isFilm ? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toEndOf="@+id/tmdb_view"
-            />
+            app:layout_constraintTop_toTopOf="@+id/tmdb_view"
+            app:mediaID="@{film.imdb_id}"
+            app:siteClickable="@{genreClick}"
+            app:tvOrMovie="@{film.isFilm}" />
 
         <ImageView
             android:id="@+id/movie_poster"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            app:filmDetailsPoster="@{film.poster_path}"
-            android:foreground="@drawable/castlist_border"
-            app:layout_constraintDimensionRatio="2:3"
             android:adjustViewBounds="true"
+            android:foreground="@drawable/castlist_border"
+            android:padding="2dp"
             android:scaleType="fitXY"
-            app:layout_constraintBottom_toTopOf="@id/details_watched_btn"
+            app:filmDetailsPoster="@{film.poster_path}"
+            app:layout_constraintBottom_toTopOf="@+id/details_queue_btn"
+            app:layout_constraintDimensionRatio="2:3"
             app:layout_constraintEnd_toStartOf="@+id/vguideline"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.13999999" />
 
         <ImageView
             android:id="@+id/details_watched_btn"
@@ -86,14 +109,14 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:clickable="true"
+            android:focusable="true"
             android:src="@{film.isWatched ? @drawable/ic_done_green_24dp : @drawable/ic_add_black_24dp}"
             android:tint="@{film.isWatched ? @color/colorWatched : @color/colorAccent}"
             app:layout_constraintBottom_toTopOf="@id/hguideline"
             app:layout_constraintEnd_toStartOf="@+id/details_queue_btn"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintStart_toStartOf="parent"
-            android:focusable="true" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/details_queue_btn"
@@ -101,23 +124,23 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:clickable="true"
+            android:focusable="true"
             android:src="@drawable/ic_watch_later_gold_24dp"
             android:tint="@{film.isQueued ? @color/colorWatched : @color/colorAccent}"
             app:layout_constraintBottom_toTopOf="@id/hguideline"
             app:layout_constraintEnd_toStartOf="@+id/movie_overview"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/details_watched_btn"
-            android:focusable="true" />
+            app:layout_constraintStart_toEndOf="@+id/details_watched_btn" />
 
         <TextView
             android:id="@+id/movie_genre"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/largeMargin"
-            app:genresContent="@{film.genres}"
-            app:genresClickable="@{genreClick}"
             android:textColorLink="@color/colorWatched"
             android:textSize="@dimen/defaultTextSize"
+            app:genresClickable="@{genreClick}"
+            app:genresContent="@{film.genres}"
             app:layout_constraintBottom_toBottomOf="@+id/details_queue_btn"
             app:layout_constraintEnd_toEndOf="@+id/movie_overview"
             app:layout_constraintStart_toEndOf="@+id/movie_rating"
@@ -130,9 +153,9 @@
             android:layout_marginTop="@dimen/defaultMargin"
             android:layout_marginBottom="8dp"
             android:gravity="top"
+            android:scrollbars="vertical"
             android:textSize="@dimen/smallTextSize"
             app:detailsText="@{film.overview}"
-            android:scrollbars="vertical"
             app:layout_constraintBottom_toTopOf="@+id/movie_genre"
             app:layout_constraintEnd_toEndOf="@+id/movie_title"
             app:layout_constraintStart_toStartOf="@+id/movie_title"
@@ -156,7 +179,7 @@
             android:id="@+id/cast_recyclerview"
             android:layout_width="0dp"
             android:layout_height="@dimen/castItemHeight"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/castlist_border"
             android:orientation="horizontal"
             android:requiresFadingEdge="horizontal"
@@ -186,7 +209,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.33" />
+            app:layout_constraintGuide_percent="0.4" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>
