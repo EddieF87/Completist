@@ -60,6 +60,16 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private MovieAdapter mMovieAdapter;
     private List<FilmByPerson> mCurrentFilmList;
     private TextView summaryTextView;
+    private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            if (!recyclerView.canScrollVertically(1)) {
+                Log.d("pokemo", "!recyclerView.canScrollVertically");
+                movieViewModel.onScrollEnd();
+            }
+        }
+    };
 
     private MovieViewModel movieViewModel;
 
@@ -83,9 +93,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         fragmentListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false);
         fragmentListBinding.setListClick(this);
 
-        mGrids = getResources().getInteger(R.integer.grid_number);
         View rootView = fragmentListBinding.getRoot();
-        mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
+        initRecyclerView(rootView);
         mListSaveButton = rootView.findViewById(R.id.listSaveButton);
         mRoleSpinner = rootView.findViewById(R.id.role_spinner);
 
@@ -112,7 +121,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
                 )
         );
         summaryTextView = rootView.findViewById(R.id.person_summary);
-        mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mGrids));
         return rootView;
     }
 
@@ -154,15 +162,20 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
         String id = personPOJO.getId();
         switch (id) {
-            case MovieKeys.LIST_WATCHED:
-            case MovieKeys.LIST_NOWPLAYING:
             case MovieKeys.LIST_POPULAR:
-            case MovieKeys.LIST_QUEUED:
+            case MovieKeys.LIST_NOWPLAYING:
             case MovieKeys.LIST_TOPRATED:
             case MovieKeys.LIST_GENRE:
+                addScrollListener();
                 mListSaveButton.hide();
                 break;
+            case MovieKeys.LIST_WATCHED:
+            case MovieKeys.LIST_QUEUED:
+                mListSaveButton.hide();
+                removeScrollListener();
+                break;
             default:
+                removeScrollListener();
                 listCompositeDisposable.add(movieViewModel.checkIfListExists(id)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -206,19 +219,39 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mRoleSpinner.setSelection(currentPos);
     }
 
+    private void initRecyclerView(View rootView) {
+        mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
+        mGrids = getResources().getInteger(R.integer.grid_number);
+        mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mGrids));
+    }
+
+    private void addScrollListener(){
+        if (mMoviesRecyclerView == null) {
+            View rootView = getView();
+            if (rootView == null) { return; }
+            initRecyclerView(rootView);
+        }
+        mMoviesRecyclerView.addOnScrollListener(onScrollListener);
+    }
+
+
+    private void removeScrollListener(){
+        if (mMoviesRecyclerView == null) {
+            View rootView = getView();
+            if (rootView == null) { return; }
+            initRecyclerView(rootView);
+        }
+        mMoviesRecyclerView.removeOnScrollListener(onScrollListener);
+    }
+
     //Populate recyclerview with films from actor/director
     private void setRecyclerView(List<FilmByPerson> filmByPersonList) {
 
         mCurrentFilmList = filmByPersonList;
-
         if (mMoviesRecyclerView == null) {
             View rootView = getView();
-            if (rootView == null) {
-                return;
-            }
-            mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
-            mGrids = getResources().getInteger(R.integer.grid_number);
-            mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mGrids));
+            if (rootView == null) { return; }
+            initRecyclerView(rootView);
         }
         if (mMovieAdapter == null) {
             mMovieAdapter = new MovieAdapter(mCurrentFilmList);
@@ -228,6 +261,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
             mMovieAdapter.setCurrentMovieList(mCurrentFilmList);
             mMovieAdapter.notifyDataSetChanged();
         }
+        movieViewModel.finishScrollLoading();
     }
 
     @Override

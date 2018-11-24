@@ -36,20 +36,27 @@ public interface TmdbAPI {
 
     //retrieve most popular movies from TMDB API
     @GET("movie/popular?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&language=en-US&include_adult=false")
-    Single<ResultsPOJO> retrievePopularMovies();
+    Single<ResultsPOJO> retrievePopularMovies(
+            @Query("page") int pageNumber
+    );
 
     //retrieve movies currently playing in theatres from TMDB API
     @GET("movie/now_playing?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&language=en-US&page=1&include_adult=false")
-    Single<ResultsPOJO> retrieveNowPlaying();
+    Single<ResultsPOJO> retrieveNowPlaying(
+            @Query("page") int pageNumber
+    );
 
     //retrieve  top-rated movies from TMDB API
     @GET("movie/top_rated?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&language=en-US&page=1&include_adult=false")
-    Single<ResultsPOJO> retrieveTopRated();
+    Single<ResultsPOJO> retrieveTopRated(
+            @Query("page") int pageNumber
+    );
 
     @GET("discover/{tvOrMovie}?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&sort_by=popularity.desc&include_adult=false")
     Single<ResultsPOJO> retrieveByGenre(
             @Path("tvOrMovie") String tvOrMovie,
-            @Query("with_genres") String genre
+            @Query("with_genres") String genre,
+            @Query("page") int pageNumber
     );
 
     @GET("search/multi?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2" +

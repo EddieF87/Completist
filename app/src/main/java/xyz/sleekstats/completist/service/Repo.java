@@ -98,33 +98,33 @@ public class Repo {
     }
 
     //Get list of most popular films
-    public Observable<List<FilmByPerson>> getPopularFilms() {
+    public Observable<List<FilmByPerson>> getPopularFilms(int pageNumber) {
         return singleToObservable(
-                tmdbAPI.retrievePopularMovies()
+                tmdbAPI.retrievePopularMovies(pageNumber)
                         .map(ResultsPOJO::getResults)
         );
     }
 
     //Get list of films currently playing in theatres
-    public Observable<List<FilmByPerson>> getNowPlaying() {
+    public Observable<List<FilmByPerson>> getNowPlaying(int pageNumber) {
         return singleToObservable(
-                tmdbAPI.retrieveNowPlaying()
+                tmdbAPI.retrieveNowPlaying(pageNumber)
                         .map(ResultsPOJO::getResults)
         );
     }
 
     //Get list of top-rated films
-    public Observable<List<FilmByPerson>> getTopRated() {
+    public Observable<List<FilmByPerson>> getTopRated(int pageNumber) {
         return singleToObservable(
-                tmdbAPI.retrieveTopRated()
+                tmdbAPI.retrieveTopRated(pageNumber)
                         .map(ResultsPOJO::getResults)
         );
     }
 
     //Get list of popular films/shows by genre
-    public Observable<List<FilmByPerson>> getMoviesByGenre(String tvOrMovie, String genre) {
+    public Observable<List<FilmByPerson>> getMoviesByGenre(String tvOrMovie, String genre, int pageNumber) {
         return singleToObservable(
-                tmdbAPI.retrieveByGenre(tvOrMovie, genre)
+                tmdbAPI.retrieveByGenre(tvOrMovie, genre, pageNumber)
                         .map(ResultsPOJO::getResults)
         );
     }
