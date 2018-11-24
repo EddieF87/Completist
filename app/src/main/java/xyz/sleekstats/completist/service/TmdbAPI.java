@@ -66,7 +66,9 @@ public interface TmdbAPI {
     );
 
     @GET("person/popular?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&language=en-US&page=1&include_adult=false")
-    Observable<PersonQueryPOJO> retrievePopularActors();
+    Observable<PersonQueryPOJO> retrievePopularActors(
+            @Query("page") int pageNumber
+    );
 
     @GET("genre/{tvOrMovie}/list?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&language=en-US")
     Single<GenreList> getGenreList(

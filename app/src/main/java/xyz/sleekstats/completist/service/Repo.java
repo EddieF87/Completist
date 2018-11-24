@@ -91,8 +91,8 @@ public class Repo {
 
 
     //Get list of most popular film-people
-    public Observable<PersonQueryPOJO> getPopularActors() {
-        return tmdbAPI.retrievePopularActors()
+    public Observable<PersonQueryPOJO> getPopularActors(int pageNumber) {
+        return tmdbAPI.retrievePopularActors(pageNumber)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

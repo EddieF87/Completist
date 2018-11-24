@@ -28,7 +28,6 @@ import xyz.sleekstats.completist.model.MediaQueryPOJO;
 import xyz.sleekstats.completist.model.MovieCredits;
 import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.PersonPOJO;
-import xyz.sleekstats.completist.model.PersonQueryPOJO;
 import xyz.sleekstats.completist.model.WatchCount;
 import xyz.sleekstats.completist.service.Repo;
 
@@ -43,6 +42,7 @@ public class MovieViewModel extends AndroidViewModel {
     private final PublishSubject<List<FilmByPerson>> filmListPublishSubject = PublishSubject.create();
     private final PublishSubject<FilmPOJO> filmDetailsPublishSubject = PublishSubject.create();
     private final PublishSubject<WatchCount> watchCountPublishSubject = PublishSubject.create();
+    private final PublishSubject<List<MyList>> popularActorsSubject = PublishSubject.create();
     private final PublishSubject<Integer> viewPagerSubject = PublishSubject.create();
 
     private FilmListDetails mFilmListDetails;
@@ -51,10 +51,12 @@ public class MovieViewModel extends AndroidViewModel {
     private int mTotalFilms;
     private int mWatchedFilms;
     private final List<FilmByPerson> displayList = new ArrayList<>();
+    private final List<MyList> popularActorList = new ArrayList<>();
     private int displayTotalFilms;
     private int displayWatchedFilms;
     private boolean initialSpin = true;
-    private int pageNumber = 1;
+    private int filmsPageNumber = 1;
+    private int actorsPageNumber = 0;
     private boolean scrollLoading = false;
     private String genreID;
     private String tvOrMovieString;
@@ -104,6 +106,7 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public void getFilms() {
+        finishScrollLoading();
         if (mFilmListDetails == null) {
             getFilmsByPerson(MovieKeys.LIST_WATCHED);
         } else {
@@ -120,7 +123,7 @@ public class MovieViewModel extends AndroidViewModel {
 
     public void getFilmsByPerson(String personID) {
 
-        pageNumber = 1;
+        filmsPageNumber = 1;
         Observable<PersonPOJO> personObservable;
         Observable<List<FilmByPerson>> filmsObservable;
 
@@ -138,17 +141,17 @@ public class MovieViewModel extends AndroidViewModel {
             case MovieKeys.LIST_POPULAR:
                 mMovieCredits = null;
                 personObservable = Observable.just(new PersonPOJO("Popular", "Most popular movies on tmdb today.", "Movies", "", personID));
-                filmsObservable = setFilmsWatched(mRepo.getPopularFilms(pageNumber));
+                filmsObservable = setFilmsWatched(mRepo.getPopularFilms(filmsPageNumber));
                 break;
             case MovieKeys.LIST_NOWPLAYING:
                 mMovieCredits = null;
                 personObservable = Observable.just(new PersonPOJO("Now Showing", "Movies currently playing in theaters.", "Movies", "", personID));
-                filmsObservable = setFilmsWatched(mRepo.getNowPlaying(pageNumber));
+                filmsObservable = setFilmsWatched(mRepo.getNowPlaying(filmsPageNumber));
                 break;
             case MovieKeys.LIST_TOPRATED:
                 mMovieCredits = null;
                 personObservable = Observable.just(new PersonPOJO("Top Rated", "Top-rated movies on tmdb.", "Movies", "", personID));
-                filmsObservable = setFilmsWatched(mRepo.getTopRated(pageNumber));
+                filmsObservable = setFilmsWatched(mRepo.getTopRated(filmsPageNumber));
                 break;
             default:
                 personObservable = mRepo.getFilmsByPerson(personID);
@@ -160,9 +163,9 @@ public class MovieViewModel extends AndroidViewModel {
                                         e -> Log.e(TAG_RXERROR, "movieCreditsObservable e: " + e.getMessage()))
                 );
                 filmsObservable = setFilmsWatched(personObservable
-                                .map(s -> s.getKnown_for_department().equals("Directing") || s.getKnown_for_department().equals("Writing")
-                                        ? new ArrayList<>(s.getMovieCredits().getCrew()) : new ArrayList<>(s.getMovieCredits().getCast())
-                                ));
+                        .map(s -> s.getKnown_for_department().equals("Directing") || s.getKnown_for_department().equals("Writing")
+                                ? new ArrayList<>(s.getMovieCredits().getCrew()) : new ArrayList<>(s.getMovieCredits().getCast())
+                        ));
         }
         mCompositeDisposable.add(
                 Observable.zip(personObservable, filmsObservable, FilmListDetails::new)
@@ -172,14 +175,14 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public void getFilmsByGenre(Genre genre, boolean tvOrMovie) {
-        pageNumber = 1;
+        filmsPageNumber = 1;
         tvOrMovieString = tvOrMovie ? "movie" : "tv";
         genreID = genre.getId();
         Observable<PersonPOJO> personObservable = Observable.just(
                 new PersonPOJO(genre.getName() + " (" + tvOrMovieString.substring(0, 1).toUpperCase() + tvOrMovieString.substring(1) + ")",
                         "", "Movies", "", MovieKeys.LIST_GENRE));
         Observable<List<FilmByPerson>> filmsObservable
-                = setFilmsWatched(mRepo.getMoviesByGenre(tvOrMovieString, genreID, pageNumber));
+                = setFilmsWatched(mRepo.getMoviesByGenre(tvOrMovieString, genreID, filmsPageNumber));
 
         mCompositeDisposable.add(
                 Observable.zip(personObservable, filmsObservable, FilmListDetails::new)
@@ -207,6 +210,10 @@ public class MovieViewModel extends AndroidViewModel {
 
     public PublishSubject<WatchCount> getWatchCountPublishSubject() {
         return watchCountPublishSubject;
+    }
+
+    public PublishSubject<List<MyList>> getPopularActorsSubject() {
+        return popularActorsSubject;
     }
 
     private void publishNewDetails(FilmListDetails details) {
@@ -289,8 +296,45 @@ public class MovieViewModel extends AndroidViewModel {
         return mRepo.queryFilms(mediaQuery);
     }
 
-    public Observable<PersonQueryPOJO> queryPopular() {
-        return mRepo.getPopularActors();
+    public void getPopularActors() {
+        if (popularActorList.isEmpty()) {
+            finishScrollLoading();
+            queryPopularActors();
+        } else {
+            popularActorsSubject.onNext(popularActorList);
+        }
+    }
+
+    public void queryPopularActors() {
+        if (scrollLoading) {
+            return;
+        }
+        scrollLoading = true;
+        actorsPageNumber++;
+        mCompositeDisposable.add(mRepo.getPopularActors(actorsPageNumber)
+                .flatMap(personQueryPOJO -> {
+                            List<PersonPOJO> personPOJOList = personQueryPOJO.getResults();
+                            List<MyList> myLists = new ArrayList<>();
+                            for (PersonPOJO personPOJO : personPOJOList) {
+                                myLists.add(new MyList(Integer.parseInt(personPOJO.getId()),
+                                        personPOJO.getName(), -1, 1, personPOJO.getProfile_path()));
+                            }
+                            return Observable.just(myLists);
+                        }
+                )
+                .subscribe(this::publishPopularActors,
+                        e -> {
+                            Log.e(TAG_RXERROR, "getPopularActors " + e.getMessage());
+                            actorsPageNumber++;
+                            finishScrollLoading();
+                        }
+                )
+        );
+    }
+
+    private void publishPopularActors(List<MyList> actors) {
+        popularActorList.addAll(actors);
+        popularActorsSubject.onNext(popularActorList);
     }
 
     private void addWatchedMovie(FilmByPerson movie) {
@@ -316,7 +360,7 @@ public class MovieViewModel extends AndroidViewModel {
                                         mWatchedFilms += x;
                                     }
                                 },
-                                e -> Log.e(TAG_RXERROR, "rrroh movieInListObservable" + e.getMessage())
+                                e -> Log.e(TAG_RXERROR, "movieInListObservable" + e.getMessage())
                         )
         );
         displayWatchedFilms += x;
@@ -559,7 +603,9 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public Flowable<List<MyList>> getSavedLists() {
-        return mRepo.getSavedLists();
+        return mRepo.getSavedLists()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public void setInitialSpin(boolean initial) {
@@ -642,24 +688,26 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public void onScrollEnd() {
-        if(scrollLoading) {return;}
+        if (scrollLoading) {
+            return;
+        }
         scrollLoading = true;
-        pageNumber++;
-        Log.d("pokemo", "onScrollEnd " + pageNumber);
+        filmsPageNumber++;
+        Log.d("pokemo", "onScrollEnd " + filmsPageNumber);
 
         Observable<List<FilmByPerson>> filmsObservable;
         switch (mFilmListDetails.getPersonPOJO().getId()) {
             case MovieKeys.LIST_POPULAR:
-                filmsObservable = setFilmsWatched(mRepo.getPopularFilms(pageNumber));
+                filmsObservable = setFilmsWatched(mRepo.getPopularFilms(filmsPageNumber));
                 break;
             case MovieKeys.LIST_NOWPLAYING:
-                filmsObservable = setFilmsWatched(mRepo.getNowPlaying(pageNumber));
+                filmsObservable = setFilmsWatched(mRepo.getNowPlaying(filmsPageNumber));
                 break;
             case MovieKeys.LIST_TOPRATED:
-                filmsObservable = setFilmsWatched(mRepo.getTopRated(pageNumber));
+                filmsObservable = setFilmsWatched(mRepo.getTopRated(filmsPageNumber));
                 break;
             case MovieKeys.LIST_GENRE:
-                filmsObservable = setFilmsWatched(mRepo.getMoviesByGenre(tvOrMovieString, genreID, pageNumber));
+                filmsObservable = setFilmsWatched(mRepo.getMoviesByGenre(tvOrMovieString, genreID, filmsPageNumber));
                 break;
             default:
                 return;
@@ -675,14 +723,15 @@ public class MovieViewModel extends AndroidViewModel {
                             mCompositeDisposable.add(scanMoviesForWatched(filmIDs)
                                     .subscribe(watchedList -> updateWatched(watchedList, displayList),
                                             e -> {
-                                        Log.e(TAG_RXERROR, "scanMoviesForWatched e=" + e.getMessage());
-                                        scrollLoading = false;
+                                                Log.e(TAG_RXERROR, "scanMoviesForWatched e=" + e.getMessage());
+                                                filmsPageNumber--;
+                                                finishScrollLoading();
                                             })
                             );
-                        },
-                        e -> {
+                        }, e -> {
                             Log.e(TAG_RXERROR, "pokemo onScrollEnd e=" + e.getMessage());
-                            scrollLoading = false;
+                            filmsPageNumber--;
+                            finishScrollLoading();
                         }
                 )
         );

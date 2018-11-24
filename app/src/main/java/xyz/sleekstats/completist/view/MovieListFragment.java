@@ -146,7 +146,10 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         listCompositeDisposable.add(personPublishSubject.subscribe(this::setPersonView,
                 e -> Log.e(TAG_RXERROR, "personPublishSubject e=" + e.getMessage())));
         listCompositeDisposable.add(filmListPublishSubject.subscribe(this::setRecyclerView,
-                e -> Log.e(TAG_RXERROR, "filmListPublishSubject e=" + e.getMessage())));
+                e -> {
+                    movieViewModel.finishScrollLoading();
+                    Log.e(TAG_RXERROR, "filmListPublishSubject e=" + e.getMessage());
+                }));
         listCompositeDisposable.add(watchCountPublishSubject.subscribe(count -> fragmentListBinding.setWatchCount(count),
                 e -> Log.e(TAG_RXERROR, "watchCountPublishSubject e=" + e.getMessage())));
 

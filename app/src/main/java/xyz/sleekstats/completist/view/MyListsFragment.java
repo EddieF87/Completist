@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -16,19 +15,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.databinding.MovieKeys;
 import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.model.GenreList;
 import xyz.sleekstats.completist.model.MyList;
-import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 public class MyListsFragment extends Fragment
@@ -42,6 +37,7 @@ public class MyListsFragment extends Fragment
     private MovieViewModel movieViewModel;
     private RadioGroup radioGroup1;
     private RadioGroup radioGroup2;
+    private PublishSubject<List<MyList>> popularActorsSubject;
 
     public MyListsFragment() {
         // Required empty public constructor
@@ -71,25 +67,22 @@ public class MyListsFragment extends Fragment
         if (movieViewModel == null) {
             movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
         }
-        myListsCompositeDisposable.add(movieViewModel.queryPopular()
-                .flatMap(personQueryPOJO -> {
-                            List<PersonPOJO> personPOJOList = personQueryPOJO.getResults();
-                            List<MyList> myLists = new ArrayList<>();
-                            for (PersonPOJO personPOJO : personPOJOList) {
-                                myLists.add(new MyList(Integer.parseInt(personPOJO.getId()),
-                                        personPOJO.getName(), -1, 1, personPOJO.getProfile_path()));
-                            }
-                            return Observable.just(myLists);
+        popularActorsSubject = movieViewModel.getPopularActorsSubject();
+        myListsCompositeDisposable.add(
+                popularActorsSubject.subscribe(this::loadPopularRV,
+                        e -> {
+                            movieViewModel.finishScrollLoading();
+                            Log.e("rxprob", "getPopularActorsSubject loadPopularRV" + e.getMessage());
                         }
                 )
-                .subscribe(this::loadPopularRV,
-                        e -> Log.e("rxprob", "queryPopular loadPopularRV" + e.getMessage())));
-
-        myListsCompositeDisposable.add(movieViewModel.getSavedLists()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::loadSavedRV,
-                        e -> Log.e("rxprob", "getSavedLists loadSavedRV" + e.getMessage())));
+        );
+        movieViewModel.getPopularActors();
+        myListsCompositeDisposable.add(
+                movieViewModel.getSavedLists()
+                        .subscribe(this::loadSavedRV,
+                                e -> Log.e("rxprob", "getSavedLists loadSavedRV" + e.getMessage())
+                        )
+        );
     }
 
     private void loadRV(List<MyList> myLists, RecyclerView rv, MyListsAdapter myListsAdapter) {
@@ -108,12 +101,31 @@ public class MyListsFragment extends Fragment
         if (mPopularListRV == null) {
             View rootView = getView();
             if (rootView == null) {
+                movieViewModel.finishScrollLoading();
                 return;
             }
             mPopularListRV = rootView.findViewById(R.id.pop_lists_rv);
             mPopularListRV.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+            mPopularListRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if (!recyclerView.canScrollHorizontally(1)) {
+                        Log.d("pokemo", "!recyclerView.canScrollHorizontally");
+                        movieViewModel.queryPopularActors();
+                    }
+                }
+            });
         }
-        loadRV(myLists, mPopularListRV, mPopularListAdapter);
+
+        if (mPopularListAdapter == null) {
+            mPopularListAdapter = new MyListsAdapter(myLists);
+            mPopularListAdapter.setClickListener(this);
+            mPopularListRV.setAdapter(mPopularListAdapter);
+        } else {
+            mPopularListAdapter.notifyDataSetChanged();
+        }
+        movieViewModel.finishScrollLoading();
     }
 
     private void loadSavedRV(List<MyList> myLists) {
@@ -141,8 +153,10 @@ public class MyListsFragment extends Fragment
         );
     }
 
-    private void openGenresDialog(GenreList genres){
-        if(genres == null) { return;}
+    private void openGenresDialog(GenreList genres) {
+        if (genres == null) {
+            return;
+        }
         FragmentManager fragmentManager = (requireActivity()).getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         GenresDialog newFragment = GenresDialog.newInstance(genres);
