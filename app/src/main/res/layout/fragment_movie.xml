@@ -92,7 +92,7 @@
             android:layout_height="0dp"
             android:layout_marginEnd="8dp"
             android:adjustViewBounds="true"
-            android:foreground="@drawable/castlist_border"
+            android:foreground="@{film.isWatched ? @drawable/castlist_border_watched : @drawable/castlist_border}"
             android:padding="2dp"
             android:scaleType="fitXY"
             app:filmDetailsPoster="@{film.poster_path}"
@@ -137,7 +137,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/largeMargin"
-            android:textColorLink="@color/colorWatched"
             android:textSize="@dimen/defaultTextSize"
             app:detailsClickable="@{detailsClick}"
             app:detailsContent="@{film.genres}"
@@ -210,6 +209,19 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.4" />
+
+        <TextView
+            android:id="@+id/similar_view"
+            app:similarText="@{film.similar}"
+            app:detailsClickable="@{detailsClick}"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/largeMargin"
+            android:layout_marginBottom="@dimen/defaultMargin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cast_recyclerview" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

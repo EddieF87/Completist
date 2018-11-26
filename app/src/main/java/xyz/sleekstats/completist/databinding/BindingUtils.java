@@ -7,17 +7,23 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+
+import org.apache.commons.lang3.text.StrBuilder;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 import xyz.sleekstats.completist.R;
+import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.Genre;
+import xyz.sleekstats.completist.model.ResultsPOJO;
 import xyz.sleekstats.completist.model.WatchCount;
 import xyz.sleekstats.completist.view.GenreClickableSpan;
+import xyz.sleekstats.completist.view.MovieClickableSpan;
 
 import static xyz.sleekstats.completist.databinding.MovieKeys.LIST_GENRE;
 import static xyz.sleekstats.completist.databinding.MovieKeys.LIST_NOWPLAYING;
@@ -121,5 +127,30 @@ public class BindingUtils {
             text = number_of_seasons + " seasons, " + number_of_episodes + " episodes";
         }
         textView.setText(text);
+    }
+
+
+    @BindingAdapter({"similarText", "detailsClickable"})
+    public static void setSimilarText(TextView textView, ResultsPOJO similar, final View.OnClickListener clickListener) {
+        if(similar == null) {
+            Log.d("similarr", "similar = null");
+            return;
+        }
+        List<FilmByPerson> films = similar.getResults();
+        SpannableStringBuilder stringBuilder = new SpannableStringBuilder("Similar: ");
+        int maxFilms = Math.min(10, films.size());
+        for (int i = 0; i < maxFilms; i++) {
+            FilmByPerson film = films.get(i);
+            SpannableString ss = new SpannableString(film.getTitle());
+            ss.setSpan(new MovieClickableSpan(film.getId(), clickListener), 0, film.getTitle().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            stringBuilder.append(ss).append(" / ");
+        }
+        if (stringBuilder.length() > 2) {
+            stringBuilder.delete(stringBuilder.length() - 3, stringBuilder.length());
+        }
+
+        textView.setText(stringBuilder, TextView.BufferType.SPANNABLE);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
+        textView.setHighlightColor(Color.RED);
     }
 }

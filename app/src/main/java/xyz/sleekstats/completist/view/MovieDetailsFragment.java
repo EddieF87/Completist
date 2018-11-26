@@ -25,6 +25,7 @@ import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.databinding.FragmentMovieBinding;
 import xyz.sleekstats.completist.model.CastCredits;
 import xyz.sleekstats.completist.model.CastInfo;
+import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
@@ -171,6 +172,18 @@ public class MovieDetailsFragment extends Fragment
                 }
                 id = view.getTag(R.id.id).toString();
                 goToSite("https://www.imdb.com/title/" + id);
+                break;
+
+            case R.id.similar_view:
+                if (view.getTag() == null) {
+                    return;
+                }
+                String filmID = (String) view.getTag();
+                if(mFilm.isFilm()) {
+                    movieViewModel.getMovieInfo(filmID);
+                } else {
+                    movieViewModel.getShowInfo(filmID);
+                }
                 break;
         }
     }

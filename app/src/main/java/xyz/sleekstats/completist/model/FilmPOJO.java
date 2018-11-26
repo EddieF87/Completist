@@ -48,6 +48,9 @@ public class FilmPOJO {
     @SerializedName("number_of_episodes")
     private int number_of_episodes;
 
+    @SerializedName("similar")
+    private ResultsPOJO similar;
+
     public String getRelease_date() {
         return release_date;
     }
@@ -145,5 +148,9 @@ public class FilmPOJO {
 
     public String getImdb_id() {
         return imdb_id;
+    }
+
+    public ResultsPOJO getSimilar() {
+        return similar;
     }
 }
