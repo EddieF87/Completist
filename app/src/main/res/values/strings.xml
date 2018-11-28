@@ -19,6 +19,6 @@
         <item>Writing/Directing</item>
         <item>TV</item>
     </string-array>
-    <item type="id" name="id"/>
-    <item type="id" name="tvOrMovie"/>
+    <item name="id" type="id" />
+    <item name="tvOrMovie" type="id" />
 </resources>

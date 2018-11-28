@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="titleTextSize">48sp</dimen>
+    <dimen name="mainTitleTextSize">144sp</dimen>
     <dimen name="watchedTextSize">48sp</dimen>
     <dimen name="midTextSize">36sp</dimen>
     <dimen name="pctTextSize">24sp</dimen>
@@ -13,6 +14,7 @@
     <dimen name="castItemHeight">240dp</dimen>
 
     <dimen name="defaultPadding">16dp</dimen>
+    <dimen name="mainPadding">64dp</dimen>
     <dimen name="smallMargin">8dp</dimen>
     <dimen name="defaultMargin">16dp</dimen>
     <dimen name="largeMargin">32dp</dimen>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="titleTextSize">24sp</dimen>
+    <dimen name="mainTitleTextSize">60sp</dimen>
     <dimen name="watchedTextSize">20sp</dimen>
     <dimen name="midTextSize">18sp</dimen>
     <dimen name="pctTextSize">16sp</dimen>
@@ -14,6 +15,7 @@
 
     <dimen name="smallPadding">8dp</dimen>
     <dimen name="defaultPadding">8dp</dimen>
+    <dimen name="mainPadding">32dp</dimen>
     <dimen name="smallMargin">4dp</dimen>
     <dimen name="defaultMargin">8dp</dimen>
     <dimen name="largeMargin">16dp</dimen>

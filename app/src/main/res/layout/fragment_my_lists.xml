@@ -44,8 +44,7 @@
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/largeMargin"
-        android:paddingTop="@dimen/defaultBtnPadding"
-        android:paddingBottom="@dimen/defaultBtnPadding"
+        android:padding="@dimen/smallPadding"
         android:layout_weight="1"
         android:orientation="horizontal">
 
@@ -73,8 +72,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
-        android:paddingTop="@dimen/defaultBtnPadding"
-        android:paddingBottom="@dimen/defaultBtnPadding"
+        android:padding="@dimen/smallPadding"
         android:layout_weight="1"
         android:orientation="horizontal">
 
