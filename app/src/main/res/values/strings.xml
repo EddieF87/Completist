@@ -13,6 +13,7 @@
     <string name="to_watch">To Watch</string>
     <string name="tmdb">TMDB</string>
     <string name="imdb">IMDB</string>
+    <string name="tmdb_acknowledgment">This product uses the TMDb API but is not endorsed or certified by TMDb.</string>
     <string-array name="list_options_array">
         <item>All Movies</item>
         <item>Acting</item>

@@ -6,7 +6,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".view.WelcomeActivity"
-    android:padding="@dimen/mainPadding"
+    android:paddingTop="@dimen/mainPadding"
+    android:paddingStart="@dimen/mainPadding"
+    android:paddingEnd="@dimen/mainPadding"
+    android:paddingBottom="@dimen/defaultPadding"
     android:onClick="goToMain"
     >
 
@@ -15,9 +18,7 @@
         android:id="@+id/title_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:fontFamily="@font/damion_regular"
         android:gravity="center"
@@ -44,15 +45,26 @@
         app:layout_constraintTop_toBottomOf="@+id/title_view" />
 
     <TextView
-        android:id="@+id/tmdb_acknowledgment_view"
+        android:id="@+id/tmdb_acknowledgment_textView"
+        android:layout_width="0dp"
+        android:layout_height="59dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/tmdb_acknowledgment"
+        android:textColor="#01d277"
+        android:textSize="@dimen/defaultTextSize"
+        app:layout_constraintBottom_toBottomOf="@+id/tmdb_acknowledgment_imageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tmdb_acknowledgment_imageView"
+        app:layout_constraintTop_toTopOf="@+id/tmdb_acknowledgment_imageView" />
+
+    <ImageView
+        android:id="@+id/tmdb_acknowledgment_imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="Powered by TMDB"
-        android:textSize="@dimen/midTextSize"
+        android:contentDescription="@string/tmdb_acknowledgment"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_tmdb_acknowledgment2"
+        android:onClick="goToMain"
+        />
 </android.support.constraint.ConstraintLayout>
