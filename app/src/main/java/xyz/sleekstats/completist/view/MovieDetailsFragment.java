@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,6 @@ import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.databinding.FragmentMovieBinding;
 import xyz.sleekstats.completist.model.CastCredits;
 import xyz.sleekstats.completist.model.CastInfo;
-import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;

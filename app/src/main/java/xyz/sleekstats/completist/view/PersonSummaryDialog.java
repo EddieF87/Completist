@@ -1,5 +1,6 @@
 package xyz.sleekstats.completist.view;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -38,7 +39,7 @@ public class PersonSummaryDialog extends DialogFragment {
             return super.onCreateDialog(savedInstanceState);
         }
         String summary = bundle.getString(KEY_SUMMARY);
-        View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_person_summary, null);
+        @SuppressLint("InflateParams") View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_person_summary, null);
         TextView textView = rootView.findViewById(R.id.dialog_person_summary);
         textView.setText(summary);
         textView.setMovementMethod(new ScrollingMovementMethod());

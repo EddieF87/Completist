@@ -14,6 +14,7 @@
     <dimen name="castItemHeight">240dp</dimen>
 
     <dimen name="defaultPadding">16dp</dimen>
+    <dimen name="filmPadding">8dp</dimen>
     <dimen name="mainPadding">64dp</dimen>
     <dimen name="smallMargin">8dp</dimen>
     <dimen name="defaultMargin">16dp</dimen>
@@ -25,4 +26,10 @@
 
     <dimen name="cardCornerRadius">8dp</dimen>
     <dimen name="cardElevation">8dp</dimen>
+
+    <dimen name="button_size">48dp</dimen>
+    <dimen name="big_button_size">72dp</dimen>
+
+    <dimen name="smallStroke">2dp</dimen>
+    <dimen name="defaultStroke">4dp</dimen>
 </resources>

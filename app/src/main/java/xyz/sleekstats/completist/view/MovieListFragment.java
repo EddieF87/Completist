@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,6 +14,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
@@ -26,9 +28,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 
@@ -52,7 +54,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         , View.OnClickListener {
 
     private static final String TAG_RXERROR = "rxprobMovieList";
-    private int mGrids;
 
     private Spinner mRoleSpinner;
     private FloatingActionButton mListSaveButton;
@@ -62,7 +63,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private TextView summaryTextView;
     private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
             if (!recyclerView.canScrollVertically(1)) {
                 Log.d("pokemo", "!recyclerView.canScrollVertically");
@@ -131,8 +132,17 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         TextView textView = Objects.requireNonNull(getView()).findViewById(R.id.person_name);
         if (drawable == R.drawable.ic_done_green_24dp) {
             textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_done_green_24dp, 0);
+            setForeground(R.drawable.poster_border_watched);
         } else {
             textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            setForeground(R.drawable.poster_border);
+        }
+    }
+
+    private void setForeground(int drawableID) {
+        if (Build.VERSION.SDK_INT > 23) {
+            ImageView posterView = Objects.requireNonNull(getView()).findViewById(R.id.person_poster);
+            posterView.setForeground(ContextCompat.getDrawable(requireActivity(), drawableID));
         }
     }
 
@@ -224,8 +234,8 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
 
     private void initRecyclerView(View rootView) {
         mMoviesRecyclerView = rootView.findViewById(R.id.film_list);
-        mGrids = getResources().getInteger(R.integer.grid_number);
-        mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mGrids));
+        int grids = getResources().getInteger(R.integer.grid_number);
+        mMoviesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), grids));
     }
 
     private void addScrollListener(){

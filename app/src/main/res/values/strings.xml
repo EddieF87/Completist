@@ -7,13 +7,16 @@
     <string name="now_showing">Now Showing</string>
     <string name="popular_actors_directors">Popular Actors/Directors</string>
     <string name="my_lists">My Lists</string>
-    <string name="cancel">Cancel</string>
     <string name="back">Back</string>
     <string name="genres">Genres</string>
     <string name="to_watch">To Watch</string>
     <string name="tmdb">TMDB</string>
     <string name="imdb">IMDB</string>
     <string name="tmdb_acknowledgment">This product uses the TMDb API but is not endorsed or certified by TMDb.</string>
+    <string name="lists">Lists</string>
+    <string name="list">List</string>
+    <string name="movie">Movie</string>
+    <string name="welcome_summary"><![CDATA[A checklist to keep track of movies watched by your favorite actors & directors]]></string>
     <string-array name="list_options_array">
         <item>All Movies</item>
         <item>Acting</item>

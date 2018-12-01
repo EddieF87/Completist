@@ -338,12 +338,12 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     private void addWatchedMovie(FilmByPerson movie) {
-        mRepo.insertMovie(movie);
+        mCompositeDisposable.add(mRepo.insertMovie(movie));
         updateWatchedMovieCount(movie.getId(), 1);
     }
 
     private void updateWatchedMovie(FilmByPerson movie) {
-        mRepo.updateFilm(movie);
+        mCompositeDisposable.add(mRepo.updateFilm(movie));
         if (movie.isWatched()) {
             updateWatchedMovieCount(movie.getId(), 1);
         } else {
@@ -459,12 +459,12 @@ public class MovieViewModel extends AndroidViewModel {
         mCompositeDisposable.add(checkIfMovieExists(film)
                 .doOnEvent((x, y) -> {
                     if (x == null) {
-                        mRepo.insertMovie(film);
+                        mCompositeDisposable.add(mRepo.insertMovie(film));
                     } else {
                         if (film.isQueued()) {
-                            mRepo.updateFilm(film);
+                            mCompositeDisposable.add(mRepo.updateFilm(film));
                         } else {
-                            mRepo.removeMovie(String.valueOf(film.getId()));
+                            mCompositeDisposable.add(mRepo.removeMovie(String.valueOf(film.getId())));
                         }
                     }
                 })

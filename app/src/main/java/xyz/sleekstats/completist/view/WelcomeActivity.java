@@ -18,14 +18,16 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     public void goToMain(View view) {
+        view.setClickable(false);
         Intent intent;
         if(view.getId() == R.id.tmdb_acknowledgment_imageView) {
+            view.setClickable(true);
             intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themoviedb.org/"));
             startActivity(intent);
         } else {
-            finish();
             intent = new Intent(WelcomeActivity.this, MainActivity.class);
             startActivity(intent);
+            finish();
         }
     }
 }

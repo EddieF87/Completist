@@ -15,6 +15,7 @@
 
     <dimen name="smallPadding">8dp</dimen>
     <dimen name="defaultPadding">8dp</dimen>
+    <dimen name="filmPadding">5dp</dimen>
     <dimen name="mainPadding">32dp</dimen>
     <dimen name="smallMargin">4dp</dimen>
     <dimen name="defaultMargin">8dp</dimen>
@@ -25,4 +26,10 @@
 
     <dimen name="cardCornerRadius">8dp</dimen>
     <dimen name="cardElevation">8dp</dimen>
+
+    <dimen name="button_size">24dp</dimen>
+    <dimen name="big_button_size">36dp</dimen>
+
+    <dimen name="smallStroke">1dp</dimen>
+    <dimen name="defaultStroke">2dp</dimen>
 </resources>

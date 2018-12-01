@@ -11,10 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import org.apache.commons.lang3.text.StrBuilder;
-
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import xyz.sleekstats.completist.R;

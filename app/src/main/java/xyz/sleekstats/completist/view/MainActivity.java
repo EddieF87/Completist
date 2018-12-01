@@ -31,7 +31,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.R;
-import xyz.sleekstats.completist.databinding.MovieKeys;
 import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 

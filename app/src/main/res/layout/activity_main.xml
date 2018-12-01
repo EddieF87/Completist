@@ -8,10 +8,12 @@
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:itemIconSize="@dimen/button_size"
         android:layout_alignParentBottom="true"
         app:menu="@menu/navigation"
         app:itemIconTint="@color/nav_icon_color"
         app:itemTextColor="@color/colorAccent"
+        app:labelVisibilityMode="unlabeled"
         android:layout_gravity="bottom" />
 
     <android.support.v4.view.ViewPager

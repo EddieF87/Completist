@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <!--<corners android:radius="@dimen/smallMargin"/>-->
+    <corners android:radius="@dimen/smallMargin"/>
     <stroke android:width="@dimen/defaultStroke" android:color="@color/poster_selector"/>
 </shape>

@@ -24,7 +24,7 @@ public class GenreClickableSpan extends ClickableSpan {
     }
 
     public void updateDrawState(@NonNull TextPaint ds) {
-        ds.setColor(Color.parseColor("#689899"));
+        ds.setColor(Color.parseColor("#65b7d2"));
 //        ds.setUnderlineText(true);
     }
 }

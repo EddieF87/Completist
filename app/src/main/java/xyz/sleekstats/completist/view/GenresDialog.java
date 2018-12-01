@@ -1,5 +1,6 @@
 package xyz.sleekstats.completist.view;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -8,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -44,9 +44,9 @@ public class GenresDialog extends DialogFragment implements GenresAdapter.ItemCl
             return super.onCreateDialog(savedInstanceState);
         }
         GenreList genresList = bundle.getParcelable(KEY_GENRES);
-        List<Genre> genres = genresList.getGenres();
+        List<Genre> genres = genresList != null ? genresList.getGenres() : null;
 
-        View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_genres, null);
+        @SuppressLint("InflateParams") View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_genres, null);
         RecyclerView recyclerView = rootView.findViewById(R.id.genres_rv);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         GenresAdapter genresAdapter = new GenresAdapter(genres);

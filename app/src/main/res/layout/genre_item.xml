@@ -8,13 +8,14 @@
     android:paddingEnd="@dimen/defaultPadding"
     android:paddingTop="@dimen/largeMargin"
     android:paddingBottom="@dimen/largeMargin"
+    android:background="@drawable/genre_selector"
     >
 
     <TextView
-        android:id="@+id/search_title"
+        android:id="@+id/genre_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/titleTextSize"
+        android:textSize="@dimen/btnTextSize"
         tools:text="SAMPLE TEXT (pppp)" />
 
 </FrameLayout>

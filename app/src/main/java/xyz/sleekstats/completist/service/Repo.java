@@ -11,7 +11,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -20,7 +20,6 @@ import xyz.sleekstats.completist.model.CastCredits;
 import xyz.sleekstats.completist.model.CastInfo;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
-import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.model.GenreList;
 import xyz.sleekstats.completist.model.MovieRoomDB;
 import xyz.sleekstats.completist.model.MyList;
@@ -153,9 +152,9 @@ public class Repo {
     }
 
 
-    public void insertMovie(FilmByPerson movie) {
+    public Disposable insertMovie(FilmByPerson movie) {
         mMovieDao.insertMovie(movie);
-        getListIDs(movie.getId()).subscribe(ids -> {
+        return getListIDs(movie.getId()).subscribe(ids -> {
                     for (String id : ids) {
                         mMovieDao.addWatchedMovie(id);
                     }
@@ -167,9 +166,9 @@ public class Repo {
         mMovieDao.insertMovie(movie);
     }
 
-    public void removeMovie(String movieID) {
+    public Disposable removeMovie(String movieID) {
         mMovieDao.removeMovie(movieID);
-        getListIDs(movieID).subscribe(ids -> {
+        return getListIDs(movieID).subscribe(ids -> {
                     for (String id : ids) {
                         mMovieDao.removeWatchedMovie(id);
                     }
@@ -197,17 +196,17 @@ public class Repo {
         return mMovieDao.checkIfMovieExists(id);
     }
 
-    public void updateFilm(FilmByPerson film) {
+    public Disposable updateFilm(FilmByPerson film) {
         mMovieDao.updateMovie(film);
         if (film.isWatched()) {
-            getListIDs(film.getId()).subscribe(ids -> {
+            return getListIDs(film.getId()).subscribe(ids -> {
                         for (String id : ids) {
                             mMovieDao.addWatchedMovie(id);
                         }
                     },
                     e -> Log.e("rxprob", "getListIDs e=" + e.getMessage()));
         } else {
-            getListIDs(film.getId()).subscribe(ids -> {
+            return getListIDs(film.getId()).subscribe(ids -> {
                         for (String id : ids) {
                             mMovieDao.removeWatchedMovie(id);
                         }

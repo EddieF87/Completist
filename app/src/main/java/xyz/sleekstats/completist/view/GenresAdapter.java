@@ -2,7 +2,6 @@ package xyz.sleekstats.completist.view;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import xyz.sleekstats.completist.R;
-import xyz.sleekstats.completist.model.CastInfo;
 import xyz.sleekstats.completist.model.Genre;
 
 public class GenresAdapter  extends RecyclerView.Adapter<GenresAdapter.GenreViewHolder>{
@@ -28,7 +26,7 @@ public class GenresAdapter  extends RecyclerView.Adapter<GenresAdapter.GenreView
     @Override
     public GenreViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         FrameLayout frameLayout = (FrameLayout) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.search_item, parent, false);
+                .inflate(R.layout.genre_item, parent, false);
         return new GenreViewHolder(frameLayout);
     }
 
@@ -51,8 +49,8 @@ public class GenresAdapter  extends RecyclerView.Adapter<GenresAdapter.GenreView
 
         public GenreViewHolder(@NonNull View itemView) {
             super(itemView);
-            mView = itemView.findViewById(R.id.search_title);
-            mView.setOnClickListener(this);
+            mView = itemView.findViewById(R.id.genre_title);
+            itemView.setOnClickListener(this);
         }
 
         @Override

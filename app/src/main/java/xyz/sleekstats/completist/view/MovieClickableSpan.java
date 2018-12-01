@@ -6,8 +6,6 @@ import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.view.View;
 
-import xyz.sleekstats.completist.model.FilmByPerson;
-
 public class MovieClickableSpan extends ClickableSpan {
     private final View.OnClickListener clickListener;
     private String filmID;
@@ -24,7 +22,7 @@ public class MovieClickableSpan extends ClickableSpan {
     }
 
     public void updateDrawState(@NonNull TextPaint ds) {
-        ds.setColor(Color.parseColor("#689899"));
+        ds.setColor(Color.parseColor("#65b7d2"));
 //        ds.setUnderlineText(true);
     }
 }

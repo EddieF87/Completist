@@ -11,8 +11,10 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:foreground="@drawable/castlist_border"
+    android:clickable="true"
+    android:focusable="true"
     card_view:cardBackgroundColor="@color/colorPrimaryDark"
-    card_view:contentPadding="2dp"
+    card_view:contentPadding="@dimen/defaultStroke"
     >
 
     <RelativeLayout
@@ -54,10 +56,10 @@
             android:shadowDx="-2"
             android:shadowDy="2"
             android:shadowRadius="4"
-            android:text="66%"
             android:textColor="@color/colorGreen"
             android:textSize="@dimen/pctTextSize"
             android:textStyle="bold"
+            android:paddingStart="@dimen/defaultStroke"
             android:visibility="gone" />
 
     </RelativeLayout>
