@@ -145,13 +145,15 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/largeMargin"
         android:layout_marginTop="@dimen/defaultMargin"
-        app:detailsContent="@{film.genres}"
-        app:detailsClickable="@{detailsClick}"
         android:textSize="@dimen/defaultTextSize"
+        android:maxLines="2"
+        app:detailsClickable="@{detailsClick}"
+        app:detailsContent="@{film.genres}"
         app:layout_constraintBottom_toTopOf="@id/h_guideline"
         app:layout_constraintEnd_toEndOf="@+id/movie_overview"
         app:layout_constraintStart_toEndOf="@+id/movie_rating"
-        app:layout_constraintTop_toBottomOf="@+id/movie_overview" />
+        app:layout_constraintTop_toBottomOf="@+id/movie_overview"
+        tools:text="1111111111111111111111111111111112222222222222222222222222222222222333333333333333333333333333333333333344444444444444444444444444411111111111111111111111111111111122222222222222222222222222222222223333333333333333333333333333333333333444444444444444444444444444" />
 
     <TextView
         android:id="@+id/movie_overview"

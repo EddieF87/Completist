@@ -39,10 +39,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/smallMargin"
             android:textSize="@dimen/smallTextSize"
-            app:releaseDate="@{film.release_date}"
             app:lastDate="@{film.last_date}"
             app:layout_constraintStart_toStartOf="@+id/movie_title"
             app:layout_constraintTop_toBottomOf="@+id/movie_title"
+            app:releaseDate="@{film.release_date}"
             tools:text="TextView" />
 
 
@@ -52,12 +52,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/largeMargin"
             android:textSize="@dimen/smallTextSize"
-            app:tvOrMovie="@{film.isFilm}"
-            app:runtime="@{film.runtime}"
-            app:number_of_seasons="@{film.number_of_seasons}"
-            app:number_of_episodes="@{film.number_of_episodes}"
             app:layout_constraintStart_toEndOf="@+id/release_view"
-            app:layout_constraintTop_toTopOf="@+id/release_view" />
+            app:layout_constraintTop_toTopOf="@+id/release_view"
+            app:number_of_episodes="@{film.number_of_episodes}"
+            app:number_of_seasons="@{film.number_of_seasons}"
+            app:runtime="@{film.runtime}"
+            app:tvOrMovie="@{film.isFilm}" />
 
         <TextView
             android:id="@+id/tmdb_view"
@@ -110,11 +110,11 @@
             android:id="@+id/details_watched_btn"
             android:layout_width="@dimen/button_size"
             android:layout_height="@dimen/button_size"
+            android:alpha="@{film.isWatched ? 1f : .6f}"
             android:clickable="true"
             android:focusable="true"
             android:src="@{film.isWatched ? @drawable/ic_done_green_24dp : @drawable/ic_add_black_24dp}"
             android:tint="@{film.isWatched ? @color/colorWatched : @color/colorAccent}"
-            android:alpha="@{film.isWatched ? 1f : .6f}"
             app:layout_constraintBottom_toTopOf="@id/hguideline"
             app:layout_constraintEnd_toStartOf="@+id/details_queue_btn"
             app:layout_constraintHorizontal_bias="0.5"
@@ -125,11 +125,11 @@
             android:id="@+id/details_queue_btn"
             android:layout_width="@dimen/button_size"
             android:layout_height="@dimen/button_size"
+            android:alpha="@{film.isQueued ? 1f : .6f}"
             android:clickable="true"
             android:focusable="true"
             android:src="@drawable/ic_watch_later_gold_24dp"
             android:tint="@{film.isQueued ? @color/colorWatched : @color/colorAccent}"
-            android:alpha="@{film.isQueued ? 1f : .6f}"
             app:layout_constraintBottom_toTopOf="@id/hguideline"
             app:layout_constraintEnd_toStartOf="@+id/movie_overview"
             app:layout_constraintHorizontal_bias="0.5"
@@ -141,12 +141,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/largeMargin"
             android:textSize="@dimen/defaultTextSize"
+            android:maxLines="2"
             app:detailsClickable="@{detailsClick}"
             app:detailsContent="@{film.genres}"
-            app:layout_constraintBottom_toBottomOf="@+id/details_queue_btn"
+            app:layout_constraintBottom_toTopOf="@+id/hguideline"
             app:layout_constraintEnd_toEndOf="@+id/movie_overview"
             app:layout_constraintStart_toEndOf="@+id/movie_rating"
-            app:layout_constraintTop_toTopOf="@+id/details_queue_btn" />
+            tools:text="11111111111111122222222222222222222222231111111111111112222222222222222222222223" />
 
         <TextView
             android:id="@+id/movie_overview"
@@ -173,9 +174,9 @@
             android:numStars="4"
             android:rating="@{film.vote_average*2/5}"
             android:stepSize=".2"
-            app:layout_constraintBottom_toBottomOf="@+id/movie_genre"
+            app:layout_constraintBottom_toTopOf="@+id/hguideline"
             app:layout_constraintStart_toStartOf="@+id/movie_title"
-            app:layout_constraintTop_toTopOf="@+id/movie_genre" />
+            app:layout_constraintTop_toTopOf="@+id/details_queue_btn" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/cast_recyclerview"
@@ -215,17 +216,17 @@
 
         <TextView
             android:id="@+id/similar_view"
-            app:similarText="@{film.similar}"
-            app:detailsClickable="@{detailsClick}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/largeMargin"
             android:layout_marginBottom="@dimen/smallMargin"
             android:textSize="@dimen/defaultTextSize"
+            app:detailsClickable="@{detailsClick}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cast_recyclerview"
+            app:similarText="@{film.similar}"
             tools:ignore="InconsistentLayout" />
 
     </android.support.constraint.ConstraintLayout>
