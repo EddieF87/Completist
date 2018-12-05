@@ -33,7 +33,7 @@ public class Repo {
     private static final String BASE_URL = "https://api.themoviedb.org/3/";
     private TmdbAPI tmdbAPI;
     private MovieDao mMovieDao;
-//    private final CompositeDisposable repoCompositeDisposable = new CompositeDisposable();
+    private static final String TAG_RXERROR = "rxprob Repo";
 
     public Repo(Application application) {
 
@@ -159,7 +159,7 @@ public class Repo {
                         mMovieDao.addWatchedMovie(id);
                     }
                 },
-                e -> Log.e("rxprob", "getListIDs e=" + e.getMessage()));
+                e -> Log.e(TAG_RXERROR, "getListIDs e=" + e.getMessage()));
     }
 
     public void insertQueuedMovie(FilmByPerson movie) {
@@ -173,7 +173,7 @@ public class Repo {
                         mMovieDao.removeWatchedMovie(id);
                     }
                 },
-                e -> Log.e("rxprob", "getListIDs e=" + e.getMessage()));
+                e -> Log.e(TAG_RXERROR, "getListIDs e=" + e.getMessage()));
     }
 
     public void removeQueuedMovie(String movieID) {
@@ -204,14 +204,14 @@ public class Repo {
                             mMovieDao.addWatchedMovie(id);
                         }
                     },
-                    e -> Log.e("rxprob", "getListIDs e=" + e.getMessage()));
+                    e -> Log.e(TAG_RXERROR, "getListIDs e=" + e.getMessage()));
         } else {
             return getListIDs(film.getId()).subscribe(ids -> {
                         for (String id : ids) {
                             mMovieDao.removeWatchedMovie(id);
                         }
                     },
-                    e -> Log.e("rxprob", "getListIDs e=" + e.getMessage()));
+                    e -> Log.e(TAG_RXERROR, "getListIDs e=" + e.getMessage()));
         }
     }
 
@@ -269,4 +269,77 @@ public class Repo {
         );
     }
 
+    public Single<List<FilmByPerson>> getSavedMovies() {
+        return mMovieDao.getSavedMovies();
+    }
+
+    public Disposable updateRankingNew(String id, int newRank) {
+
+        return Single.just(id)
+                .subscribeOn(Schedulers.io())
+                .subscribe(x -> {
+                            Log.d("rankingssub", "updateRankingNew");
+                            mMovieDao.updateOtherRankingsDownAfterNew(newRank);
+                            mMovieDao.updateRanking(x, newRank);
+                            checkcheck();
+                        },
+                        e -> Log.e(TAG_RXERROR, "updateRankingNew e=" + e.getMessage())
+                );
+    }
+
+    public Disposable updateRankingRemove(String id, int oldRank) {
+        return Single.just(id)
+                .subscribeOn(Schedulers.io())
+                .subscribe(x -> {
+                            Log.d("rankingssub", "updateRankingRemove");
+                            mMovieDao.updateRanking(x, -1);
+                            mMovieDao.updateOtherRankingsUpAfterRemoval(oldRank);
+                            checkcheck();
+                        },
+                        e -> Log.e(TAG_RXERROR, "updateRankingRemove e=" + e.getMessage())
+                );
+    }
+
+    public Disposable updateRankingUp(String id, int oldRank, int newRank) {
+        return Single.just(id)
+                .subscribeOn(Schedulers.io())
+                .subscribe(x -> {
+                            Log.d("rankingssub", "updateRankingUp");
+                            mMovieDao.updateOtherRankingsDown(oldRank, newRank);
+                            mMovieDao.updateRanking(x, newRank);
+                            checkcheck();
+                        },
+                        e -> Log.e(TAG_RXERROR, "updateRankingUp e=" + e.getMessage())
+                );
+
+    }
+
+    public Disposable updateRankingDown(String id, int oldRank, int newRank) {
+        return Single.just(id)
+                .subscribeOn(Schedulers.io())
+                .subscribe(x -> {
+                            Log.d("rankingssub", "updateRankingDown");
+                            mMovieDao.updateOtherRankingsUp(oldRank, newRank);
+                            mMovieDao.updateRanking(x, newRank);
+                            checkcheck();
+                        },
+                        e -> Log.e(TAG_RXERROR, "updateRankingDown e=" + e.getMessage())
+                );
+    }
+
+    private void checkcheck() {
+        getSavedMovies()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        films -> {
+                            for (FilmByPerson film : films) {
+                                if(film.getRanking() < 0) {continue;}
+                                Log.d("rankingslischeck", film.getRanking() + " " + film.getTitle());
+                            }
+                        }
+                        , e ->
+                                Log.e(TAG_RXERROR, "rankingslis e=" + e.getMessage())
+                );
+    }
 }

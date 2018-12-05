@@ -25,4 +25,5 @@
     </string-array>
     <item name="id" type="id" />
     <item name="tvOrMovie" type="id" />
+    <string name="rank">Rankings</string>
 </resources>

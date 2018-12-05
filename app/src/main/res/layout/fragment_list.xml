@@ -74,7 +74,8 @@
 
                 <TextView
                     android:id="@+id/person_name"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
+                    app:layout_constrainedWidth="true"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/defaultMargin"
                     android:layout_marginEnd="@dimen/defaultMargin"
@@ -86,7 +87,6 @@
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="@+id/list_v_guideline"
                     app:layout_constraintTop_toTopOf="@+id/collapsing_layout"
-                    app:layout_constraintWidth_default="wrap"
                     tools:text="Brad Pitt" />
 
                 <TextView

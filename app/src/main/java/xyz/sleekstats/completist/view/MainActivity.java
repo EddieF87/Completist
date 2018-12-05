@@ -40,12 +40,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String SEARCH_ID = "search_id";
     private static final String SEARCH_TYPE = "search_type";
 
-    private ViewPager myViewPager;
+    private CustomViewPager myViewPager;
     private MyPagerAdapter myPagerAdapter;
     private BottomNavigationView mBottomNavigationView;
     private MovieDetailsFragment movieDetailsFragment;
     private MovieListFragment movieListFragment;
     private MyListsFragment myListsFragment;
+    private RankingsFragment rankingsFragment;
     private MovieViewModel movieViewModel;
     private SimpleCursorAdapter mSearchAdapter;
     private final CompositeDisposable mainCompositeDisposable = new CompositeDisposable();
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         }
         startPager();
     }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -98,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case R.id.navigation_movie:
                             i = 2;
+                            break;
+                        case R.id.navigation_rank:
+                            i = 3;
                             break;
                         default:
                             return false;
@@ -146,6 +151,11 @@ public class MainActivity extends AppCompatActivity {
                         movieDetailsFragment = new MovieDetailsFragment();
                     }
                     return movieDetailsFragment;
+                case 3:
+                    if (rankingsFragment == null) {
+                        rankingsFragment = new RankingsFragment();
+                    }
+                    return rankingsFragment;
                 default:
                     return null;
             }
@@ -153,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
 
         @NonNull
@@ -170,6 +180,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case 2:
                     movieDetailsFragment = (MovieDetailsFragment) createdFragment;
+                    break;
+                case 3:
+                    rankingsFragment = (RankingsFragment) createdFragment;
                     break;
             }
             return createdFragment;
@@ -274,6 +287,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(mSearchDisposable != null) {mSearchDisposable.dispose();}
+        if (mSearchDisposable != null) {
+            mSearchDisposable.dispose();
+        }
     }
 }

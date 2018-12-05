@@ -23,7 +23,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/av/ic_library_books_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/editor/ic_format_list_numbered_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -33,9 +33,10 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_library_books_black_24dp" />
+                            <entry key="color" value="ffcc01" />
+                            <entry key="outputName" value="ic_format_list_numbered_black_24dp" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="C:\Users\Eddie\Downloads\sharp-account_box-24px.svg" />
+                            <entry key="sourceFile" value="C:\Users\Eddie\Downloads\tmdb_acknowledgment2.svg" />
                           </map>
                         </option>
                       </PersistentState>

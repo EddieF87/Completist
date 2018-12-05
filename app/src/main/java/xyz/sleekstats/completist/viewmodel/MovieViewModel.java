@@ -19,6 +19,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.databinding.MovieKeys;
+import xyz.sleekstats.completist.model.CastInfo;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmListDetails;
 import xyz.sleekstats.completist.model.FilmPOJO;
@@ -44,6 +45,7 @@ public class MovieViewModel extends AndroidViewModel {
     private final PublishSubject<WatchCount> watchCountPublishSubject = PublishSubject.create();
     private final PublishSubject<List<MyList>> popularActorsSubject = PublishSubject.create();
     private final PublishSubject<Integer> viewPagerSubject = PublishSubject.create();
+    private final PublishSubject<List<FilmByPerson>> rankingsSubject = PublishSubject.create();
 
     private FilmListDetails mFilmListDetails;
     private FilmPOJO mFilmDetails;
@@ -204,6 +206,10 @@ public class MovieViewModel extends AndroidViewModel {
         return filmListPublishSubject;
     }
 
+    public PublishSubject<List<FilmByPerson>> getRankingsSubject() {
+        return rankingsSubject;
+    }
+
     public PublishSubject<FilmPOJO> getFilmDetailsPublishSubject() {
         return filmDetailsPublishSubject;
     }
@@ -237,7 +243,6 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     private void updateWatched(Map<String, FilmByPerson> watchedFilms, List<FilmByPerson> totalFilms) {
-        Log.d("pokemo", "updateWatched");
 
         mWatchedFilms = 0;
 
@@ -338,6 +343,7 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     private void addWatchedMovie(FilmByPerson movie) {
+        movie.setRanking(-1);
         mCompositeDisposable.add(mRepo.insertMovie(movie));
         updateWatchedMovieCount(movie.getId(), 1);
     }
@@ -459,6 +465,7 @@ public class MovieViewModel extends AndroidViewModel {
         mCompositeDisposable.add(checkIfMovieExists(film)
                 .doOnEvent((x, y) -> {
                     if (x == null) {
+                        film.setRanking(-1);
                         mCompositeDisposable.add(mRepo.insertMovie(film));
                     } else {
                         if (film.isQueued()) {
@@ -521,18 +528,18 @@ public class MovieViewModel extends AndroidViewModel {
         return mFilmDetails;
     }
 
-    public Single<FilmByPerson> checkIfMovieExistsFromDetails(FilmByPerson film) {
-        return mRepo.checkIfMovieExists(film.getId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .doOnEvent((x, y) -> {
-                    if (x == null) {
-                        addWatchedMovie(film);
-                    } else {
-                        removeWatchedMovie(String.valueOf(film.getId()));
-                    }
-                });
-    }
+//    public Single<FilmByPerson> checkIfMovieExistsFromDetails(FilmByPerson film) {
+//        return mRepo.checkIfMovieExists(film.getId())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(Schedulers.io())
+//                .doOnEvent((x, y) -> {
+//                    if (x == null) {
+//                        addWatchedMovie(film);
+//                    } else {
+//                        removeWatchedMovie(String.valueOf(film.getId()));
+//                    }
+//                });
+//    }
 
     private boolean detailsFilmInFilmList() {
         if (mFilmDetails == null) {
@@ -693,7 +700,6 @@ public class MovieViewModel extends AndroidViewModel {
         }
         scrollLoading = true;
         filmsPageNumber++;
-        Log.d("pokemo", "onScrollEnd " + filmsPageNumber);
 
         Observable<List<FilmByPerson>> filmsObservable;
         switch (mFilmListDetails.getPersonPOJO().getId()) {
@@ -717,7 +723,6 @@ public class MovieViewModel extends AndroidViewModel {
                 .subscribe(filmByPeople -> {
                             displayList.addAll(filmByPeople);
                             List<String> filmIDs = getFilmIDs(displayList);
-                            Log.d("pokemo", "size = " + displayList.size());
                             mTotalFilms = displayList.size();
 
                             mCompositeDisposable.add(scanMoviesForWatched(filmIDs)
@@ -729,11 +734,42 @@ public class MovieViewModel extends AndroidViewModel {
                                             })
                             );
                         }, e -> {
-                            Log.e(TAG_RXERROR, "pokemo onScrollEnd e=" + e.getMessage());
+                            Log.e(TAG_RXERROR, "onScrollEnd e=" + e.getMessage());
                             filmsPageNumber--;
                             finishScrollLoading();
                         }
                 )
         );
+    }
+
+    public void publishSavedMovies() {
+        mCompositeDisposable.add(mRepo.getSavedMovies()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+//                .toObservable()
+//                .flatMapIterable(list -> list)
+//                .filter(FilmByPerson::isWatched)
+//                .toList()
+                .subscribe(rankingsSubject::onNext, e ->
+                    Log.e(TAG_RXERROR, "getSavedMovies e=" + e.getMessage())
+                )
+        );
+    }
+
+
+    public void updateRankingNew(String id, int newRank) {
+        mCompositeDisposable.add(mRepo.updateRankingNew(id, newRank));
+    }
+
+    public void updateRankingRemove(String id, int oldRank) {
+        mCompositeDisposable.add(mRepo.updateRankingRemove(id, oldRank));
+    }
+
+    public void updateRankingUp(String id, int oldRank, int newRank) {
+        mCompositeDisposable.add(mRepo.updateRankingUp(id, oldRank, newRank));
+    }
+
+    public void updateRankingDown(String id, int oldRank, int newRank) {
+        mCompositeDisposable.add(mRepo.updateRankingDown(id, oldRank, newRank));
     }
 }

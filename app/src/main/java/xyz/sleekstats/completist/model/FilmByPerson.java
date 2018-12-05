@@ -11,6 +11,8 @@ import java.util.Objects;
 @Entity(tableName = "movie_table")
 public class FilmByPerson {
 
+    public FilmByPerson(){ }
+
     public FilmByPerson(String title, @NonNull String id, String poster_path) {
         this.title = title;
         this.id = id;
@@ -44,6 +46,17 @@ public class FilmByPerson {
     private boolean isWatched;
 
     private boolean isQueued;
+
+    private int ranking;
+
+    public int getRanking() {
+        return ranking;
+    }
+
+    public void setRanking(int ranking) {
+        this.ranking = ranking;
+    }
+
 
     public String getTitle() {
         return title;
