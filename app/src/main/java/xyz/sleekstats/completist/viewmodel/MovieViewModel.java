@@ -374,10 +374,10 @@ public class MovieViewModel extends AndroidViewModel {
 
     }
 
-    private void removeWatchedMovie(String movieID) {
-        mRepo.removeMovie(movieID);
-        updateWatchedMovieCount(movieID, -1);
-    }
+//    private void removeWatchedMovie(String movieID) {
+//        mRepo.removeMovie(movieID);
+//        updateWatchedMovieCount(movieID, -1);
+//    }
 
     private Single<Boolean> movieInListObservable(String id) {
         return Observable.just(mFilmListDetails.getFilmByPersonList())
@@ -411,11 +411,11 @@ public class MovieViewModel extends AndroidViewModel {
                     if (x == null) {
                         addWatchedMovie(film);
                     } else {
-                        if (film.isQueued()) {
+//                        if (film.isQueued()) {
                             updateWatchedMovie(film);
-                        } else {
-                            removeWatchedMovie(String.valueOf(film.getId()));
-                        }
+//                        } else {
+//                            removeWatchedMovie(String.valueOf(film.getId()));
+//                        }
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -434,11 +434,11 @@ public class MovieViewModel extends AndroidViewModel {
                     if (x == null) {
                         mRepo.insertQueuedMovie(film);
                     } else {
-                        if (film.isWatched()) {
+//                        if (film.isWatched()) {
                             mRepo.updateQueuedFilm(film);
-                        } else {
-                            mRepo.removeQueuedMovie(String.valueOf(film.getId()));
-                        }
+//                        } else {
+//                            mRepo.removeQueuedMovie(String.valueOf(film.getId()));
+//                        }
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -468,11 +468,11 @@ public class MovieViewModel extends AndroidViewModel {
                         film.setRanking(-1);
                         mCompositeDisposable.add(mRepo.insertMovie(film));
                     } else {
-                        if (film.isQueued()) {
+//                        if (film.isQueued()) {
                             mCompositeDisposable.add(mRepo.updateFilm(film));
-                        } else {
-                            mCompositeDisposable.add(mRepo.removeMovie(String.valueOf(film.getId())));
-                        }
+//                        } else {
+//                            mCompositeDisposable.add(mRepo.removeMovie(String.valueOf(film.getId())));
+//                        }
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -510,11 +510,11 @@ public class MovieViewModel extends AndroidViewModel {
                     if (x == null) {
                         mRepo.insertQueuedMovie(film);
                     } else {
-                        if (film.isWatched()) {
+//                        if (film.isWatched()) {
                             mRepo.updateQueuedFilm(film);
-                        } else {
-                            mRepo.removeQueuedMovie(String.valueOf(film.getId()));
-                        }
+//                        } else {
+//                            mRepo.removeQueuedMovie(String.valueOf(film.getId()));
+//                        }
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())

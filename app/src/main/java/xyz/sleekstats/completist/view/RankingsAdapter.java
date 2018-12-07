@@ -12,15 +12,17 @@ import com.woxthebox.draglistview.DragItemAdapter;
 import java.util.ArrayList;
 
 import xyz.sleekstats.completist.R;
+import xyz.sleekstats.completist.model.FilmByPerson;
 
-class RankingsAdapter extends DragItemAdapter<Pair<Long, String>, RankingsAdapter.ViewHolder> {
+class RankingsAdapter extends DragItemAdapter<Pair<Long, FilmByPerson>, RankingsAdapter.ViewHolder> {
 
     private int mLayoutId;
     private int mGrabHandleId;
     private boolean mDragOnLongPress;
     private final boolean isRanked;
+    private ItemClickListener mClickListener;
 
-    RankingsAdapter(ArrayList<Pair<Long, String>> list, boolean ranked) {
+    RankingsAdapter(ArrayList<Pair<Long, FilmByPerson>> list, boolean ranked) {
         mLayoutId = R.layout.rank_item;
         mGrabHandleId = R.id.grabber;
         mDragOnLongPress = false;
@@ -38,8 +40,8 @@ class RankingsAdapter extends DragItemAdapter<Pair<Long, String>, RankingsAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
-        String movieText = mItemList.get(position).second;
-        holder.mMovieTextView.setText(movieText);
+        FilmByPerson film = mItemList.get(position).second;
+        holder.bindFilm(film);
         if(isRanked) {
             String positionText = String.valueOf(position+1);
             holder.mRankTextView.setText(positionText);
@@ -55,6 +57,7 @@ class RankingsAdapter extends DragItemAdapter<Pair<Long, String>, RankingsAdapte
     class ViewHolder extends DragItemAdapter.ViewHolder {
         private TextView mMovieTextView;
         private TextView mRankTextView;
+        private FilmByPerson mFilm;
 
         ViewHolder(final View itemView) {
             super(itemView, mGrabHandleId, mDragOnLongPress);
@@ -62,15 +65,36 @@ class RankingsAdapter extends DragItemAdapter<Pair<Long, String>, RankingsAdapte
             mRankTextView = itemView.findViewById(R.id.grabber);
         }
 
+        private void bindFilm(FilmByPerson film) {
+            mFilm = film;
+            mMovieTextView.setText(mFilm.getTitle());
+        }
+
         @Override
         public void onItemClicked(View view) {
-//            Toast.makeText(view.getContext(), "Item clicked", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public boolean onItemLongClicked(View view) {
-//            Toast.makeText(view.getContext(), "Item long clicked", Toast.LENGTH_SHORT).show();
+            if(mClickListener != null) {
+                if(mFilm.isFilm()) {
+                    mClickListener.onFilmClick(mFilm.getId());
+                } else {
+                    mClickListener.onShowClick(mFilm.getId());
+                }
+            }
             return true;
         }
     }
+
+
+    public void setClickListener(ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
+
+    public interface ItemClickListener{
+        void onFilmClick(String id);
+        void onShowClick(String id);
+    }
+
 }

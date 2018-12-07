@@ -27,8 +27,8 @@ import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RankingsFragment extends Fragment {
-
+public class RankingsFragment extends Fragment
+        implements RankingsAdapter.ItemClickListener {
 
     private BoardView mBoardView;
     private boolean itemDragStarted;
@@ -39,8 +39,6 @@ public class RankingsFragment extends Fragment {
     public RankingsFragment() {
         // Required empty public constructor
     }
-
-
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -54,7 +52,6 @@ public class RankingsFragment extends Fragment {
                 e -> Log.e("rxprob", "rankingsSubject e=" + e.getMessage())));
         movieViewModel.publishSavedMovies();
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -176,13 +173,14 @@ public class RankingsFragment extends Fragment {
 
     private void addColumn(List<FilmByPerson> movies, boolean ranked) {
 
-        final ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
+        final ArrayList<Pair<Long, FilmByPerson>> mItemArray = new ArrayList<>();
         for (int i = 0; i < movies.size(); i++) {
             FilmByPerson movie = movies.get(i);
-            mItemArray.add(new Pair<>(Long.parseLong(movie.getId()), movie.getTitle()));
+            mItemArray.add(new Pair<>(Long.parseLong(movie.getId()), movie));
         }
 
         final RankingsAdapter listAdapter = new RankingsAdapter(mItemArray, ranked);
+        listAdapter.setClickListener(this);
         final View header = View.inflate(getActivity(), R.layout.column_header, null);
         String rankedString = ranked ? "Rankings" : "Unranked";
         ((TextView) header.findViewById(R.id.text)).setText(rankedString);
@@ -190,4 +188,13 @@ public class RankingsFragment extends Fragment {
         mBoardView.addColumn(listAdapter, header, header, false);
     }
 
+    @Override
+    public void onFilmClick(String id) {
+        movieViewModel.getMovieInfo(id);
+    }
+
+    @Override
+    public void onShowClick(String id) {
+        movieViewModel.getShowInfo(id);
+    }
 }

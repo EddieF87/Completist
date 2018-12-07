@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.RankingsFragment"
     android:paddingStart="80dp"
+    android:paddingEnd="@dimen/defaultPadding"
+    android:paddingTop="@dimen/defaultPadding"
+    android:orientation="vertical"
     >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/titleTextSize"
+        android:textStyle="bold"
+        android:text="My Rankings"
+        />
 
     <com.woxthebox.draglistview.BoardView
         android:id="@+id/board_view"
@@ -13,6 +25,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/poster_border"
         android:paddingBottom="@dimen/defaultStroke"
+        android:layout_marginTop="@dimen/smallMargin"
         />
 
-</FrameLayout>
+</LinearLayout>

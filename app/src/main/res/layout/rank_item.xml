@@ -52,14 +52,14 @@
                 android:background="#666464"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentBottom="true"
                 android:layout_toStartOf="@id/grabber"
                 android:paddingStart="@dimen/smallPadding"
                 android:paddingEnd="@dimen/smallPadding"
-                android:textSize="16sp"/>
+                android:textSize="@dimen/smallTextSize"/>
 
 
         </RelativeLayout>
