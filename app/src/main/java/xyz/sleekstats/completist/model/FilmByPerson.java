@@ -17,6 +17,7 @@ public class FilmByPerson {
         this.title = title;
         this.id = id;
         this.poster_path = poster_path;
+        this.ranking = -1;
     }
 
     @SerializedName(value = "title", alternate = "name")

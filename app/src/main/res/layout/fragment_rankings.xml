@@ -1,31 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.RankingsFragment"
-    android:paddingStart="80dp"
-    android:paddingEnd="@dimen/defaultPadding"
-    android:paddingTop="@dimen/defaultPadding"
     android:orientation="vertical"
-    >
+    android:padding="@dimen/defaultPadding"
+    tools:context=".view.RankingsFragment">
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/title_ranks"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:gravity="center_vertical"
+        android:text="@string/rankings"
         android:textSize="@dimen/titleTextSize"
         android:textStyle="bold"
-        android:text="My Rankings"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/toggle_ranks"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.woxthebox.draglistview.BoardView
         android:id="@+id/board_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
         android:background="@drawable/poster_border"
         android:paddingBottom="@dimen/defaultStroke"
-        android:layout_marginTop="@dimen/smallMargin"
-        />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/title_ranks" />
 
-</LinearLayout>
+    <Button
+        android:id="@+id/load_popular_ranks"
+        style="@style/ListButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/popular"
+        android:textSize="@dimen/smallTextSize"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toggle_ranks" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.27" />
+
+    <Button
+        android:id="@+id/load_watched_ranks"
+        style="@style/ListButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/saved"
+        android:textSize="@dimen/smallTextSize"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/load_popular_ranks" />
+
+    <android.support.v7.widget.SearchView
+        android:id="@+id/search_ranks"
+        style="@style/ListButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/load_watched_ranks" />
+
+    <ToggleButton
+        android:id="@+id/toggle_ranks"
+        style="@style/ListButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:textOff="@string/tv"
+        android:textOn="@string/movie"
+        app:layout_constraintBottom_toTopOf="@+id/board_view"
+        app:layout_constraintEnd_toStartOf="@+id/title_ranks"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

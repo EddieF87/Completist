@@ -59,10 +59,23 @@ public class Repo {
     }
 
     //Get list of films matching search query
-    public Observable<MediaQueryPOJO> queryFilms(String movieQuery) {
-        return tmdbAPI.queryFilms(movieQuery)
+    public Observable<MediaQueryPOJO> queryMedia(String movieQuery) {
+        return tmdbAPI.queryMedia(movieQuery)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    //Get list of films matching search query
+    public Observable<MediaQueryPOJO> queryForRankings(String movieQuery, boolean isFilmRankings) {
+        if (isFilmRankings) {
+            return tmdbAPI.queryFilmsForRankings(movieQuery)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+        } else {
+            return tmdbAPI.queryShowsForRankings(movieQuery)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+        }
     }
 
     //Get specific film details based  Tmdb film id
@@ -100,6 +113,14 @@ public class Repo {
     public Observable<List<FilmByPerson>> getPopularFilms(int pageNumber) {
         return singleToObservable(
                 tmdbAPI.retrievePopularMovies(pageNumber)
+                        .map(ResultsPOJO::getResults)
+        );
+    }
+
+    //Get list of most popular shows
+    public Observable<List<FilmByPerson>> getPopularShows(int pageNumber) {
+        return singleToObservable(
+                tmdbAPI.retrievePopularShows(pageNumber)
                         .map(ResultsPOJO::getResults)
         );
     }
@@ -269,77 +290,83 @@ public class Repo {
         );
     }
 
-    public Single<List<FilmByPerson>> getSavedMovies() {
-        return mMovieDao.getSavedMovies();
+    public Single<List<FilmByPerson>> getSavedForRankings(boolean isFilm) {
+        int isFilmRankings = isFilm ? 1 : 0;
+        return mMovieDao.getSavedForRankings(isFilmRankings)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Disposable updateRankingNew(String id, int newRank) {
+    public Disposable updateRankingNew(String id, int newRank, boolean isFilm) {
 
         return Single.just(id)
                 .subscribeOn(Schedulers.io())
                 .subscribe(x -> {
-                            Log.d("rankingssub", "updateRankingNew");
-                            mMovieDao.updateOtherRankingsDownAfterNew(newRank);
-                            mMovieDao.updateRanking(x, newRank);
-                            checkcheck();
+                            int isFilmRankings = isFilm ? 1 : 0;
+                            mMovieDao.updateOtherRankingsDownAfterNew(newRank, isFilmRankings);
+                            mMovieDao.updateRanking(x, newRank, isFilmRankings);
+//                            checkcheck(isFilm);
                         },
                         e -> Log.e(TAG_RXERROR, "updateRankingNew e=" + e.getMessage())
                 );
     }
 
-    public Disposable updateRankingRemove(String id, int oldRank) {
+    public Disposable updateRankingRemove(String id, int oldRank, boolean isFilm) {
         return Single.just(id)
                 .subscribeOn(Schedulers.io())
                 .subscribe(x -> {
                             Log.d("rankingssub", "updateRankingRemove");
-                            mMovieDao.updateRanking(x, -1);
-                            mMovieDao.updateOtherRankingsUpAfterRemoval(oldRank);
-                            checkcheck();
+                            int isFilmRankings = isFilm ? 1 : 0;
+                            mMovieDao.updateRanking(x, -1, isFilmRankings);
+                            mMovieDao.updateOtherRankingsUpAfterRemoval(oldRank, isFilmRankings);
+//                            checkcheck(isFilm);
                         },
                         e -> Log.e(TAG_RXERROR, "updateRankingRemove e=" + e.getMessage())
                 );
     }
 
-    public Disposable updateRankingUp(String id, int oldRank, int newRank) {
+    public Disposable updateRankingUp(String id, int oldRank, int newRank, boolean isFilm) {
         return Single.just(id)
                 .subscribeOn(Schedulers.io())
                 .subscribe(x -> {
                             Log.d("rankingssub", "updateRankingUp");
-                            mMovieDao.updateOtherRankingsDown(oldRank, newRank);
-                            mMovieDao.updateRanking(x, newRank);
-                            checkcheck();
+                            int isFilmRankings = isFilm ? 1 : 0;
+                            mMovieDao.updateOtherRankingsDown(oldRank, newRank, isFilmRankings);
+                            mMovieDao.updateRanking(x, newRank, isFilmRankings);
+//                            checkcheck(isFilm);
                         },
                         e -> Log.e(TAG_RXERROR, "updateRankingUp e=" + e.getMessage())
                 );
 
     }
 
-    public Disposable updateRankingDown(String id, int oldRank, int newRank) {
+    public Disposable updateRankingDown(String id, int oldRank, int newRank, boolean isFilm) {
         return Single.just(id)
                 .subscribeOn(Schedulers.io())
                 .subscribe(x -> {
                             Log.d("rankingssub", "updateRankingDown");
-                            mMovieDao.updateOtherRankingsUp(oldRank, newRank);
-                            mMovieDao.updateRanking(x, newRank);
-                            checkcheck();
+                            int isFilmRankings = isFilm ? 1 : 0;
+                            mMovieDao.updateOtherRankingsUp(oldRank, newRank, isFilmRankings);
+                            mMovieDao.updateRanking(x, newRank, isFilmRankings);
+//                            checkcheck(isFilm);
                         },
                         e -> Log.e(TAG_RXERROR, "updateRankingDown e=" + e.getMessage())
                 );
     }
 
-    private void checkcheck() {
-        getSavedMovies()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        films -> {
-                            for (FilmByPerson film : films) {
-                                if(film.getRanking() < 0) {continue;}
-                                Log.d("rankingslischeck", film.getRanking() + " " + film.getTitle());
-                            }
-                        }
-                        , e ->
-                                Log.e(TAG_RXERROR, "rankingslis e=" + e.getMessage())
-                );
-    }
+//    private void checkcheck(boolean isf) {
+//        getSavedForRankings(isf)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(
+//                        films -> {
+//                            for (FilmByPerson film : films) {
+//                                if(film.getRanking() < 0) {continue;}
+//                                Log.d("rankingslischeck", film.getRanking() + " " + film.getTitle());
+//                            }
+//                        }
+//                        , e ->
+//                                Log.e(TAG_RXERROR, "rankingslis e=" + e.getMessage())
+//                );
+//    }
 }

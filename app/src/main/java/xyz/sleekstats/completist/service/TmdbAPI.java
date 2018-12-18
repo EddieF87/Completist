@@ -43,6 +43,12 @@ public interface TmdbAPI {
             @Query("page") int pageNumber
     );
 
+    //retrieve most popular movies from TMDB API
+    @GET("tv/popular?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&include_adult=false&language=en-US")
+    Single<ResultsPOJO> retrievePopularShows(
+            @Query("page") int pageNumber
+    );
+
     //retrieve movies currently playing in theatres from TMDB API
     @GET("movie/now_playing?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2&include_adult=false&language=en-US")
     Single<ResultsPOJO> retrieveNowPlaying(
@@ -65,7 +71,20 @@ public interface TmdbAPI {
 
     @GET("search/multi?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2" +
             "&language=en-US&page=1&include_adult=false&language=en-US")
-    Observable<MediaQueryPOJO> queryFilms(
+    Observable<MediaQueryPOJO> queryMedia(
+            @Query("query") String movie_query
+    );
+
+
+    @GET("search/movie?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2" +
+            "&language=en-US&page=1&include_adult=false&language=en-US")
+    Observable<MediaQueryPOJO> queryFilmsForRankings(
+            @Query("query") String movie_query
+    );
+
+    @GET("search/tv?api_key=b5f45c3ea3adf1ca53b96fa5bb9394d2" +
+            "&language=en-US&page=1&include_adult=false&language=en-US")
+    Observable<MediaQueryPOJO> queryShowsForRankings(
             @Query("query") String movie_query
     );
 

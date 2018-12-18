@@ -26,8 +26,8 @@ public interface MovieDao {
     @Update
     void updateMovie(FilmByPerson film);
 
-    @Query("SELECT * from movie_table ORDER BY ranking ASC")
-    Single<List<FilmByPerson>> getSavedMovies();
+    @Query("SELECT * from movie_table WHERE isFilm == :isFilmRankings ORDER BY ranking ASC")
+    Single<List<FilmByPerson>> getSavedForRankings(int isFilmRankings);
 
     @Query("SELECT * from movie_table WHERE isWatched == 1")
     Single<List<FilmByPerson>> getSavedWatchedMovies();
@@ -50,20 +50,20 @@ public interface MovieDao {
     @Query("SELECT * FROM movie_table WHERE id IN (:ids) AND isQueued == 1")
     Single<List<FilmByPerson>> getQueuedMoviesInList(List<String> ids);
 
-    @Query("UPDATE movie_table SET ranking = ranking + 1 WHERE ranking >= :newRank AND ranking < :oldRank")
-    void updateOtherRankingsDown(int oldRank, int newRank);
+    @Query("UPDATE movie_table SET ranking = ranking + 1 WHERE ranking >= :newRank AND ranking < :oldRank AND isFilm == :isFilmRankings")
+    void updateOtherRankingsDown(int oldRank, int newRank, int isFilmRankings);
 
-    @Query("UPDATE movie_table SET ranking = ranking + 1 WHERE ranking >= :newRank")
-    void updateOtherRankingsDownAfterNew(int newRank);
+    @Query("UPDATE movie_table SET ranking = ranking + 1 WHERE ranking >= :newRank AND isFilm == :isFilmRankings")
+    void updateOtherRankingsDownAfterNew(int newRank, int isFilmRankings);
 
-    @Query("UPDATE movie_table SET ranking = ranking - 1 WHERE ranking <= :newRank AND ranking > :oldRank")
-    void updateOtherRankingsUp(int oldRank, int newRank);
+    @Query("UPDATE movie_table SET ranking = ranking - 1 WHERE ranking <= :newRank AND ranking > :oldRank AND isFilm == :isFilmRankings")
+    void updateOtherRankingsUp(int oldRank, int newRank, int isFilmRankings);
 
-    @Query("UPDATE movie_table SET ranking = ranking - 1 WHERE ranking > :oldRank")
-    void updateOtherRankingsUpAfterRemoval(int oldRank);
+    @Query("UPDATE movie_table SET ranking = ranking - 1 WHERE ranking > :oldRank AND isFilm == :isFilmRankings")
+    void updateOtherRankingsUpAfterRemoval(int oldRank, int isFilmRankings);
 
-    @Query("UPDATE movie_table SET ranking = :newRank WHERE id LIKE :id")
-    void updateRanking(String id, int newRank);
+    @Query("UPDATE movie_table SET ranking = :newRank WHERE id LIKE :id AND isFilm == :isFilmRankings")
+    void updateRanking(String id, int newRank, int isFilmRankings);
 
 
     //Lists Table

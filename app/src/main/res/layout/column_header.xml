@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright 2014 Magnus Woxblom
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright 2014 Magnus Woxblom
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -10,45 +9,26 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    card_view:cardPreventCornerOverlap="true"
-    card_view:cardUseCompatPadding="true"
-    card_view:cardElevation="1dp"
+    card_view:cardBackgroundColor="@color/colorAccent"
     card_view:cardCornerRadius="0dp"
-    card_view:cardBackgroundColor="@color/colorAccent">
+    card_view:cardElevation="1dp"
+    card_view:cardPreventCornerOverlap="true"
+    card_view:cardUseCompatPadding="true">
 
-    <LinearLayout
+
+    <TextView
+        android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingLeft="14dp"
-        android:paddingRight="14dp"
-        android:gravity="center_vertical">
+        android:gravity="center"
+        android:text="Test"
+        android:textColor="#000000"
+        android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="20sp"
-            android:textColor="#000000"
-            android:text="Test"/>
-
-        <TextView
-            android:id="@+id/item_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            android:text="Test"/>
-
-    </LinearLayout>
 </android.support.v7.widget.CardView>

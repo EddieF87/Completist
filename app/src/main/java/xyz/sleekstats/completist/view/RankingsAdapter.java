@@ -54,6 +54,10 @@ class RankingsAdapter extends DragItemAdapter<Pair<Long, FilmByPerson>, Rankings
         return mItemList.get(position).first;
     }
 
+    public FilmByPerson getFilmOrShow(int position) {
+        return mItemList.get(position).second;
+    }
+
     class ViewHolder extends DragItemAdapter.ViewHolder {
         private TextView mMovieTextView;
         private TextView mRankTextView;

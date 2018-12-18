@@ -26,4 +26,9 @@
     <item name="id" type="id" />
     <item name="tvOrMovie" type="id" />
     <string name="rank">Rankings</string>
+    <string name="popular">Popular</string>
+    <string name="watched">Watched</string>
+    <string name="rankings">Rankings</string>
+    <string name="tv">TV</string>
+    <string name="saved">Saved</string>
 </resources>

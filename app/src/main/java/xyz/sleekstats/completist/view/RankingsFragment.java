@@ -2,26 +2,41 @@ package xyz.sleekstats.completist.view;
 
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
+import com.google.common.collect.Lists;
+import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 import com.woxthebox.draglistview.BoardView;
+import com.woxthebox.draglistview.DragItemAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.model.FilmByPerson;
+import xyz.sleekstats.completist.model.FilmPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 /**
@@ -35,6 +50,15 @@ public class RankingsFragment extends Fragment
     private MovieViewModel movieViewModel;
     private final CompositeDisposable listCompositeDisposable = new CompositeDisposable();
     private PublishSubject<List<FilmByPerson>> rankingsSubject;
+    private RankingsAdapter mUnrankedAListdapter;
+    private RankingsAdapter mRankedAListdapter;
+    private SimpleCursorAdapter mSearchAdapter;
+    private final List<FilmByPerson> rankedList = new ArrayList<>();
+
+
+    private static final String SEARCH_TITLE = "title";
+    private static final String SEARCH_ID = "search_id";
+    private static final String SEARCH_TYPE = "search_type";
 
     public RankingsFragment() {
         // Required empty public constructor
@@ -50,13 +74,12 @@ public class RankingsFragment extends Fragment
         rankingsSubject = movieViewModel.getRankingsSubject();
         listCompositeDisposable.add(rankingsSubject.subscribe(this::addMovies,
                 e -> Log.e("rxprob", "rankingsSubject e=" + e.getMessage())));
-        movieViewModel.publishSavedMovies();
+        movieViewModel.publishRankedMovies();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_rankings, container, false);
         mBoardView = view.findViewById(R.id.board_view);
         mBoardView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -73,63 +96,50 @@ public class RankingsFragment extends Fragment
         mBoardView.setColumnSnapPosition(BoardView.ColumnSnapPosition.CENTER);
         mBoardView.setBoardListener(new BoardView.BoardListener() {
 
-
             @Override
-            public void onItemDragStarted(int column, int row) {
-                Log.d("rankingsdr", "onItemDragStarted" + column +", " + row);
-                itemDragStarted = true;
-            }
+            public void onItemDragStarted(int column, int row) { itemDragStarted = true; }
 
             @Override
             public void onItemDragEnded(int fromColumn, int fromRow, int toColumn, int toRow) {
                 if(itemDragStarted) {
                     itemDragStarted = false;
                 } else {
-                    Log.d("rankingsfals", "itemdragstarted is false!");
                     return;
                 }
-                Log.d("rankings", "onItemDragEnded  old = " + fromColumn + ", " + fromRow + "  new = "  + toColumn + ", "  + toRow);
+
+                FilmByPerson movie;
                 String movieID;
                 try {
-                    movieID = String.valueOf(mBoardView.getAdapter(toColumn).getUniqueItemId(toRow));
+                    RankingsAdapter adapter = (RankingsAdapter) mBoardView.getAdapter(toColumn);
+                    movieID = String.valueOf(adapter.getUniqueItemId(toRow));
+                    movie = adapter.getFilmOrShow(toRow);
                 } catch (Exception e) {
-                    Log.e("rankingslis", e.getMessage());
                     return;
                 }
 
                 if (fromColumn != toColumn || fromRow != toRow) {
                     if(fromColumn != toColumn) {
                         if(toColumn == 0) {
+                            rankedList.remove(movie);
                             movieViewModel.updateRankingRemove(movieID, fromRow);
-                            Log.d("rankings", "updateRankingRemove " + movieID);
                         } else {
-                            movieViewModel.updateRankingNew(movieID, toRow);
-                            Log.d("rankings", "updateRankingNew " + movieID);
+                            rankedList.add(movie);
+                            movieViewModel.updateRankingNew(movie, toRow);
                         }
                     } else if (toColumn == 1){
                         if(fromRow > toRow) {
                             movieViewModel.updateRankingUp(movieID, fromRow, toRow);
-                            Log.d("rankings", "updateRankingUp " + movieID);
                         } else {
                             movieViewModel.updateRankingDown(movieID, fromRow, toRow);
-                            Log.d("rankings", "updateRankingDown " + movieID);
                         }
                     }
                 }
             }
 
             @Override
-            public void onItemChangedPosition(int oldColumn, int oldRow, int newColumn, int newRow) {
-                //Toast.makeText(mBoardView.getContext(), "Position changed - column: " + newColumn + " row: " + newRow, Toast.LENGTH_SHORT).show();
-            }
-
+            public void onItemChangedPosition(int oldColumn, int oldRow, int newColumn, int newRow) { }
             @Override
-            public void onItemChangedColumn(int oldColumn, int newColumn) {
-                if(newColumn > oldColumn) {
-
-                }
-            }
-
+            public void onItemChangedColumn(int oldColumn, int newColumn) { }
             @Override
             public void onFocusedColumnChanged(int oldColumn, int newColumn) { }
             @Override
@@ -141,14 +151,85 @@ public class RankingsFragment extends Fragment
         });
         mBoardView.setBoardCallback(new BoardView.BoardCallback() {
             @Override
-            public boolean canDragItemAtPosition(int column, int dragPosition) {
-                // Add logic here to prevent an item to be dragged
+            public boolean canDragItemAtPosition(int column, int dragPosition) { return true; }
+            @Override
+            public boolean canDropItemAtPosition(int oldColumn, int oldRow, int newColumn, int newRow) { return true; }
+        });
+
+        view.findViewById(R.id.load_popular_ranks).setOnClickListener(
+                v -> listCompositeDisposable.add(movieViewModel.getPopularForRankings()
+                        .subscribe(this::addUnrankedColumn,
+                                e -> Log.e("rxprob", "getPopularForRankings e=" + e.getMessage())
+                        )
+                )
+        );
+
+        view.findViewById(R.id.load_watched_ranks).setOnClickListener(
+                v -> listCompositeDisposable.add(movieViewModel.getWatchedForRankings()
+                        .subscribe(this::addUnrankedColumn,
+                                e -> Log.e("rxprob", "getWatchedForRankings e=" + e.getMessage())
+                        )
+                )
+        );
+
+
+        if (movieViewModel == null) {
+            movieViewModel = ViewModelProviders.of(requireActivity()).get(MovieViewModel.class);
+        }
+
+        ToggleButton toggleButton = view.findViewById(R.id.toggle_ranks);
+        toggleButton.setChecked(movieViewModel.isFilmRankings());
+        toggleButton.setOnCheckedChangeListener((compoundButton, b) -> {
+            movieViewModel.setFilmShowRankings(b);
+            movieViewModel.publishRankedMovies();
+        });
+
+        SearchView searchView = view.findViewById(R.id.search_ranks);
+        searchView.setIconifiedByDefault(true);
+
+       listCompositeDisposable.add(RxSearchView
+                .queryTextChanges(searchView)
+                .skip(1)
+                .debounce(600, TimeUnit.MILLISECONDS)
+                .filter(charSequence -> !TextUtils.isEmpty(charSequence))
+                .map(CharSequence::toString)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
+                .switchMap(query -> movieViewModel.queryRankings(query))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(s -> {
+                    Log.d("rxproby", "syyy");
+                    List<FilmPOJO> films = s.getResults();
+                    for (FilmPOJO filmPOJO : films) {
+                        Log.d("rxproby", filmPOJO.getTitle());
+                    }
+                    populateAdapter(s.getResults());
+                        },
+                        e -> Log.e("rxprob", "RxSearchView.queryTextChanges e=" + e.getMessage())
+                )
+       );
+
+        final String[] from = new String[]{SEARCH_TITLE, SEARCH_ID};
+        final int[] to = new int[]{R.id.search_title};
+
+        if (mSearchAdapter == null) {
+            mSearchAdapter = new SimpleCursorAdapter(requireActivity(), R.layout.search_item,
+                    null, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+        }
+        searchView.setSuggestionsAdapter(mSearchAdapter);
+
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionClick(int position) {
+                Cursor cursor = mSearchAdapter.getCursor();
+                cursor.moveToPosition(position);
+                String id = cursor.getString(cursor.getColumnIndex(SEARCH_ID));
+                movieViewModel.getMediaForRankings(id);
                 return true;
             }
 
             @Override
-            public boolean canDropItemAtPosition(int oldColumn, int oldRow, int newColumn, int newRow) {
-                // Add logic here to prevent an item to be dropped
+            public boolean onSuggestionSelect(int position) {
                 return true;
             }
         });
@@ -156,22 +237,21 @@ public class RankingsFragment extends Fragment
     }
 
     private void addMovies(List<FilmByPerson> movies) {
-        List<FilmByPerson> rankedList = new ArrayList<>();
+        rankedList.clear();
         List<FilmByPerson> unrankedList = new ArrayList<>();
 
         for (FilmByPerson movie : movies) {
-            Log.d("rankingslist", movie.getTitle() + " " + movie.getRanking());
             if(movie.getRanking() >= 0) {
                 rankedList.add(movie);
             } else {
                 unrankedList.add(movie);
             }
         }
-        addColumn(unrankedList, false);
-        addColumn(rankedList, true);
+        addUnrankedColumn(unrankedList);
+        addRankedColumn(rankedList);
     }
 
-    private void addColumn(List<FilmByPerson> movies, boolean ranked) {
+    private void addRankedColumn(List<FilmByPerson> movies) {
 
         final ArrayList<Pair<Long, FilmByPerson>> mItemArray = new ArrayList<>();
         for (int i = 0; i < movies.size(); i++) {
@@ -179,13 +259,39 @@ public class RankingsFragment extends Fragment
             mItemArray.add(new Pair<>(Long.parseLong(movie.getId()), movie));
         }
 
-        final RankingsAdapter listAdapter = new RankingsAdapter(mItemArray, ranked);
-        listAdapter.setClickListener(this);
-        final View header = View.inflate(getActivity(), R.layout.column_header, null);
-        String rankedString = ranked ? "Rankings" : "Unranked";
-        ((TextView) header.findViewById(R.id.text)).setText(rankedString);
-        ((TextView) header.findViewById(R.id.item_count)).setText(String.valueOf(movies.size()));
-        mBoardView.addColumn(listAdapter, header, header, false);
+        if(mRankedAListdapter == null) {
+            mRankedAListdapter = new RankingsAdapter(mItemArray, true);
+            mRankedAListdapter.setClickListener(this);
+            final View header = View.inflate(getActivity(), R.layout.column_header, null);
+            ((TextView) header.findViewById(R.id.text)).setText(R.string.rankings);
+            mBoardView.addColumn(mRankedAListdapter, header, header, false);
+        } else {
+            mRankedAListdapter.setItemList(mItemArray);
+        }
+    }
+
+
+
+    private void addUnrankedColumn(List<FilmByPerson> movies) {
+
+        final ArrayList<Pair<Long, FilmByPerson>> mItemArray = new ArrayList<>();
+        for (int i = 0; i < movies.size(); i++) {
+            FilmByPerson movie = movies.get(i);
+            if(rankedList.contains(movie)) {
+                continue;
+            }
+            mItemArray.add(new Pair<>(Long.parseLong(movie.getId()), movie));
+        }
+
+        if(mUnrankedAListdapter == null) {
+            mUnrankedAListdapter = new RankingsAdapter(mItemArray, false);
+            mUnrankedAListdapter.setClickListener(this);
+            final View header = View.inflate(getActivity(), R.layout.column_header, null);
+            ((TextView) header.findViewById(R.id.text)).setText("Unranked");
+            mBoardView.addColumn(mUnrankedAListdapter, header, header, false);
+        } else {
+            mUnrankedAListdapter.setItemList(mItemArray);
+        }
     }
 
     @Override
@@ -196,5 +302,30 @@ public class RankingsFragment extends Fragment
     @Override
     public void onShowClick(String id) {
         movieViewModel.getShowInfo(id);
+    }
+
+    private void populateAdapter(List<FilmPOJO> filmPOJOs) {
+        if (filmPOJOs == null) {
+            return;
+        }
+        String[] columns = {
+                BaseColumns._ID,
+                SEARCH_TITLE,
+                SEARCH_ID
+        };
+
+        MatrixCursor cursor = new MatrixCursor(columns);
+
+        for (int i = 0; i < filmPOJOs.size(); i++) {
+
+            FilmPOJO filmPOJO = filmPOJOs.get(i);
+
+            String id = filmPOJO.getId();
+            String name = filmPOJO.getTitle();
+
+            String[] row = {Integer.toString(i), name, id};
+            cursor.addRow(row);
+        }
+        mSearchAdapter.changeCursor(cursor);
     }
 }
