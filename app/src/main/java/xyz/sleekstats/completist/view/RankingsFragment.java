@@ -185,7 +185,8 @@ public class RankingsFragment extends Fragment
         });
 
         SearchView searchView = view.findViewById(R.id.search_ranks);
-        searchView.setIconifiedByDefault(true);
+
+        searchView.setOnClickListener(v -> searchView.setIconified(false));
 
        listCompositeDisposable.add(RxSearchView
                 .queryTextChanges(searchView)
@@ -197,14 +198,7 @@ public class RankingsFragment extends Fragment
                 .observeOn(Schedulers.io())
                 .switchMap(query -> movieViewModel.queryRankings(query))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(s -> {
-                    Log.d("rxproby", "syyy");
-                    List<FilmPOJO> films = s.getResults();
-                    for (FilmPOJO filmPOJO : films) {
-                        Log.d("rxproby", filmPOJO.getTitle());
-                    }
-                    populateAdapter(s.getResults());
-                        },
+                .subscribe(s -> populateAdapter(s.getResults()),
                         e -> Log.e("rxprob", "RxSearchView.queryTextChanges e=" + e.getMessage())
                 )
        );
@@ -225,6 +219,8 @@ public class RankingsFragment extends Fragment
                 cursor.moveToPosition(position);
                 String id = cursor.getString(cursor.getColumnIndex(SEARCH_ID));
                 movieViewModel.getMediaForRankings(id);
+                searchView.setQuery("", false);
+                searchView.clearFocus();
                 return true;
             }
 

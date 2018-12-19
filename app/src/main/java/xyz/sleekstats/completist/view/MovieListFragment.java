@@ -66,7 +66,6 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
             if (!recyclerView.canScrollVertically(1)) {
-                Log.d("pokemo", "!recyclerView.canScrollVertically");
                 movieViewModel.onScrollEnd();
             }
         }

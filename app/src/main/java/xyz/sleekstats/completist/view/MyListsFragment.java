@@ -111,7 +111,6 @@ public class MyListsFragment extends Fragment
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
                     if (!recyclerView.canScrollHorizontally(1)) {
-                        Log.d("pokemo", "!recyclerView.canScrollHorizontally");
                         movieViewModel.queryPopularActors();
                     }
                 }

@@ -74,10 +74,6 @@ public class MovieDetailsFragment extends Fragment
                 setMovieInfoDisplay(movieViewModel.onMovieWatchedFromDetails(mFilm)));
         rootView.findViewById(R.id.details_queue_btn).setOnClickListener(view ->
                 setMovieInfoDisplay(movieViewModel.onMovieQueuedFromDetails(mFilm)));
-//        rootView.findViewById(R.id.tmdb_view).setOnClickListener(view -> {
-//            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themoviedb.org/movie/" + mFilm.getId()));
-//            startActivity(browserIntent);
-//        });
         return rootView;
     }
 

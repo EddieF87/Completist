@@ -305,7 +305,6 @@ public class Repo {
                             int isFilmRankings = isFilm ? 1 : 0;
                             mMovieDao.updateOtherRankingsDownAfterNew(newRank, isFilmRankings);
                             mMovieDao.updateRanking(x, newRank, isFilmRankings);
-//                            checkcheck(isFilm);
                         },
                         e -> Log.e(TAG_RXERROR, "updateRankingNew e=" + e.getMessage())
                 );
@@ -315,11 +314,9 @@ public class Repo {
         return Single.just(id)
                 .subscribeOn(Schedulers.io())
                 .subscribe(x -> {
-                            Log.d("rankingssub", "updateRankingRemove");
                             int isFilmRankings = isFilm ? 1 : 0;
                             mMovieDao.updateRanking(x, -1, isFilmRankings);
                             mMovieDao.updateOtherRankingsUpAfterRemoval(oldRank, isFilmRankings);
-//                            checkcheck(isFilm);
                         },
                         e -> Log.e(TAG_RXERROR, "updateRankingRemove e=" + e.getMessage())
                 );
@@ -329,11 +326,9 @@ public class Repo {
         return Single.just(id)
                 .subscribeOn(Schedulers.io())
                 .subscribe(x -> {
-                            Log.d("rankingssub", "updateRankingUp");
                             int isFilmRankings = isFilm ? 1 : 0;
                             mMovieDao.updateOtherRankingsDown(oldRank, newRank, isFilmRankings);
                             mMovieDao.updateRanking(x, newRank, isFilmRankings);
-//                            checkcheck(isFilm);
                         },
                         e -> Log.e(TAG_RXERROR, "updateRankingUp e=" + e.getMessage())
                 );
@@ -344,17 +339,15 @@ public class Repo {
         return Single.just(id)
                 .subscribeOn(Schedulers.io())
                 .subscribe(x -> {
-                            Log.d("rankingssub", "updateRankingDown");
                             int isFilmRankings = isFilm ? 1 : 0;
                             mMovieDao.updateOtherRankingsUp(oldRank, newRank, isFilmRankings);
                             mMovieDao.updateRanking(x, newRank, isFilmRankings);
-//                            checkcheck(isFilm);
                         },
                         e -> Log.e(TAG_RXERROR, "updateRankingDown e=" + e.getMessage())
                 );
     }
 
-//    private void checkcheck(boolean isf) {
+//    private void rankCheck(boolean isf) {
 //        getSavedForRankings(isf)
 //                .subscribeOn(Schedulers.io())
 //                .observeOn(AndroidSchedulers.mainThread())

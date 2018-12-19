@@ -27,7 +27,6 @@ public class CustomViewPager extends ViewPager {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         int position = this.getCurrentItem();
-        Log.d("oooppp", "o = " + position);
         if (position == 3) {
             return false;
         }

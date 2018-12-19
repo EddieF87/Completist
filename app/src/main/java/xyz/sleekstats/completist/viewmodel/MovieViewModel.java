@@ -95,7 +95,6 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public void getShowOrFilm() {
-//        initialSpin = true;
         if (mFilmDetails != null) {
             checkForMovieFromDetails(mFilmDetails);
         } else {
@@ -306,7 +305,7 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public void getMediaForRankings(String mediaId) {
-        if(isFilmRankings) {
+        if (isFilmRankings) {
             mCompositeDisposable.add(mRepo.getFilm(mediaId)
                     .subscribe(filmPOJO -> addRankedMovie(filmPOJO, true),
                             e -> Log.e(TAG_RXERROR, "getMediaForRankings mRepo.getFilm e = " + e.getMessage()))
@@ -364,6 +363,7 @@ public class MovieViewModel extends AndroidViewModel {
         movie.setRanking(-1);
         mCompositeDisposable.add(mRepo.insertMovie(movie));
         updateWatchedMovieCount(movie.getId(), 1);
+        publishRankedMovies();
     }
 
     private void addRankedMovie(FilmPOJO filmPOJO, boolean isFilm) {
@@ -373,16 +373,17 @@ public class MovieViewModel extends AndroidViewModel {
         movie.setIsFilm(isFilm);
 
         mCompositeDisposable.add(checkIfMovieExists(movie)
-            .subscribe(x -> {
-                        if (x == null) {
+                .subscribe(x -> {
+                            if (x == null) {
+                                mRepo.insertMovie(movie);
+                                publishRankedMovies();
+                            }
+                        },
+                        e -> {
                             mRepo.insertMovie(movie);
+                            publishRankedMovies();
                         }
-                    },
-                    e -> {
-                        mRepo.insertMovie(movie);
-                        publishRankedMovies();
-                    }
-            )
+                )
         );
     }
 
@@ -411,11 +412,6 @@ public class MovieViewModel extends AndroidViewModel {
         updateWatchCount(displayWatchedFilms, displayTotalFilms);
 
     }
-
-//    private void removeWatchedMovie(String movieID) {
-//        mRepo.removeMovie(movieID);
-//        updateWatchedMovieCount(movieID, -1);
-//    }
 
     private Single<Boolean> movieInListObservable(String id) {
         return Observable.just(mFilmListDetails.getFilmByPersonList())
@@ -449,11 +445,7 @@ public class MovieViewModel extends AndroidViewModel {
                     if (x == null) {
                         addWatchedMovie(film);
                     } else {
-//                        if (film.isQueued()) {
-                            updateWatchedMovie(film);
-//                        } else {
-//                            removeWatchedMovie(String.valueOf(film.getId()));
-//                        }
+                        updateWatchedMovie(film);
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -472,12 +464,9 @@ public class MovieViewModel extends AndroidViewModel {
                     if (x == null) {
                         film.setRanking(-1);
                         mRepo.insertQueuedMovie(film);
+                        publishRankedMovies();
                     } else {
-//                        if (film.isWatched()) {
-                            mRepo.updateQueuedFilm(film);
-//                        } else {
-//                            mRepo.removeQueuedMovie(String.valueOf(film.getId()));
-//                        }
+                        mRepo.updateQueuedFilm(film);
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -502,31 +491,28 @@ public class MovieViewModel extends AndroidViewModel {
         film.setQueued(mFilmDetails.isQueued());
         film.setIsFilm(mFilmDetails.isFilm());
         mCompositeDisposable.add(checkIfMovieExists(film)
-                .doOnEvent((x, y) -> {
-                    if (x == null) {
-                        film.setRanking(-1);
-                        mCompositeDisposable.add(mRepo.insertMovie(film));
-                    } else {
-//                        if (film.isQueued()) {
-                            mCompositeDisposable.add(mRepo.updateFilm(film));
-//                        } else {
-//                            mCompositeDisposable.add(mRepo.removeMovie(String.valueOf(film.getId())));
-//                        }
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((x, y) -> {
-                            if (detailsFilmInFilmList()) {
-                                displayList.get(displayList.indexOf(film)).setWatched(film.isWatched());
-                                filmListPublishSubject.onNext(displayList);
-                                if (film.isWatched()) {
-                                    updateWatchedMovieCount(film.getId(), 1);
-                                } else {
-                                    updateWatchedMovieCount(film.getId(), -1);
-                                }
+                        .doOnEvent((x, y) -> {
+                            if (x == null) {
+                                film.setRanking(-1);
+                                mCompositeDisposable.add(mRepo.insertMovie(film));
+                                publishRankedMovies();
+                            } else {
+                                mCompositeDisposable.add(mRepo.updateFilm(film));
                             }
-                        }
-                )
+                        })
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe((x, y) -> {
+                                    if (detailsFilmInFilmList()) {
+                                        displayList.get(displayList.indexOf(film)).setWatched(film.isWatched());
+                                        filmListPublishSubject.onNext(displayList);
+                                        if (film.isWatched()) {
+                                            updateWatchedMovieCount(film.getId(), 1);
+                                        } else {
+                                            updateWatchedMovieCount(film.getId(), -1);
+                                        }
+                                    }
+                                }
+                        )
         );
         return mFilmDetails;
     }
@@ -545,40 +531,25 @@ public class MovieViewModel extends AndroidViewModel {
         film.setQueued(mFilmDetails.isQueued());
         film.setIsFilm(mFilmDetails.isFilm());
         mCompositeDisposable.add(checkIfMovieExists(film)
-                .doOnEvent((x, y) -> {
-                    if (x == null) {
-                        mRepo.insertQueuedMovie(film);
-                    } else {
-//                        if (film.isWatched()) {
-                            mRepo.updateQueuedFilm(film);
-//                        } else {
-//                            mRepo.removeQueuedMovie(String.valueOf(film.getId()));
-//                        }
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((x, y) -> {
-                    if (detailsFilmInFilmList()) {
-                        displayList.get(displayList.indexOf(film)).setQueued(film.isQueued());
-                        filmListPublishSubject.onNext(displayList);
-                    }
-                })
+                        .doOnEvent((x, y) -> {
+                            if (x == null) {
+                                film.setRanking(-1);
+                                mRepo.insertQueuedMovie(film);
+                                publishRankedMovies();
+                            } else {
+                                mRepo.updateQueuedFilm(film);
+                            }
+                        })
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe((x, y) -> {
+                            if (detailsFilmInFilmList()) {
+                                displayList.get(displayList.indexOf(film)).setQueued(film.isQueued());
+                                filmListPublishSubject.onNext(displayList);
+                            }
+                        })
         );
         return mFilmDetails;
     }
-
-//    public Single<FilmByPerson> checkIfMovieExistsFromDetails(FilmByPerson film) {
-//        return mRepo.checkIfMovieExists(film.getId())
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(Schedulers.io())
-//                .doOnEvent((x, y) -> {
-//                    if (x == null) {
-//                        addWatchedMovie(film);
-//                    } else {
-//                        removeWatchedMovie(String.valueOf(film.getId()));
-//                    }
-//                });
-//    }
 
     private boolean detailsFilmInFilmList() {
         if (mFilmDetails == null) {
@@ -803,15 +774,15 @@ public class MovieViewModel extends AndroidViewModel {
     public void updateRankingNew(FilmByPerson movie, int newRank) {
         mCompositeDisposable.add(checkIfMovieExists(movie)
                 .subscribe(x -> {
-                    if (x == null) {
-                        mRepo.insertMovie(movie);
-                    }
-                    mCompositeDisposable.add(mRepo.updateRankingNew(movie.getId(), newRank, isFilmRankings));
-                },
+                            if (x == null) {
+                                mRepo.insertMovie(movie);
+                            }
+                            mCompositeDisposable.add(mRepo.updateRankingNew(movie.getId(), newRank, isFilmRankings));
+                        },
                         e -> {
-                    mRepo.insertMovie(movie);
-                    mCompositeDisposable.add(mRepo.updateRankingNew(movie.getId(), newRank, isFilmRankings));
-                }
+                            mRepo.insertMovie(movie);
+                            mCompositeDisposable.add(mRepo.updateRankingNew(movie.getId(), newRank, isFilmRankings));
+                        }
                 )
         );
     }

@@ -129,7 +129,6 @@ public class BindingUtils {
     @BindingAdapter({"similarText", "detailsClickable"})
     public static void setSimilarText(TextView textView, ResultsPOJO similar, final View.OnClickListener clickListener) {
         if(similar == null) {
-            Log.d("similarr", "similar = null");
             return;
         }
         List<FilmByPerson> films = similar.getResults();
