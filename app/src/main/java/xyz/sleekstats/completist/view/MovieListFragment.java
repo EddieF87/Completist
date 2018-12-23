@@ -44,7 +44,7 @@ import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.databinding.FragmentListBinding;
 import xyz.sleekstats.completist.databinding.MovieKeys;
-import xyz.sleekstats.completist.model.FilmByPerson;
+import xyz.sleekstats.completist.model.MediaByPerson;
 import xyz.sleekstats.completist.model.PersonPOJO;
 import xyz.sleekstats.completist.model.WatchCount;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
@@ -59,7 +59,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private FloatingActionButton mListSaveButton;
     private RecyclerView mMoviesRecyclerView;
     private MovieAdapter mMovieAdapter;
-    private List<FilmByPerson> mCurrentFilmList;
+    private List<MediaByPerson> mCurrentFilmList;
     private TextView summaryTextView;
     private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
@@ -77,7 +77,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private FragmentListBinding fragmentListBinding;
 
     private PublishSubject<PersonPOJO> personPublishSubject;
-    private PublishSubject<List<FilmByPerson>> filmListPublishSubject;
+    private PublishSubject<List<MediaByPerson>> filmListPublishSubject;
     private PublishSubject<WatchCount> watchCountPublishSubject;
 
     public MovieListFragment() {
@@ -257,9 +257,9 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     }
 
     //Populate recyclerview with films from actor/director
-    private void setRecyclerView(List<FilmByPerson> filmByPersonList) {
+    private void setRecyclerView(List<MediaByPerson> mediaByPersonList) {
 
-        mCurrentFilmList = filmByPersonList;
+        mCurrentFilmList = mediaByPersonList;
         if (mMoviesRecyclerView == null) {
             View rootView = getView();
             if (rootView == null) { return; }
@@ -288,7 +288,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     @Override
     public void onFilmWatched(int pos) {
 
-        FilmByPerson film = mCurrentFilmList.get(pos);
+        MediaByPerson film = mCurrentFilmList.get(pos);
 
         listCompositeDisposable.add(movieViewModel.onMovieWatchedFromList(film)
                 .subscribeOn(Schedulers.io())
@@ -303,7 +303,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     @Override
     public void onFilmQueued(int pos) {
 
-        FilmByPerson film = mCurrentFilmList.get(pos);
+        MediaByPerson film = mCurrentFilmList.get(pos);
 
         listCompositeDisposable.add(movieViewModel.onMovieQueuedFromList(film)
                 .subscribeOn(Schedulers.io())
@@ -315,7 +315,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         );
     }
 
-    private void setItemWatched(FilmByPerson film, boolean watched, int pos) {
+    private void setItemWatched(MediaByPerson film, boolean watched, int pos) {
         if (mMovieAdapter == null) {
             return;
         }
@@ -323,7 +323,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
         mMovieAdapter.notifyItemChanged(pos);
     }
 
-    private void setItemQueued(FilmByPerson film, boolean queued, int pos) {
+    private void setItemQueued(MediaByPerson film, boolean queued, int pos) {
         if (mMovieAdapter == null) {
             return;
         }

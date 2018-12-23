@@ -16,7 +16,7 @@ public class PersonPOJO {
     private MovieCredits movieCredits;
 
     @SerializedName("tv_credits")
-    private MovieCredits tvCredits;
+    private ShowCredits tvCredits;
 
     @SerializedName("name")
     private String name;
@@ -48,7 +48,7 @@ public class PersonPOJO {
         return movieCredits;
     }
 
-    public MovieCredits getTvCredits() {
+    public ShowCredits getTvCredits() {
         return tvCredits;
     }
 

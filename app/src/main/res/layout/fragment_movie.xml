@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
             name="film"
-            type="xyz.sleekstats.completist.model.FilmPOJO" />
+            type="xyz.sleekstats.completist.model.MediaPOJO" />
 
         <variable
             name="detailsClick"

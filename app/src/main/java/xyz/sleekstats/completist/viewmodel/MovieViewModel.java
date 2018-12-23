@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,14 +21,17 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.databinding.MovieKeys;
 import xyz.sleekstats.completist.model.FilmByPerson;
-import xyz.sleekstats.completist.model.FilmListDetails;
 import xyz.sleekstats.completist.model.FilmPOJO;
+import xyz.sleekstats.completist.model.MediaByPerson;
+import xyz.sleekstats.completist.model.FilmListDetails;
+import xyz.sleekstats.completist.model.MediaPOJO;
 import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.model.GenreList;
 import xyz.sleekstats.completist.model.MediaQueryPOJO;
 import xyz.sleekstats.completist.model.MovieCredits;
 import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.PersonPOJO;
+import xyz.sleekstats.completist.model.ShowPOJO;
 import xyz.sleekstats.completist.model.WatchCount;
 import xyz.sleekstats.completist.service.Repo;
 
@@ -39,19 +43,19 @@ public class MovieViewModel extends AndroidViewModel {
 
     private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private final PublishSubject<PersonPOJO> personPublishSubject = PublishSubject.create();
-    private final PublishSubject<List<FilmByPerson>> filmListPublishSubject = PublishSubject.create();
-    private final PublishSubject<FilmPOJO> filmDetailsPublishSubject = PublishSubject.create();
+    private final PublishSubject<List<MediaByPerson>> filmListPublishSubject = PublishSubject.create();
+    private final PublishSubject<MediaPOJO> filmDetailsPublishSubject = PublishSubject.create();
     private final PublishSubject<WatchCount> watchCountPublishSubject = PublishSubject.create();
     private final PublishSubject<List<MyList>> popularActorsSubject = PublishSubject.create();
     private final PublishSubject<Integer> viewPagerSubject = PublishSubject.create();
-    private final PublishSubject<List<FilmByPerson>> rankingsSubject = PublishSubject.create();
+    private final PublishSubject<List<MediaByPerson>> rankingsSubject = PublishSubject.create();
 
     private FilmListDetails mFilmListDetails;
-    private FilmPOJO mFilmDetails;
+    private MediaPOJO mFilmDetails;
     private MovieCredits mMovieCredits;
     private int mTotalFilms;
     private int mWatchedFilms;
-    private final List<FilmByPerson> displayList = new ArrayList<>();
+    private final List<MediaByPerson> displayList = new ArrayList<>();
     private final List<MyList> popularActorList = new ArrayList<>();
     private int displayTotalFilms;
     private int displayWatchedFilms;
@@ -84,13 +88,11 @@ public class MovieViewModel extends AndroidViewModel {
         viewPagerSubject.onNext(2);
     }
 
-    private void updateShow(FilmPOJO filmPOJO) {
-        filmPOJO.setIsFilm(false);
-        checkForMovieFromDetails(filmPOJO);
+    private void updateShow(ShowPOJO showPOJO) {
+        checkForMovieFromDetails(showPOJO);
     }
 
     private void updateFilm(FilmPOJO filmPOJO) {
-        filmPOJO.setIsFilm(true);
         checkForMovieFromDetails(filmPOJO);
     }
 
@@ -126,7 +128,7 @@ public class MovieViewModel extends AndroidViewModel {
 
         filmsPageNumber = 1;
         Observable<PersonPOJO> personObservable;
-        Observable<List<FilmByPerson>> filmsObservable;
+        Observable<List<MediaByPerson>> filmsObservable;
 
         switch (personID) {
             case MovieKeys.LIST_WATCHED:
@@ -142,17 +144,20 @@ public class MovieViewModel extends AndroidViewModel {
             case MovieKeys.LIST_POPULAR:
                 mMovieCredits = null;
                 personObservable = Observable.just(new PersonPOJO("Popular", "Most popular movies on tmdb today.", "Movies", "", personID));
-                filmsObservable = setAsFilm(mRepo.getPopularFilms(filmsPageNumber));
+                filmsObservable = mRepo.getPopularFilms(filmsPageNumber)
+                        .flatMap(filmByPeople -> Observable.just(new ArrayList<>(filmByPeople)));
                 break;
             case MovieKeys.LIST_NOWPLAYING:
                 mMovieCredits = null;
                 personObservable = Observable.just(new PersonPOJO("Now Showing", "Movies currently playing in theaters.", "Movies", "", personID));
-                filmsObservable = setAsFilm(mRepo.getNowPlaying(filmsPageNumber));
+                filmsObservable = mRepo.getNowPlaying(filmsPageNumber)
+                        .flatMap(filmByPeople -> Observable.just(new ArrayList<>(filmByPeople)));
                 break;
             case MovieKeys.LIST_TOPRATED:
                 mMovieCredits = null;
                 personObservable = Observable.just(new PersonPOJO("Top Rated", "Top-rated movies on tmdb.", "Movies", "", personID));
-                filmsObservable = setAsFilm(mRepo.getTopRated(filmsPageNumber));
+                filmsObservable = mRepo.getTopRated(filmsPageNumber)
+                        .flatMap(filmByPeople -> Observable.just(new ArrayList<>(filmByPeople)));
                 break;
             default:
                 personObservable = mRepo.getFilmsByPerson(personID);
@@ -163,10 +168,10 @@ public class MovieViewModel extends AndroidViewModel {
                                 .subscribe(credits -> mMovieCredits = credits,
                                         e -> Log.e(TAG_RXERROR, "movieCreditsObservable e: " + e.getMessage()))
                 );
-                filmsObservable = setAsFilm(personObservable
+                filmsObservable = personObservable
                         .map(s -> s.getKnown_for_department().equals("Directing") || s.getKnown_for_department().equals("Writing")
                                 ? new ArrayList<>(s.getMovieCredits().getCrew()) : new ArrayList<>(s.getMovieCredits().getCast())
-                        ));
+                        );
         }
         mCompositeDisposable.add(
                 Observable.zip(personObservable, filmsObservable, FilmListDetails::new)
@@ -182,8 +187,9 @@ public class MovieViewModel extends AndroidViewModel {
         Observable<PersonPOJO> personObservable = Observable.just(
                 new PersonPOJO(genre.getName() + " (" + tvOrMovieString.substring(0, 1).toUpperCase() + tvOrMovieString.substring(1) + ")",
                         "", "Movies", "", MovieKeys.LIST_GENRE));
-        Observable<List<FilmByPerson>> filmsObservable
-                = setAsFilm(mRepo.getMoviesByGenre(tvOrMovieString, genreID, filmsPageNumber));
+        Observable<List<MediaByPerson>> filmsObservable
+                = mRepo.getMoviesByGenre(tvOrMovieString, genreID, filmsPageNumber)
+                .flatMap(filmByPeople -> Observable.just(new ArrayList<>(filmByPeople)));
 
         mCompositeDisposable.add(
                 Observable.zip(personObservable, filmsObservable, FilmListDetails::new)
@@ -201,15 +207,15 @@ public class MovieViewModel extends AndroidViewModel {
         return viewPagerSubject;
     }
 
-    public PublishSubject<List<FilmByPerson>> getFilmListPublishSubject() {
+    public PublishSubject<List<MediaByPerson>> getFilmListPublishSubject() {
         return filmListPublishSubject;
     }
 
-    public PublishSubject<List<FilmByPerson>> getRankingsSubject() {
+    public PublishSubject<List<MediaByPerson>> getRankingsSubject() {
         return rankingsSubject;
     }
 
-    public PublishSubject<FilmPOJO> getFilmDetailsPublishSubject() {
+    public PublishSubject<MediaPOJO> getFilmDetailsPublishSubject() {
         return filmDetailsPublishSubject;
     }
 
@@ -227,11 +233,11 @@ public class MovieViewModel extends AndroidViewModel {
 
         mFilmListDetails = details;
 
-        List<FilmByPerson> films = details.getFilmByPersonList();
+        List<MediaByPerson> films = details.getMediaByPersonList();
         mTotalFilms = films.size();
 
         displayList.clear();
-        displayList.addAll(mFilmListDetails.getFilmByPersonList());
+        displayList.addAll(mFilmListDetails.getMediaByPersonList());
         List<String> filmIDs = getFilmIDs(displayList);
 
         mCompositeDisposable.add(scanMoviesForWatched(filmIDs)
@@ -241,13 +247,13 @@ public class MovieViewModel extends AndroidViewModel {
         );
     }
 
-    private void updateWatched(Map<String, FilmByPerson> watchedFilms, List<FilmByPerson> totalFilms) {
+    private void updateWatched(Map<String, MediaByPerson> watchedFilms, List<MediaByPerson> totalFilms) {
 
         mWatchedFilms = 0;
 
-        for (FilmByPerson film : totalFilms) {
+        for (MediaByPerson film : totalFilms) {
             if (watchedFilms.containsKey(film.getId())) {
-                FilmByPerson film1 = watchedFilms.get(film.getId());
+                MediaByPerson film1 = watchedFilms.get(film.getId());
                 if (film1.isQueued()) {
                     film.setQueued(true);
                 }
@@ -270,13 +276,13 @@ public class MovieViewModel extends AndroidViewModel {
         filmListPublishSubject.onNext(totalFilms);
     }
 
-    private void updateDisplayWatched(Map<String, FilmByPerson> watchedFilms, List<FilmByPerson> totalFilms) {
+    private void updateDisplayWatched(Map<String, MediaByPerson> watchedFilms, List<MediaByPerson> totalFilms) {
 
         displayWatchedFilms = 0;
 
-        for (FilmByPerson film : totalFilms) {
+        for (MediaByPerson film : totalFilms) {
             if (watchedFilms.containsKey(film.getId())) {
-                FilmByPerson film1 = watchedFilms.get(film.getId());
+                MediaByPerson film1 = watchedFilms.get(film.getId());
                 if (film1.isQueued()) {
                     film.setQueued(true);
                 }
@@ -307,12 +313,13 @@ public class MovieViewModel extends AndroidViewModel {
     public void getMediaForRankings(String mediaId) {
         if (isFilmRankings) {
             mCompositeDisposable.add(mRepo.getFilm(mediaId)
-                    .subscribe(filmPOJO -> addRankedMovie(filmPOJO, true),
+                    .subscribe(this::addRankedMovie,
                             e -> Log.e(TAG_RXERROR, "getMediaForRankings mRepo.getFilm e = " + e.getMessage()))
             );
-        } else {
+        }
+        else {
             mCompositeDisposable.add(mRepo.getShow(mediaId)
-                    .subscribe(filmPOJO -> addRankedMovie(filmPOJO, false),
+                    .subscribe(this::addRankedMovie,
                             e -> Log.e(TAG_RXERROR, "getMediaForRankings mRepo.getShow e = " + e.getMessage()))
             );
         }
@@ -359,18 +366,16 @@ public class MovieViewModel extends AndroidViewModel {
         popularActorsSubject.onNext(popularActorList);
     }
 
-    private void addWatchedMovie(FilmByPerson movie) {
+    private void addWatchedMovie(MediaByPerson movie) {
         movie.setRanking(-1);
         mCompositeDisposable.add(mRepo.insertMovie(movie));
         updateWatchedMovieCount(movie.getId(), 1);
         publishRankedMovies();
     }
 
-    private void addRankedMovie(FilmPOJO filmPOJO, boolean isFilm) {
+    private void addRankedMovie(MediaPOJO mediaPOJO) {
 
-        FilmByPerson movie = new FilmByPerson(filmPOJO.getTitle(), filmPOJO.getId(), filmPOJO.getPoster_path());
-        movie.setRanking(-1);
-        movie.setIsFilm(isFilm);
+        MediaByPerson movie = new MediaByPerson(mediaPOJO.getTitle(), mediaPOJO.getId(), mediaPOJO.getPoster_path(), mediaPOJO.isFilm());
 
         mCompositeDisposable.add(checkIfMovieExists(movie)
                 .subscribe(x -> {
@@ -387,7 +392,7 @@ public class MovieViewModel extends AndroidViewModel {
         );
     }
 
-    private void updateWatchedMovie(FilmByPerson movie) {
+    private void updateWatchedMovie(MediaByPerson movie) {
         mCompositeDisposable.add(mRepo.updateFilm(movie));
         if (movie.isWatched()) {
             updateWatchedMovieCount(movie.getId(), 1);
@@ -414,9 +419,9 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     private Single<Boolean> movieInListObservable(String id) {
-        return Observable.just(mFilmListDetails.getFilmByPersonList())
+        return Observable.just(mFilmListDetails.getMediaByPersonList())
                 .flatMapIterable(list -> list)
-                .map(FilmByPerson::getId)
+                .map(MediaByPerson::getId)
                 .contains(id);
     }
 
@@ -432,13 +437,13 @@ public class MovieViewModel extends AndroidViewModel {
         mRepo.updateList(numberSeen, numberOfMovies, id);
     }
 
-    private Single<FilmByPerson> checkIfMovieExists(FilmByPerson film) {
+    private Single<MediaByPerson> checkIfMovieExists(MediaByPerson film) {
         return mRepo.checkIfMovieExists(film.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io());
     }
 
-    public Single<FilmByPerson> onMovieWatchedFromList(FilmByPerson film) {
+    public Single<MediaByPerson> onMovieWatchedFromList(MediaByPerson film) {
         film.reverseWatched();
         return checkIfMovieExists(film)
                 .doOnEvent((x, y) -> {
@@ -457,7 +462,7 @@ public class MovieViewModel extends AndroidViewModel {
                 );
     }
 
-    public Single<FilmByPerson> onMovieQueuedFromList(FilmByPerson film) {
+    public Single<MediaByPerson> onMovieQueuedFromList(MediaByPerson film) {
         film.reverseQueued();
         return checkIfMovieExists(film)
                 .doOnEvent((x, y) -> {
@@ -478,75 +483,75 @@ public class MovieViewModel extends AndroidViewModel {
                 );
     }
 
-    public FilmPOJO onMovieWatchedFromDetails(FilmPOJO filmPOJO) {
+    public MediaPOJO onMovieWatchedFromDetails(MediaPOJO mediaPOJO) {
         if (mFilmDetails == null) {
-            mFilmDetails = filmPOJO;
+            mFilmDetails = mediaPOJO;
             if (mFilmDetails == null) {
-                return new FilmPOJO();
+                return new MediaPOJO();
             }
         }
         mFilmDetails.reverseWatched();
-        FilmByPerson film = new FilmByPerson(mFilmDetails.getTitle(), mFilmDetails.getId(), mFilmDetails.getPoster_path());
+        MediaByPerson film = new MediaByPerson(mFilmDetails.getTitle(), mFilmDetails.getId(), mFilmDetails.getPoster_path(), mFilmDetails.isFilm());
         film.setWatched(mFilmDetails.isWatched());
         film.setQueued(mFilmDetails.isQueued());
         film.setIsFilm(mFilmDetails.isFilm());
         mCompositeDisposable.add(checkIfMovieExists(film)
-                        .doOnEvent((x, y) -> {
-                            if (x == null) {
-                                film.setRanking(-1);
-                                mCompositeDisposable.add(mRepo.insertMovie(film));
-                                publishRankedMovies();
-                            } else {
-                                mCompositeDisposable.add(mRepo.updateFilm(film));
-                            }
-                        })
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe((x, y) -> {
-                                    if (detailsFilmInFilmList()) {
-                                        displayList.get(displayList.indexOf(film)).setWatched(film.isWatched());
-                                        filmListPublishSubject.onNext(displayList);
-                                        if (film.isWatched()) {
-                                            updateWatchedMovieCount(film.getId(), 1);
-                                        } else {
-                                            updateWatchedMovieCount(film.getId(), -1);
-                                        }
-                                    }
+                .doOnEvent((x, y) -> {
+                    if (x == null) {
+                        film.setRanking(-1);
+                        mCompositeDisposable.add(mRepo.insertMovie(film));
+                        publishRankedMovies();
+                    } else {
+                        mCompositeDisposable.add(mRepo.updateFilm(film));
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((x, y) -> {
+                            if (detailsFilmInFilmList()) {
+                                displayList.get(displayList.indexOf(film)).setWatched(film.isWatched());
+                                filmListPublishSubject.onNext(displayList);
+                                if (film.isWatched()) {
+                                    updateWatchedMovieCount(film.getId(), 1);
+                                } else {
+                                    updateWatchedMovieCount(film.getId(), -1);
                                 }
-                        )
+                            }
+                        }
+                )
         );
         return mFilmDetails;
     }
 
-    public FilmPOJO onMovieQueuedFromDetails(FilmPOJO filmPOJO) {
+    public MediaPOJO onMovieQueuedFromDetails(MediaPOJO mediaPOJO) {
 
         if (mFilmDetails == null) {
-            mFilmDetails = filmPOJO;
+            mFilmDetails = mediaPOJO;
             if (mFilmDetails == null) {
-                return new FilmPOJO();
+                return new MediaPOJO();
             }
         }
         mFilmDetails.reverseQueued();
-        FilmByPerson film = new FilmByPerson(mFilmDetails.getTitle(), mFilmDetails.getId(), mFilmDetails.getPoster_path());
+        MediaByPerson film = new MediaByPerson(mFilmDetails.getTitle(), mFilmDetails.getId(), mFilmDetails.getPoster_path(), mFilmDetails.isFilm());
         film.setWatched(mFilmDetails.isWatched());
         film.setQueued(mFilmDetails.isQueued());
-        film.setIsFilm(mFilmDetails.isFilm());
+
         mCompositeDisposable.add(checkIfMovieExists(film)
-                        .doOnEvent((x, y) -> {
-                            if (x == null) {
-                                film.setRanking(-1);
-                                mRepo.insertQueuedMovie(film);
-                                publishRankedMovies();
-                            } else {
-                                mRepo.updateQueuedFilm(film);
-                            }
-                        })
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe((x, y) -> {
-                            if (detailsFilmInFilmList()) {
-                                displayList.get(displayList.indexOf(film)).setQueued(film.isQueued());
-                                filmListPublishSubject.onNext(displayList);
-                            }
-                        })
+                .doOnEvent((x, y) -> {
+                    if (x == null) {
+                        film.setRanking(-1);
+                        mRepo.insertQueuedMovie(film);
+                        publishRankedMovies();
+                    } else {
+                        mRepo.updateQueuedFilm(film);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((x, y) -> {
+                    if (detailsFilmInFilmList()) {
+                        displayList.get(displayList.indexOf(film)).setQueued(film.isQueued());
+                        filmListPublishSubject.onNext(displayList);
+                    }
+                })
         );
         return mFilmDetails;
     }
@@ -559,35 +564,35 @@ public class MovieViewModel extends AndroidViewModel {
         return filmIDs.contains(mFilmDetails.getId());
     }
 
-    private Single<FilmByPerson> checkMovie(FilmPOJO filmPOJO) {
-        if (filmPOJO.getId() == null) {
-            filmPOJO.setId("");
+    private Single<MediaByPerson> checkMovie(MediaPOJO mediaPOJO) {
+        if (mediaPOJO.getId() == null) {
+            mediaPOJO.setId("");
         }
 
-        return mRepo.checkIfMovieExists(filmPOJO.getId())
+        return mRepo.checkIfMovieExists(mediaPOJO.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
 
-    private void checkForMovieFromDetails(FilmPOJO filmPOJO) {
+    private void checkForMovieFromDetails(MediaPOJO mediaPOJO) {
         mCompositeDisposable.add(
-                checkMovie(filmPOJO)
+                checkMovie(mediaPOJO)
                         .subscribe(
-                                film -> setQueuedAndWatched(film, filmPOJO),
-                                error -> publishFilmDetails(filmPOJO)
+                                film -> setQueuedAndWatched(film, mediaPOJO),
+                                error -> publishFilmDetails(mediaPOJO)
                         )
         );
     }
 
-    private void setQueuedAndWatched(FilmByPerson film, FilmPOJO filmPOJO) {
-        filmPOJO.setWatched(film.isWatched());
-        filmPOJO.setQueued(film.isQueued());
-        publishFilmDetails(filmPOJO);
+    private void setQueuedAndWatched(MediaByPerson film, MediaPOJO mediaPOJO) {
+        mediaPOJO.setWatched(film.isWatched());
+        mediaPOJO.setQueued(film.isQueued());
+        publishFilmDetails(mediaPOJO);
     }
 
-    private void publishFilmDetails(FilmPOJO filmPOJO) {
-        mFilmDetails = filmPOJO;
+    private void publishFilmDetails(MediaPOJO mediaPOJO) {
+        mFilmDetails = mediaPOJO;
         filmDetailsPublishSubject.onNext(mFilmDetails);
     }
 
@@ -615,7 +620,7 @@ public class MovieViewModel extends AndroidViewModel {
         return mRepo.checkIfListExists(id);
     }
 
-    private Single<List<FilmByPerson>> getAllMovies(List<String> ids) {
+    private Single<List<MediaByPerson>> getAllMovies(List<String> ids) {
         return mRepo.getAllMovies(ids);
     }
 
@@ -640,22 +645,22 @@ public class MovieViewModel extends AndroidViewModel {
             return;
         }
 
-        Set<FilmByPerson> filmByPersonSet;
+        Set<MediaByPerson> mediaByPersonSet;
         switch (pos) {
             case 1:
-                filmByPersonSet = mMovieCredits.getCast();
+                mediaByPersonSet = new HashSet<>(mMovieCredits.getCast());
                 break;
             case 2:
-                filmByPersonSet = mMovieCredits.getCrew();
+                mediaByPersonSet = new HashSet<>(mMovieCredits.getCrew());
                 break;
             case 3:
-                filmByPersonSet = mFilmListDetails.getPersonPOJO().getTvCredits().bothLists();
+                mediaByPersonSet = new HashSet<>(mFilmListDetails.getPersonPOJO().getTvCredits().bothLists());
                 break;
             default:
-                filmByPersonSet = mMovieCredits.bothLists();
+                mediaByPersonSet = new HashSet<>(mMovieCredits.bothLists());
         }
         displayList.clear();
-        displayList.addAll(filmByPersonSet);
+        displayList.addAll(mediaByPersonSet);
 
         List<String> filmIDs = getFilmIDs(displayList);
 
@@ -667,20 +672,20 @@ public class MovieViewModel extends AndroidViewModel {
         );
     }
 
-    private List<String> getFilmIDs(List<FilmByPerson> films) {
+    private List<String> getFilmIDs(List<MediaByPerson> films) {
         List<String> filmIDs = new ArrayList<>();
-        for (FilmByPerson film : films) {
+        for (MediaByPerson film : films) {
             filmIDs.add(film.getId());
         }
         return filmIDs;
     }
 
-    private Single<Map<String, FilmByPerson>> scanMoviesForWatched(List<String> filmIDs) {
+    private Single<Map<String, MediaByPerson>> scanMoviesForWatched(List<String> filmIDs) {
         return getAllMovies(filmIDs)
                 .subscribeOn(Schedulers.io())
                 .flattenAsObservable(s -> s)
                 .filter(film -> filmIDs.contains(film.getId()))
-                .toMap(FilmByPerson::getId)
+                .toMap(MediaByPerson::getId)
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -688,16 +693,6 @@ public class MovieViewModel extends AndroidViewModel {
     protected void onCleared() {
         super.onCleared();
         mCompositeDisposable.clear();
-    }
-
-    private Observable<List<FilmByPerson>> setAsFilm(Observable<List<FilmByPerson>> listObservable) {
-        return listObservable
-                .flatMap(list -> {
-                    for (FilmByPerson film : list) {
-                        film.setIsFilm(true);
-                    }
-                    return Observable.just(list);
-                });
     }
 
     public void finishScrollLoading() {
@@ -714,41 +709,42 @@ public class MovieViewModel extends AndroidViewModel {
         Observable<List<FilmByPerson>> filmsObservable;
         switch (mFilmListDetails.getPersonPOJO().getId()) {
             case MovieKeys.LIST_POPULAR:
-                filmsObservable = setAsFilm(mRepo.getPopularFilms(filmsPageNumber));
+                filmsObservable = mRepo.getPopularFilms(filmsPageNumber);
                 break;
             case MovieKeys.LIST_NOWPLAYING:
-                filmsObservable = setAsFilm(mRepo.getNowPlaying(filmsPageNumber));
+                filmsObservable = mRepo.getNowPlaying(filmsPageNumber);
                 break;
             case MovieKeys.LIST_TOPRATED:
-                filmsObservable = setAsFilm(mRepo.getTopRated(filmsPageNumber));
+                filmsObservable = mRepo.getTopRated(filmsPageNumber);
                 break;
             case MovieKeys.LIST_GENRE:
-                filmsObservable = setAsFilm(mRepo.getMoviesByGenre(tvOrMovieString, genreID, filmsPageNumber));
+                filmsObservable = mRepo.getMoviesByGenre(tvOrMovieString, genreID, filmsPageNumber);
                 break;
             default:
                 return;
         }
 
         mCompositeDisposable.add(filmsObservable
-                .subscribe(filmByPeople -> {
-                            displayList.addAll(filmByPeople);
-                            List<String> filmIDs = getFilmIDs(displayList);
-                            mTotalFilms = displayList.size();
+                        .flatMap(filmByPeople -> Observable.just(new ArrayList<>(filmByPeople)))
+                        .subscribe(filmByPeople -> {
+                                    displayList.addAll(filmByPeople);
+                                    List<String> filmIDs = getFilmIDs(displayList);
+                                    mTotalFilms = displayList.size();
 
-                            mCompositeDisposable.add(scanMoviesForWatched(filmIDs)
-                                    .subscribe(watchedList -> updateWatched(watchedList, displayList),
-                                            e -> {
-                                                Log.e(TAG_RXERROR, "scanMoviesForWatched e=" + e.getMessage());
-                                                filmsPageNumber--;
-                                                finishScrollLoading();
-                                            })
-                            );
-                        }, e -> {
-                            Log.e(TAG_RXERROR, "onScrollEnd e=" + e.getMessage());
-                            filmsPageNumber--;
-                            finishScrollLoading();
-                        }
-                )
+                                    mCompositeDisposable.add(scanMoviesForWatched(filmIDs)
+                                            .subscribe(watchedList -> updateWatched(watchedList, displayList),
+                                                    e -> {
+                                                        Log.e(TAG_RXERROR, "scanMoviesForWatched e=" + e.getMessage());
+                                                        filmsPageNumber--;
+                                                        finishScrollLoading();
+                                                    })
+                                    );
+                                }, e -> {
+                                    Log.e(TAG_RXERROR, "onScrollEnd e=" + e.getMessage());
+                                    filmsPageNumber--;
+                                    finishScrollLoading();
+                                }
+                        )
         );
     }
 
@@ -771,7 +767,7 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
 
-    public void updateRankingNew(FilmByPerson movie, int newRank) {
+    public void updateRankingNew(MediaByPerson movie, int newRank) {
         mCompositeDisposable.add(checkIfMovieExists(movie)
                 .subscribe(x -> {
                             if (x == null) {
@@ -799,11 +795,12 @@ public class MovieViewModel extends AndroidViewModel {
         mCompositeDisposable.add(mRepo.updateRankingDown(id, oldRank, newRank, isFilmRankings));
     }
 
-    public Observable<List<FilmByPerson>> getPopularForRankings() {
-        return isFilmRankings ? setAsFilm(mRepo.getPopularFilms(1)) : mRepo.getPopularShows(1);
+    public Observable<List<MediaByPerson>> getPopularForRankings() {
+        return (isFilmRankings ? mRepo.getPopularFilms(1) : mRepo.getPopularShows(1))
+                .flatMap(mediaByPeople -> Observable.just(new ArrayList<>(mediaByPeople)));
     }
 
-    public Single<List<FilmByPerson>> getWatchedForRankings() {
+    public Single<List<MediaByPerson>> getWatchedForRankings() {
         return mRepo.getSavedForRankings(isFilmRankings);
     }
 }

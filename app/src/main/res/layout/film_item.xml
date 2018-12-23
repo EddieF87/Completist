@@ -4,7 +4,7 @@
         <import type="xyz.sleekstats.completist.databinding.BindingUtils"/>
         <variable
             name="film"
-            type="xyz.sleekstats.completist.model.FilmByPerson"/>
+            type="xyz.sleekstats.completist.model.MediaByPerson"/>
     </data>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/tools"

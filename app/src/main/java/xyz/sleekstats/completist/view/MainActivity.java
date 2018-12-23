@@ -31,7 +31,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.R;
-import xyz.sleekstats.completist.model.FilmPOJO;
+import xyz.sleekstats.completist.model.MediaPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 public class MainActivity extends AppCompatActivity {
@@ -251,8 +251,8 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void populateAdapter(List<FilmPOJO> filmPOJOs) {
-        if (filmPOJOs == null) {
+    private void populateAdapter(List<MediaPOJO> mediaPOJOS) {
+        if (mediaPOJOS == null) {
             return;
         }
         String[] columns = {
@@ -264,13 +264,13 @@ public class MainActivity extends AppCompatActivity {
 
         MatrixCursor cursor = new MatrixCursor(columns);
 
-        for (int i = 0; i < filmPOJOs.size(); i++) {
+        for (int i = 0; i < mediaPOJOS.size(); i++) {
 
-            FilmPOJO filmPOJO = filmPOJOs.get(i);
+            MediaPOJO mediaPOJO = mediaPOJOS.get(i);
 
-            String type = filmPOJO.getMedia_type();
-            String id = filmPOJO.getId();
-            String name = filmPOJO.getTitle() + " (" + type.toUpperCase() + ")";
+            String type = mediaPOJO.getMedia_type();
+            String id = mediaPOJO.getId();
+            String name = mediaPOJO.getTitle() + " (" + type.toUpperCase() + ")";
 
             String[] row = {Integer.toString(i), name, id, type};
             cursor.addRow(row);

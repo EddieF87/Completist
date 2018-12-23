@@ -21,10 +21,8 @@ import android.view.ViewTreeObserver;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.google.common.collect.Lists;
 import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 import com.woxthebox.draglistview.BoardView;
-import com.woxthebox.draglistview.DragItemAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +33,8 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import xyz.sleekstats.completist.R;
-import xyz.sleekstats.completist.model.FilmByPerson;
-import xyz.sleekstats.completist.model.FilmPOJO;
+import xyz.sleekstats.completist.model.MediaByPerson;
+import xyz.sleekstats.completist.model.MediaPOJO;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
 /**
@@ -49,11 +47,11 @@ public class RankingsFragment extends Fragment
     private boolean itemDragStarted;
     private MovieViewModel movieViewModel;
     private final CompositeDisposable listCompositeDisposable = new CompositeDisposable();
-    private PublishSubject<List<FilmByPerson>> rankingsSubject;
+    private PublishSubject<List<MediaByPerson>> rankingsSubject;
     private RankingsAdapter mUnrankedAListdapter;
     private RankingsAdapter mRankedAListdapter;
     private SimpleCursorAdapter mSearchAdapter;
-    private final List<FilmByPerson> rankedList = new ArrayList<>();
+    private final List<MediaByPerson> rankedList = new ArrayList<>();
 
 
     private static final String SEARCH_TITLE = "title";
@@ -107,7 +105,7 @@ public class RankingsFragment extends Fragment
                     return;
                 }
 
-                FilmByPerson movie;
+                MediaByPerson movie;
                 String movieID;
                 try {
                     RankingsAdapter adapter = (RankingsAdapter) mBoardView.getAdapter(toColumn);
@@ -232,11 +230,11 @@ public class RankingsFragment extends Fragment
         return view;
     }
 
-    private void addMovies(List<FilmByPerson> movies) {
+    private void addMovies(List<MediaByPerson> movies) {
         rankedList.clear();
-        List<FilmByPerson> unrankedList = new ArrayList<>();
+        List<MediaByPerson> unrankedList = new ArrayList<>();
 
-        for (FilmByPerson movie : movies) {
+        for (MediaByPerson movie : movies) {
             if(movie.getRanking() >= 0) {
                 rankedList.add(movie);
             } else {
@@ -247,11 +245,11 @@ public class RankingsFragment extends Fragment
         addRankedColumn(rankedList);
     }
 
-    private void addRankedColumn(List<FilmByPerson> movies) {
+    private void addRankedColumn(List<MediaByPerson> movies) {
 
-        final ArrayList<Pair<Long, FilmByPerson>> mItemArray = new ArrayList<>();
+        final ArrayList<Pair<Long, MediaByPerson>> mItemArray = new ArrayList<>();
         for (int i = 0; i < movies.size(); i++) {
-            FilmByPerson movie = movies.get(i);
+            MediaByPerson movie = movies.get(i);
             mItemArray.add(new Pair<>(Long.parseLong(movie.getId()), movie));
         }
 
@@ -268,11 +266,11 @@ public class RankingsFragment extends Fragment
 
 
 
-    private void addUnrankedColumn(List<FilmByPerson> movies) {
+    private void addUnrankedColumn(List<MediaByPerson> movies) {
 
-        final ArrayList<Pair<Long, FilmByPerson>> mItemArray = new ArrayList<>();
+        final ArrayList<Pair<Long, MediaByPerson>> mItemArray = new ArrayList<>();
         for (int i = 0; i < movies.size(); i++) {
-            FilmByPerson movie = movies.get(i);
+            MediaByPerson movie = movies.get(i);
             if(rankedList.contains(movie)) {
                 continue;
             }
@@ -300,8 +298,8 @@ public class RankingsFragment extends Fragment
         movieViewModel.getShowInfo(id);
     }
 
-    private void populateAdapter(List<FilmPOJO> filmPOJOs) {
-        if (filmPOJOs == null) {
+    private void populateAdapter(List<MediaPOJO> mediaPOJOS) {
+        if (mediaPOJOS == null) {
             return;
         }
         String[] columns = {
@@ -312,12 +310,12 @@ public class RankingsFragment extends Fragment
 
         MatrixCursor cursor = new MatrixCursor(columns);
 
-        for (int i = 0; i < filmPOJOs.size(); i++) {
+        for (int i = 0; i < mediaPOJOS.size(); i++) {
 
-            FilmPOJO filmPOJO = filmPOJOs.get(i);
+            MediaPOJO mediaPOJO = mediaPOJOS.get(i);
 
-            String id = filmPOJO.getId();
-            String name = filmPOJO.getTitle();
+            String id = mediaPOJO.getId();
+            String name = mediaPOJO.getTitle();
 
             String[] row = {Integer.toString(i), name, id};
             cursor.addRow(row);

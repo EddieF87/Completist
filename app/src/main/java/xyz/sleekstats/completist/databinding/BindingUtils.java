@@ -7,14 +7,13 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import java.util.List;
 
 import xyz.sleekstats.completist.R;
-import xyz.sleekstats.completist.model.FilmByPerson;
+import xyz.sleekstats.completist.model.MediaByPerson;
 import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.model.ResultsPOJO;
 import xyz.sleekstats.completist.model.WatchCount;
@@ -131,11 +130,11 @@ public class BindingUtils {
         if(similar == null) {
             return;
         }
-        List<FilmByPerson> films = similar.getResults();
+        List<MediaByPerson> films = similar.getResults();
         SpannableStringBuilder stringBuilder = new SpannableStringBuilder("Similar: ");
         int maxFilms = Math.min(10, films.size());
         for (int i = 0; i < maxFilms; i++) {
-            FilmByPerson film = films.get(i);
+            MediaByPerson film = films.get(i);
             SpannableString ss = new SpannableString(film.getTitle());
             ss.setSpan(new MovieClickableSpan(film.getId(), clickListener), 0, film.getTitle().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             stringBuilder.append(ss).append(" / ");

@@ -7,7 +7,7 @@ import android.content.Context;
 
 import xyz.sleekstats.completist.service.MovieDao;
 
-@Database(entities = {FilmByPerson.class, MyList.class}, version = 1)
+@Database(entities = {MediaByPerson.class, MyList.class}, version = 1)
 public abstract class MovieRoomDB  extends RoomDatabase {
 
     public abstract MovieDao movieDao();

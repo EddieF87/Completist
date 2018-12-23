@@ -1,9 +1,9 @@
 package xyz.sleekstats.completist.model;
 
-public class FilmPOJO extends MediaPOJO {
+public class ShowPOJO extends MediaPOJO {
 
     @Override
     public boolean isFilm() {
-        return true;
+        return false;
     }
 }

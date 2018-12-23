@@ -5,18 +5,18 @@ import java.util.List;
 public class FilmListDetails {
 
     private final PersonPOJO personPOJO;
-    private final List<FilmByPerson> filmByPersonList;
+    private final List<MediaByPerson> mediaByPersonList;
 
-    public FilmListDetails(PersonPOJO personPOJO, List<FilmByPerson> filmByPersonList) {
+    public FilmListDetails(PersonPOJO personPOJO, List<MediaByPerson> mediaByPersonList) {
         this.personPOJO = personPOJO;
-        this.filmByPersonList = filmByPersonList;
+        this.mediaByPersonList = mediaByPersonList;
     }
 
     public PersonPOJO getPersonPOJO() {
         return personPOJO;
     }
 
-    public List<FilmByPerson> getFilmByPersonList() {
-        return filmByPersonList;
+    public List<MediaByPerson> getMediaByPersonList() {
+        return mediaByPersonList;
     }
 }

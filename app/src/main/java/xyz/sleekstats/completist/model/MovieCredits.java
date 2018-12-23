@@ -25,10 +25,9 @@ public class MovieCredits {
 
     public Set<FilmByPerson> bothLists() {
         if(both == null) {
-            Set<FilmByPerson> filmByPersonSet = new HashSet<>(cast);
-            filmByPersonSet.addAll(getCrew());
-//            both = new ArrayList<>(filmByPersonSet);
-            both = filmByPersonSet;
+            Set<FilmByPerson> FilmByPersonSet = new HashSet<>(cast);
+            FilmByPersonSet.addAll(getCrew());
+            both = FilmByPersonSet;
         }
         return both;
     }
@@ -40,7 +39,6 @@ public class MovieCredits {
                 filteredSet.add(film);
             }
         }
-//        return new ArrayList<>(filteredSet);
         return filteredSet;
     }
 }

@@ -8,11 +8,10 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import xyz.sleekstats.completist.model.FilmByPerson;
+import xyz.sleekstats.completist.model.MediaByPerson;
 import xyz.sleekstats.completist.model.MyList;
 
 @Dao
@@ -21,34 +20,34 @@ public interface MovieDao {
     //Movies Table
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertMovie(FilmByPerson myMovie);
+    void insertMovie(MediaByPerson myMovie);
 
     @Update
-    void updateMovie(FilmByPerson film);
+    void updateMovie(MediaByPerson film);
 
     @Query("SELECT * from movie_table WHERE isFilm == :isFilmRankings ORDER BY ranking ASC")
-    Single<List<FilmByPerson>> getSavedForRankings(int isFilmRankings);
+    Single<List<MediaByPerson>> getSavedForRankings(int isFilmRankings);
 
     @Query("SELECT * from movie_table WHERE isWatched == 1")
-    Single<List<FilmByPerson>> getSavedWatchedMovies();
+    Single<List<MediaByPerson>> getSavedWatchedMovies();
 
     @Query("SELECT * from movie_table WHERE isQueued == 1")
-    Single<List<FilmByPerson>> getSavedQueuedMovies();
+    Single<List<MediaByPerson>> getSavedQueuedMovies();
 
     @Query("DELETE FROM movie_table WHERE id LIKE :id")
     void removeMovie(String id);
 
     @Query("SELECT * FROM movie_table WHERE id LIKE :id")
-    Single<FilmByPerson> checkIfMovieExists(String id);
+    Single<MediaByPerson> checkIfMovieExists(String id);
 
     @Query("SELECT * FROM movie_table WHERE id IN (:ids)")
-    Single<List<FilmByPerson>> getAllMoviesInList(List<String> ids);
+    Single<List<MediaByPerson>> getAllMoviesInList(List<String> ids);
 
     @Query("SELECT * FROM movie_table WHERE id IN (:ids) AND isWatched == 1")
-    Single<List<FilmByPerson>> getWatchedMoviesInList(List<String> ids);
+    Single<List<MediaByPerson>> getWatchedMoviesInList(List<String> ids);
 
     @Query("SELECT * FROM movie_table WHERE id IN (:ids) AND isQueued == 1")
-    Single<List<FilmByPerson>> getQueuedMoviesInList(List<String> ids);
+    Single<List<MediaByPerson>> getQueuedMoviesInList(List<String> ids);
 
     @Query("UPDATE movie_table SET ranking = ranking + 1 WHERE ranking >= :newRank AND ranking < :oldRank AND isFilm == :isFilmRankings")
     void updateOtherRankingsDown(int oldRank, int newRank, int isFilmRankings);

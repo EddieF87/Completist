@@ -7,9 +7,9 @@ import java.util.List;
 public class MediaQueryPOJO {
 
     @SerializedName("results")
-    private List<FilmPOJO> results;
+    private List<MediaPOJO> results;
 
-    public List<FilmPOJO> getResults() {
+    public List<MediaPOJO> getResults() {
         return results;
     }
 }

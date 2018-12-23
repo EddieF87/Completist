@@ -12,9 +12,9 @@ import com.woxthebox.draglistview.DragItemAdapter;
 import java.util.ArrayList;
 
 import xyz.sleekstats.completist.R;
-import xyz.sleekstats.completist.model.FilmByPerson;
+import xyz.sleekstats.completist.model.MediaByPerson;
 
-class RankingsAdapter extends DragItemAdapter<Pair<Long, FilmByPerson>, RankingsAdapter.ViewHolder> {
+class RankingsAdapter extends DragItemAdapter<Pair<Long, MediaByPerson>, RankingsAdapter.ViewHolder> {
 
     private int mLayoutId;
     private int mGrabHandleId;
@@ -22,7 +22,7 @@ class RankingsAdapter extends DragItemAdapter<Pair<Long, FilmByPerson>, Rankings
     private final boolean isRanked;
     private ItemClickListener mClickListener;
 
-    RankingsAdapter(ArrayList<Pair<Long, FilmByPerson>> list, boolean ranked) {
+    RankingsAdapter(ArrayList<Pair<Long, MediaByPerson>> list, boolean ranked) {
         mLayoutId = R.layout.rank_item;
         mGrabHandleId = R.id.grabber;
         mDragOnLongPress = false;
@@ -40,7 +40,7 @@ class RankingsAdapter extends DragItemAdapter<Pair<Long, FilmByPerson>, Rankings
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
-        FilmByPerson film = mItemList.get(position).second;
+        MediaByPerson film = mItemList.get(position).second;
         holder.bindFilm(film);
         if(isRanked) {
             String positionText = String.valueOf(position+1);
@@ -54,14 +54,14 @@ class RankingsAdapter extends DragItemAdapter<Pair<Long, FilmByPerson>, Rankings
         return mItemList.get(position).first;
     }
 
-    public FilmByPerson getFilmOrShow(int position) {
+    public MediaByPerson getFilmOrShow(int position) {
         return mItemList.get(position).second;
     }
 
     class ViewHolder extends DragItemAdapter.ViewHolder {
         private TextView mMovieTextView;
         private TextView mRankTextView;
-        private FilmByPerson mFilm;
+        private MediaByPerson mFilm;
 
         ViewHolder(final View itemView) {
             super(itemView, mGrabHandleId, mDragOnLongPress);
@@ -69,7 +69,7 @@ class RankingsAdapter extends DragItemAdapter<Pair<Long, FilmByPerson>, Rankings
             mRankTextView = itemView.findViewById(R.id.grabber);
         }
 
-        private void bindFilm(FilmByPerson film) {
+        private void bindFilm(MediaByPerson film) {
             mFilm = film;
             mMovieTextView.setText(mFilm.getTitle());
         }

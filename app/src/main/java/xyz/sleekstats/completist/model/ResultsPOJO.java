@@ -7,9 +7,9 @@ import java.util.List;
 public class ResultsPOJO {
 
     @SerializedName("results")
-    private List<FilmByPerson> results;
+    private List<MediaByPerson> results;
 
-    public List<FilmByPerson> getResults() {
+    public List<MediaByPerson> getResults() {
         return results;
     }
 }

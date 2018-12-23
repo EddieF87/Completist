@@ -20,13 +20,18 @@ import xyz.sleekstats.completist.model.CastCredits;
 import xyz.sleekstats.completist.model.CastInfo;
 import xyz.sleekstats.completist.model.FilmByPerson;
 import xyz.sleekstats.completist.model.FilmPOJO;
+import xyz.sleekstats.completist.model.MediaPOJO;
+import xyz.sleekstats.completist.model.FilmResultsPOJO;
 import xyz.sleekstats.completist.model.GenreList;
+import xyz.sleekstats.completist.model.MediaByPerson;
+import xyz.sleekstats.completist.model.MediaQueryPOJO;
 import xyz.sleekstats.completist.model.MovieRoomDB;
 import xyz.sleekstats.completist.model.MyList;
 import xyz.sleekstats.completist.model.PersonPOJO;
-import xyz.sleekstats.completist.model.MediaQueryPOJO;
 import xyz.sleekstats.completist.model.PersonQueryPOJO;
-import xyz.sleekstats.completist.model.ResultsPOJO;
+import xyz.sleekstats.completist.model.ShowByPerson;
+import xyz.sleekstats.completist.model.ShowPOJO;
+import xyz.sleekstats.completist.model.ShowResultsPOJO;
 
 public class Repo {
 
@@ -95,7 +100,7 @@ public class Repo {
     }
 
     //Get specific film details based  Tmdb film id
-    public Single<FilmPOJO> getShow(String show_id) {
+    public Single<ShowPOJO> getShow(String show_id) {
         return tmdbAPI.retrieveShow(show_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -111,56 +116,68 @@ public class Repo {
 
     //Get list of most popular films
     public Observable<List<FilmByPerson>> getPopularFilms(int pageNumber) {
-        return singleToObservable(
+        return singleToFilmObservable(
                 tmdbAPI.retrievePopularMovies(pageNumber)
-                        .map(ResultsPOJO::getResults)
+                        .map(FilmResultsPOJO::getResults)
         );
     }
 
     //Get list of most popular shows
-    public Observable<List<FilmByPerson>> getPopularShows(int pageNumber) {
-        return singleToObservable(
+    public Observable<List<ShowByPerson>> getPopularShows(int pageNumber) {
+        return singleToShowObservable(
                 tmdbAPI.retrievePopularShows(pageNumber)
-                        .map(ResultsPOJO::getResults)
+                        .map(ShowResultsPOJO::getResults)
         );
     }
 
     //Get list of films currently playing in theatres
     public Observable<List<FilmByPerson>> getNowPlaying(int pageNumber) {
-        return singleToObservable(
+        return singleToFilmObservable(
                 tmdbAPI.retrieveNowPlaying(pageNumber)
-                        .map(ResultsPOJO::getResults)
+                        .map(FilmResultsPOJO::getResults)
         );
     }
 
     //Get list of top-rated films
     public Observable<List<FilmByPerson>> getTopRated(int pageNumber) {
-        return singleToObservable(
+        return singleToFilmObservable(
                 tmdbAPI.retrieveTopRated(pageNumber)
-                        .map(ResultsPOJO::getResults)
+                        .map(FilmResultsPOJO::getResults)
         );
     }
 
     //Get list of popular films/shows by genre
     public Observable<List<FilmByPerson>> getMoviesByGenre(String tvOrMovie, String genre, int pageNumber) {
-        return singleToObservable(
+        return singleToFilmObservable(
                 tmdbAPI.retrieveByGenre(tvOrMovie, genre, pageNumber)
-                        .map(ResultsPOJO::getResults)
+                        .map(FilmResultsPOJO::getResults)
         );
     }
 
 
     //Get list of top-rated films
-    public Observable<List<FilmByPerson>> getMyWatchedMovies() {
+    public Observable<List<MediaByPerson>> getMyWatchedMovies() {
         return singleToObservable(mMovieDao.getSavedWatchedMovies());
     }
 
     //Get list of top-rated films
-    public Observable<List<FilmByPerson>> getMyQueuedMovies() {
+    public Observable<List<MediaByPerson>> getMyQueuedMovies() {
         return singleToObservable(mMovieDao.getSavedQueuedMovies());
     }
 
-    private Observable<List<FilmByPerson>> singleToObservable(Single<List<FilmByPerson>> single) {
+    private Observable<List<MediaByPerson>> singleToObservable(Single<List<MediaByPerson>> single) {
+        return single.toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private Observable<List<FilmByPerson>> singleToFilmObservable(Single<List<FilmByPerson>> single) {
+        return single.toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private Observable<List<ShowByPerson>> singleToShowObservable(Single<List<ShowByPerson>> single) {
         return single.toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -173,7 +190,7 @@ public class Repo {
     }
 
 
-    public Disposable insertMovie(FilmByPerson movie) {
+    public Disposable insertMovie(MediaByPerson movie) {
         mMovieDao.insertMovie(movie);
         return getListIDs(movie.getId()).subscribe(ids -> {
                     for (String id : ids) {
@@ -183,7 +200,7 @@ public class Repo {
                 e -> Log.e(TAG_RXERROR, "getListIDs e=" + e.getMessage()));
     }
 
-    public void insertQueuedMovie(FilmByPerson movie) {
+    public void insertQueuedMovie(MediaByPerson movie) {
         mMovieDao.insertMovie(movie);
     }
 
@@ -213,11 +230,11 @@ public class Repo {
         mMovieDao.updateListWatched(numberSeen, numberOfMovies, id);
     }
 
-    public Single<FilmByPerson> checkIfMovieExists(String id) {
+    public Single<MediaByPerson> checkIfMovieExists(String id) {
         return mMovieDao.checkIfMovieExists(id);
     }
 
-    public Disposable updateFilm(FilmByPerson film) {
+    public Disposable updateFilm(MediaByPerson film) {
         mMovieDao.updateMovie(film);
         if (film.isWatched()) {
             return getListIDs(film.getId()).subscribe(ids -> {
@@ -236,7 +253,7 @@ public class Repo {
         }
     }
 
-    public void updateQueuedFilm(FilmByPerson film) {
+    public void updateQueuedFilm(MediaByPerson film) {
         mMovieDao.updateMovie(film);
     }
 
@@ -244,15 +261,15 @@ public class Repo {
         return mMovieDao.checkIfListExists(id);
     }
 
-    public Single<List<FilmByPerson>> getAllMovies(List<String> ids) {
+    public Single<List<MediaByPerson>> getAllMovies(List<String> ids) {
         return mMovieDao.getAllMoviesInList(ids);
     }
 
-    public Single<List<FilmByPerson>> getWatchedMovies(List<String> ids) {
+    public Single<List<MediaByPerson>> getWatchedMovies(List<String> ids) {
         return mMovieDao.getWatchedMoviesInList(ids);
     }
 
-    public Single<List<FilmByPerson>> getQueuedMovies(List<String> ids) {
+    public Single<List<MediaByPerson>> getQueuedMovies(List<String> ids) {
         return mMovieDao.getQueuedMoviesInList(ids);
     }
 
@@ -270,7 +287,7 @@ public class Repo {
         Single<List<String>> castSingle = tmdbAPI.retrieveFilm(movieID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .map(FilmPOJO::getCastCredits)
+                .map(MediaPOJO::getCastCredits)
                 .map(CastCredits::bothLists)
                 .toObservable()
                 .flatMapIterable(list -> list)
@@ -290,7 +307,7 @@ public class Repo {
         );
     }
 
-    public Single<List<FilmByPerson>> getSavedForRankings(boolean isFilm) {
+    public Single<List<MediaByPerson>> getSavedForRankings(boolean isFilm) {
         int isFilmRankings = isFilm ? 1 : 0;
         return mMovieDao.getSavedForRankings(isFilmRankings)
                 .subscribeOn(Schedulers.io())
@@ -353,7 +370,7 @@ public class Repo {
 //                .observeOn(AndroidSchedulers.mainThread())
 //                .subscribe(
 //                        films -> {
-//                            for (FilmByPerson film : films) {
+//                            for (MediaByPerson film : films) {
 //                                if(film.getRanking() < 0) {continue;}
 //                                Log.d("rankingslischeck", film.getRanking() + " " + film.getTitle());
 //                            }

@@ -24,7 +24,7 @@ import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.databinding.FragmentMovieBinding;
 import xyz.sleekstats.completist.model.CastCredits;
 import xyz.sleekstats.completist.model.CastInfo;
-import xyz.sleekstats.completist.model.FilmPOJO;
+import xyz.sleekstats.completist.model.MediaPOJO;
 import xyz.sleekstats.completist.model.Genre;
 import xyz.sleekstats.completist.viewmodel.MovieViewModel;
 
@@ -35,13 +35,13 @@ public class MovieDetailsFragment extends Fragment
 
     private static final String TAG_RXERROR = "rxprobMovieDetails";
 
-    private FilmPOJO mFilm;
+    private MediaPOJO mFilm;
     private RecyclerView mCastView;
     private CastAdapter mCastAdapter;
 
     private MovieViewModel movieViewModel;
 
-    private PublishSubject<FilmPOJO> filmDetailsSubject;
+    private PublishSubject<MediaPOJO> filmDetailsSubject;
 
     private FragmentMovieBinding movieBinding;
     private final CompositeDisposable listCompositeDisposable = new CompositeDisposable();
@@ -84,14 +84,14 @@ public class MovieDetailsFragment extends Fragment
     }
 
     //Set display of movie details
-    private void setMovieInfoDisplay(FilmPOJO filmPOJO) {
+    private void setMovieInfoDisplay(MediaPOJO mediaPOJO) {
 
-        if (filmPOJO == null) {
+        if (mediaPOJO == null) {
             return;
         }
-        mFilm = filmPOJO;
+        mFilm = mediaPOJO;
         movieBinding.setFilm(mFilm);
-        setCastRecyclerView(filmPOJO.getCastCredits());
+        setCastRecyclerView(mediaPOJO.getCastCredits());
     }
 
     //Populate recyclerview of cast names and images

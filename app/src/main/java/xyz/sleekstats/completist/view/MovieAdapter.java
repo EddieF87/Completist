@@ -11,16 +11,16 @@ import java.util.List;
 
 import xyz.sleekstats.completist.R;
 import xyz.sleekstats.completist.databinding.FilmItemBinding;
-import xyz.sleekstats.completist.model.FilmByPerson;
+import xyz.sleekstats.completist.model.MediaByPerson;
 
 //Load film names and posters for a specific actor/director in a recyclerview
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHolder> {
 
-    private List<FilmByPerson> mCurrentMovieList;
+    private List<MediaByPerson> mCurrentMovieList;
     private ItemClickListener mClickListener;
 
-    public MovieAdapter(List<FilmByPerson> filmByPersonList) {
-        this.mCurrentMovieList = filmByPersonList;
+    public MovieAdapter(List<MediaByPerson> mediaByPersonList) {
+        this.mCurrentMovieList = mediaByPersonList;
     }
 
     @NonNull
@@ -33,12 +33,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
 
     @Override
     public void onBindViewHolder(@NonNull FilmViewHolder holder, int position) {
-        FilmByPerson movie = mCurrentMovieList.get(position);
+        MediaByPerson movie = mCurrentMovieList.get(position);
         holder.bind(movie);
         holder.setPos(position);
     }
 
-    public void setCurrentMovieList(List<FilmByPerson> mCurrentMovieList) {
+    public void setCurrentMovieList(List<MediaByPerson> mCurrentMovieList) {
         this.mCurrentMovieList = mCurrentMovieList;
         notifyDataSetChanged();
     }
@@ -52,7 +52,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
 
         private final CardView mView;
         private int listPos;
-        private FilmByPerson mFilm;
+        private MediaByPerson mFilm;
         private final FilmItemBinding filmItemBinding;
 
         public FilmViewHolder(FilmItemBinding binding) {
@@ -65,7 +65,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.FilmViewHold
             itemView.findViewById(R.id.later_btn).setOnClickListener(this);
         }
 
-        public void bind(FilmByPerson film) {
+        public void bind(MediaByPerson film) {
             String id = film.getId();
             mView.setTag(id);
             mFilm = film;
