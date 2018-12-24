@@ -4,25 +4,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="bottom"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        android:layout_marginBottom="@dimen/smallMargin"
+        >
+    </com.google.android.gms.ads.AdView>
+
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:itemIconSize="@dimen/button_size"
-        android:layout_alignParentBottom="true"
         app:menu="@menu/navigation"
         app:itemIconTint="@color/nav_icon_color"
         app:itemTextColor="@color/colorAccent"
         app:labelVisibilityMode="unlabeled"
-        android:layout_gravity="bottom" />
+        android:layout_alignParentBottom="true"
+        />
 
     <xyz.sleekstats.completist.view.CustomViewPager
         android:id="@+id/my_view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_nav"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/adView"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    />
+        />
 
 </RelativeLayout>

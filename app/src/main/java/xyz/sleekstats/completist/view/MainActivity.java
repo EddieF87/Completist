@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.ViewGroup;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 
 import java.util.List;
@@ -63,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
             movieViewModel = ViewModelProviders.of(MainActivity.this).get(MovieViewModel.class);
         }
         startPager();
+        AdView adView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
     }
 
     @Override
