@@ -22,7 +22,7 @@ public class MovieClickableSpan extends ClickableSpan {
     }
 
     public void updateDrawState(@NonNull TextPaint ds) {
-        ds.setColor(Color.parseColor("#65b7d2"));
+        ds.setColor(Color.parseColor("#a68bf1"));
 //        ds.setUnderlineText(true);
     }
 }

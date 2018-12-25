@@ -16,26 +16,23 @@
 
     <TextView
         android:id="@+id/title_view"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/smallMargin"
-        android:layout_marginBottom="@dimen/smallMargin"
         android:fontFamily="@font/damion_regular"
-        android:gravity="center"
+        android:gravity="center_horizontal|top"
         android:text="@string/app_name"
         android:textSize="@dimen/mainTitleTextSize"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.23000002" />
+        app:layout_constraintVertical_bias="0.39" />
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/mainPadding"
+        android:layout_height="64dp"
         android:layout_marginTop="@dimen/smallMargin"
-        android:layout_marginEnd="@dimen/mainPadding"
         android:text="@string/welcome_summary"
         android:textSize="@dimen/midTextSize"
         android:textStyle="italic"
@@ -44,6 +41,7 @@
         app:layout_constraintTop_toBottomOf="@+id/title_view" />
 
     <TextView
+        android:id="@+id/textView2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/smallMargin"
@@ -59,10 +57,21 @@
         android:id="@+id/tmdb_acknowledgment_imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:contentDescription="@string/tmdb_acknowledgment"
+        android:onClick="goToMain"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_tmdb_acknowledgment2"
-        android:onClick="goToMain"
-        />
+        app:srcCompat="@drawable/ic_tmdb_acknowledgment2" />
+
+    <ImageView
+        android:id="@+id/iconView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/title_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_popcorn" />
+
 </android.support.constraint.ConstraintLayout>
