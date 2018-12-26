@@ -11,15 +11,15 @@ import java.util.List;
 public class GenreList implements Parcelable {
 
     @SerializedName("genres")
-    private List<Genre> genres;
+    private final List<Genre> genres;
 
     public List<Genre> getGenres() {
         return genres;
     }
 
-    protected GenreList(Parcel in) {
+    private GenreList(Parcel in) {
         if (in.readByte() == 0x01) {
-            genres = new ArrayList<Genre>();
+            genres = new ArrayList<>();
             in.readList(genres, Genre.class.getClassLoader());
         } else {
             genres = null;

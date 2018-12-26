@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
@@ -76,7 +77,7 @@ public class RankingsFragment extends Fragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_rankings, container, false);
         mBoardView = view.findViewById(R.id.board_view);
@@ -281,7 +282,7 @@ public class RankingsFragment extends Fragment
             mUnrankedAListdapter = new RankingsAdapter(mItemArray, false);
             mUnrankedAListdapter.setClickListener(this);
             final View header = View.inflate(getActivity(), R.layout.column_header, null);
-            ((TextView) header.findViewById(R.id.text)).setText("Unranked");
+            ((TextView) header.findViewById(R.id.text)).setText(R.string.unranked);
             mBoardView.addColumn(mUnrankedAListdapter, header, header, false);
         } else {
             mUnrankedAListdapter.setItemList(mItemArray);

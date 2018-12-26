@@ -15,7 +15,7 @@ public class ShowCredits {
 
     private Set<ShowByPerson> both;
 
-    public Set<ShowByPerson> getCrew() {
+    private Set<ShowByPerson> getCrew() {
         return filterCrew(crew);
     }
 

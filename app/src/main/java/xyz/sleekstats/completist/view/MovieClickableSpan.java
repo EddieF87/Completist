@@ -8,7 +8,7 @@ import android.view.View;
 
 public class MovieClickableSpan extends ClickableSpan {
     private final View.OnClickListener clickListener;
-    private String filmID;
+    private final String filmID;
 
     public MovieClickableSpan(String filmID, View.OnClickListener clickListener) {
         super();

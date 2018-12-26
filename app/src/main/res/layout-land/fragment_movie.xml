@@ -104,7 +104,8 @@
         app:layout_constraintDimensionRatio="2:3"
         app:layout_constraintEnd_toStartOf="@+id/v_guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/film_poster" />
 
     <ImageView
         android:id="@+id/details_watched_btn"
@@ -120,7 +121,8 @@
         app:layout_constraintEnd_toStartOf="@+id/details_queue_btn"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        android:focusable="true" />
+        android:focusable="true"
+        android:contentDescription="@string/set_watched_button" />
 
     <ImageView
         android:id="@+id/details_queue_btn"
@@ -137,7 +139,8 @@
         app:layout_constraintEnd_toStartOf="@+id/v_guideline"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/details_watched_btn"
-        android:focusable="true" />
+        android:focusable="true"
+        android:contentDescription="@string/set_queued_button" />
 
     <TextView
         android:id="@+id/movie_genre"

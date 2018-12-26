@@ -15,7 +15,7 @@ import xyz.sleekstats.completist.model.Genre;
 
 public class GenresAdapter  extends RecyclerView.Adapter<GenresAdapter.GenreViewHolder>{
 
-    private List<Genre> genreList;
+    private final List<Genre> genreList;
     private ItemClickListener mClickListener;
 
     public GenresAdapter(List<Genre> genres) {

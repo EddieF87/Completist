@@ -70,7 +70,8 @@
                     app:layout_constraintStart_toStartOf="@+id/collapsing_layout"
                     app:layout_constraintTop_toTopOf="@+id/collapsing_layout"
                     app:layout_constraintVertical_bias="0.13"
-                    app:profilePoster="@{person.profile_path}" />
+                    app:profilePoster="@{person.profile_path}"
+                    android:contentDescription="@string/cast_poster" />
 
                 <TextView
                     android:id="@+id/person_name"

@@ -61,7 +61,7 @@ public class MovieListFragment extends Fragment implements MovieAdapter.ItemClic
     private MovieAdapter mMovieAdapter;
     private List<MediaByPerson> mCurrentFilmList;
     private TextView summaryTextView;
-    private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+    private final RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);

@@ -16,9 +16,9 @@ import xyz.sleekstats.completist.model.MediaByPerson;
 
 class RankingsAdapter extends DragItemAdapter<Pair<Long, MediaByPerson>, RankingsAdapter.ViewHolder> {
 
-    private int mLayoutId;
-    private int mGrabHandleId;
-    private boolean mDragOnLongPress;
+    private final int mLayoutId;
+    private final int mGrabHandleId;
+    private final boolean mDragOnLongPress;
     private final boolean isRanked;
     private ItemClickListener mClickListener;
 
@@ -59,8 +59,8 @@ class RankingsAdapter extends DragItemAdapter<Pair<Long, MediaByPerson>, Ranking
     }
 
     class ViewHolder extends DragItemAdapter.ViewHolder {
-        private TextView mMovieTextView;
-        private TextView mRankTextView;
+        private final TextView mMovieTextView;
+        private final TextView mRankTextView;
         private MediaByPerson mFilm;
 
         ViewHolder(final View itemView) {

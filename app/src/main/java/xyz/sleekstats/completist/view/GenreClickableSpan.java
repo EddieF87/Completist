@@ -10,7 +10,7 @@ import xyz.sleekstats.completist.model.Genre;
 
 public class GenreClickableSpan extends ClickableSpan {
     private final View.OnClickListener clickListener;
-    private Genre content;
+    private final Genre content;
 
     public GenreClickableSpan(Genre content, View.OnClickListener clickListener) {
         super();
