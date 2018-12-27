@@ -133,17 +133,17 @@ public class MovieViewModel extends AndroidViewModel {
         switch (personID) {
             case MovieKeys.LIST_WATCHED:
                 mMovieCredits = null;
-                personObservable = Observable.just(new PersonPOJO("My Watched", "Movies that I have watched.", "Movies", "", personID));
+                personObservable = Observable.just(new PersonPOJO("My Watched", "Movies that I've watched.", "Movies", "", personID));
                 filmsObservable = mRepo.getMyWatchedMovies();
                 break;
             case MovieKeys.LIST_QUEUED:
                 mMovieCredits = null;
-                personObservable = Observable.just(new PersonPOJO("My Queued", "Movies that I have queued.", "Movies", "", personID));
+                personObservable = Observable.just(new PersonPOJO("My Queued", "Movies that I'm planning to watch.", "Movies", "", personID));
                 filmsObservable = mRepo.getMyQueuedMovies();
                 break;
             case MovieKeys.LIST_POPULAR:
                 mMovieCredits = null;
-                personObservable = Observable.just(new PersonPOJO("Popular", "Most popular movies on tmdb today.", "Movies", "", personID));
+                personObservable = Observable.just(new PersonPOJO("Popular", "Most popular movies on TMDB today.", "Movies", "", personID));
                 filmsObservable = mRepo.getPopularFilms(filmsPageNumber)
                         .flatMap(filmByPeople -> Observable.just(new ArrayList<>(filmByPeople)));
                 break;
@@ -155,7 +155,7 @@ public class MovieViewModel extends AndroidViewModel {
                 break;
             case MovieKeys.LIST_TOPRATED:
                 mMovieCredits = null;
-                personObservable = Observable.just(new PersonPOJO("Top Rated", "Top-rated movies on tmdb.", "Movies", "", personID));
+                personObservable = Observable.just(new PersonPOJO("Top Rated", "Top-rated movies on TMDB.", "Movies", "", personID));
                 filmsObservable = mRepo.getTopRated(filmsPageNumber)
                         .flatMap(filmByPeople -> Observable.just(new ArrayList<>(filmByPeople)));
                 break;

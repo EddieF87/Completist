@@ -12,6 +12,7 @@
 
     <dimen name="toolbarHeight">72dp</dimen>
     <dimen name="castItemHeight">240dp</dimen>
+    <dimen name="rankItemHeight">80dp</dimen>
 
     <dimen name="defaultPadding">16dp</dimen>
     <dimen name="filmPadding">8dp</dimen>
