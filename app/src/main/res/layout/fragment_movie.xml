@@ -14,7 +14,7 @@
             type="android.view.View.OnClickListener"/>
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/defaultPadding"
@@ -181,20 +181,25 @@
             app:layout_constraintStart_toStartOf="@+id/movie_title"
             app:layout_constraintTop_toTopOf="@+id/details_queue_btn" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/cast_recyclerview"
+        <xyz.sleekstats.completist.view.NestedScrollableHost
+            android:id="@+id/nestedHost"
             android:layout_width="0dp"
             android:layout_height="@dimen/castItemHeight"
             android:layout_marginTop="@dimen/defaultMargin"
-            android:foreground="@drawable/poster_border"
-            android:orientation="horizontal"
-            android:requiresFadingEdge="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/hguideline" />
+            app:layout_constraintTop_toTopOf="@+id/hguideline">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/cast_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:foreground="@drawable/poster_border"
+                android:orientation="horizontal"
+                android:requiresFadingEdge="horizontal" />
+        </xyz.sleekstats.completist.view.NestedScrollableHost>
 
-        <android.support.constraint.Barrier
+        <androidx.constraintlayout.widget.Barrier
             android:id="@+id/person_barrier"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
@@ -203,14 +208,14 @@
             app:layout_constraintBottom_toTopOf="@id/hguideline"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/hguideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.5" />
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/vguideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -228,9 +233,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cast_recyclerview"
+            app:layout_constraintTop_toBottomOf="@id/nestedHost"
             app:similarText="@{film.similar}"
             tools:ignore="InconsistentLayout" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

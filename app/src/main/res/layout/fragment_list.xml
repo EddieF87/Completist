@@ -15,25 +15,25 @@
             name="listClick"
             type="android.view.View.OnClickListener"/>
     </data>
-<android.support.design.widget.CoordinatorLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.MainActivity">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/film_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/film_item">
-    </android.support.v7.widget.RecyclerView>
+    </androidx.recyclerview.widget.RecyclerView>
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.design.widget.CollapsingToolbarLayout
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:title="@{BindingUtils.setCollapsingToolBarText(person.name, watchCount)}">
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/collapsing_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -104,21 +104,21 @@
                     app:layout_constraintTop_toBottomOf="@+id/tmdb_view"
                     tools:text="ipsum lepsum tesidifdsdnachusuibsvvefipsum lepsum tesidifdsdnachusuibsvvefipsum lepsum tesidifdsdnachusuibsvvef" />
 
-                <android.support.constraint.Guideline
+                <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/list_v_guideline"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     app:layout_constraintGuide_percent="0.4" />
 
-                <android.support.constraint.Barrier
+                <androidx.constraintlayout.widget.Barrier
                     android:id="@+id/person_barrier"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:barrierDirection="bottom"
                     app:constraint_referenced_ids="person_summary,person_poster,role_spinner,watched_tracker" />
 
-                <android.support.constraint.Barrier
+                <androidx.constraintlayout.widget.Barrier
                     android:id="@+id/name_barrier"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -176,18 +176,18 @@
                     />
 
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <android.support.v7.widget.Toolbar
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/ListToolBar"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/toolbarHeight"
                 app:layout_collapseMode="pin"
                 />
-        </android.support.design.widget.CollapsingToolbarLayout>
-    </android.support.design.widget.AppBarLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/listSaveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -196,5 +196,5 @@
         android:layout_margin="@dimen/largeMargin"
         />
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

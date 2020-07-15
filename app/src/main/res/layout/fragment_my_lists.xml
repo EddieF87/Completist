@@ -14,13 +14,18 @@
         android:text="@string/my_lists"
         android:textSize="@dimen/titleTextSize" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/saved_lists_rv"
-        android:background="@drawable/poster_border"
-        android:requiresFadingEdge="horizontal"
+    <xyz.sleekstats.completist.view.NestedScrollableHost
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2" />
+        android:layout_weight="2">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/saved_lists_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/poster_border"
+        android:requiresFadingEdge="horizontal" />
+    </xyz.sleekstats.completist.view.NestedScrollableHost>
 
     <TextView
         android:id="@+id/pop_list_label"
@@ -30,23 +35,28 @@
         android:text="@string/popular_actors_directors"
         android:textSize="@dimen/titleTextSize" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/pop_lists_rv"
-        android:background="@drawable/poster_border"
-        android:requiresFadingEdge="horizontal"
+    <xyz.sleekstats.completist.view.NestedScrollableHost
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2" />
+        android:layout_weight="2">
 
-    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pop_lists_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/poster_border"
+            android:requiresFadingEdge="horizontal" />
+    </xyz.sleekstats.completist.view.NestedScrollableHost>
+
+    <RadioGroup
         android:id="@+id/radio_group1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/largeMargin"
-        android:padding="@dimen/smallPadding"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="@dimen/smallPadding">
 
         <RadioButton
             android:id="@+id/watched_movies_btn"
@@ -67,14 +77,14 @@
             android:text="@string/genres" />
     </RadioGroup>
 
-    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    <RadioGroup
         android:id="@+id/radio_group2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
-        android:padding="@dimen/smallPadding"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="@dimen/smallPadding">
 
         <RadioButton
             android:id="@+id/top_movies_btn"

@@ -6,7 +6,7 @@
             name="film"
             type="xyz.sleekstats.completist.model.MediaByPerson"/>
     </data>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -18,7 +18,7 @@
     card_view:contentPadding="@dimen/filmPadding"
     >
 
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
@@ -91,6 +91,6 @@
             android:contentDescription="@string/set_queued_button" />
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
-</android.support.v7.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
 </layout>

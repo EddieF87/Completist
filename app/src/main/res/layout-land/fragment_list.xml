@@ -15,7 +15,7 @@
             type="xyz.sleekstats.completist.model.WatchCount" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/collapsing_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:text="ipsum lepsum tesidifdsdnachusuibsvvefipsum lepsum tesidifdsdnachusuibsvvefipsum lepsum tesidifdsdnachusuibsvvef" />
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
             app:layout_constraintTop_toBottomOf="@+id/person_name" />
 
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/film_list"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -120,7 +120,7 @@
             tools:listitem="@layout/film_item" />
 
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/listSaveButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -162,6 +162,6 @@
             app:personID="@{person.imdb_id}"
             app:personSiteClickable="@{listClick}" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
