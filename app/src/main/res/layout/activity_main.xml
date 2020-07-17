@@ -13,12 +13,12 @@
         android:layout_alignParentTop="true"
         android:layout_gravity="bottom"
         ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        ads:adUnitId="ca-app-pub-5443559095909539/8689663602"
         android:layout_marginBottom="@dimen/smallMargin"
         >
     </com.google.android.gms.ads.AdView>
 
-    <android.support.design.widget.BottomNavigationView
+    <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
         android:layout_alignParentBottom="true"
         />
 
-    <xyz.sleekstats.completist.view.CustomViewPager
+    <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/my_view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

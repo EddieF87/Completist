@@ -18,9 +18,9 @@ class WelcomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome)
-        MobileAds.initialize(this, "ca-app-pub-5443559095909539~1441728975")
+        MobileAds.initialize(this) {}
 
-//        checkForConsent();
+        checkForConsent();
     }
 
     fun goToMain(view: View) {

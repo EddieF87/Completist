@@ -78,7 +78,9 @@ class MovieDetailsFragment : Fragment(), CastAdapter.ItemClickListener, View.OnC
         }
         val castInfos: MutableList<CastInfo> = ArrayList(castCredits.cast)
         val crewInfos: List<CastInfo> = ArrayList(castCredits.crew)
-        castInfos.add(0, crewInfos.first { it.job == "Director" })
+        crewInfos.firstOrNull { it.job == "Director" }?.let {
+            castInfos.add(0, it)
+        }
 
         if (mCastView == null) {
             val rootView = view ?: return

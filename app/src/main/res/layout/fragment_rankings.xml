@@ -21,19 +21,25 @@
         app:layout_constraintStart_toEndOf="@+id/toggle_ranks"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.woxthebox.draglistview.BoardView
-        android:id="@+id/board_view"
+    <xyz.sleekstats.completist.view.NestedScrollableHost
+        android:id="@+id/nestedHost"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/defaultMargin"
         android:layout_marginBottom="@dimen/defaultMargin"
         android:layout_weight="1"
-        android:background="@drawable/poster_border"
-        android:paddingBottom="@dimen/defaultStroke"
         app:layout_constraintBottom_toTopOf="@+id/search_ranks"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/title_ranks" />
+        app:layout_constraintTop_toBottomOf="@+id/title_ranks">
+
+        <com.woxthebox.draglistview.BoardView
+            android:id="@+id/board_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/poster_border"
+            android:paddingBottom="@dimen/defaultStroke" />
+    </xyz.sleekstats.completist.view.NestedScrollableHost>
 
     <Button
         android:id="@+id/load_popular_ranks"
@@ -73,14 +79,14 @@
         style="@style/ListButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="0dp"
         android:layout_marginStart="0dp"
         android:layout_marginEnd="0dp"
-        app:searchIcon="@drawable/ic_search_gold_24dp"
-        app:searchHintIcon="@drawable/ic_search_gold_24dp"
+        android:padding="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:searchHintIcon="@drawable/ic_search_gold_24dp"
+        app:searchIcon="@drawable/ic_search_gold_24dp" />
 
     <ToggleButton
         android:id="@+id/toggle_ranks"
@@ -90,7 +96,7 @@
         android:layout_marginBottom="@dimen/defaultMargin"
         android:textOff="@string/tv"
         android:textOn="@string/movie"
-        app:layout_constraintBottom_toTopOf="@+id/board_view"
+        app:layout_constraintBottom_toTopOf="@+id/nestedHost"
         app:layout_constraintEnd_toStartOf="@+id/title_ranks"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toTopOf="parent" />

@@ -79,7 +79,6 @@ class MainActivity : AppCompatActivity() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
                     mBottomNavigationView?.menu?.getItem(position)?.isChecked = true
-                    isUserInputEnabled = position != 3
                 }
             }
             )

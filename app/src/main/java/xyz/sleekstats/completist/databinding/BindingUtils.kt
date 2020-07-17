@@ -117,13 +117,16 @@ object BindingUtils {
         val films = similar.results
         val stringBuilder = SpannableStringBuilder("Similar: ")
         val maxFilms = 10.coerceAtMost(films.size)
+        if(maxFilms == 0) {
+            return
+        }
         for (i in 0 until maxFilms) {
             val film = films[i]
             val ss = SpannableString(film.title)
             ss.setSpan(MovieClickableSpan(film.id, clickListener), 0, film.title?.length ?: 0, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             stringBuilder.append(ss).append(" / ")
         }
-        if (stringBuilder.length > 2) {
+        if (stringBuilder.length > 11) {
             stringBuilder.delete(stringBuilder.length - 3, stringBuilder.length)
         }
         textView.apply {
