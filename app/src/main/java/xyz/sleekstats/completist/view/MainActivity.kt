@@ -156,13 +156,15 @@ class MainActivity : AppCompatActivity() {
         searchView.suggestionsAdapter = mSearchAdapter
         searchView.setOnSuggestionListener(object : SearchView.OnSuggestionListener {
             override fun onSuggestionClick(position: Int): Boolean {
-                val cursor = mSearchAdapter!!.cursor
-                cursor.moveToPosition(position)
-                val id = cursor.getString(cursor.getColumnIndex(SEARCH_ID))
-                when (cursor.getString(cursor.getColumnIndex(SEARCH_TYPE))) {
-                    "person" -> movieViewModel!!.getFilmsByPerson(id)
-                    "movie" -> movieViewModel!!.getMovieInfo(id)
-                    else -> movieViewModel!!.getShowInfo(id)
+                mSearchAdapter?.cursor?.apply {
+                    moveToPosition(position)
+                    getString(getColumnIndex(SEARCH_ID))?.let { id->
+                        when (getString(getColumnIndex(SEARCH_TYPE))) {
+                            "person" -> movieViewModel?.getFilmsByPerson(id)
+                            "movie" -> movieViewModel?.getMovieInfo(id)
+                            else -> movieViewModel?.getShowInfo(id)
+                        }
+                    }
                 }
                 return true
             }

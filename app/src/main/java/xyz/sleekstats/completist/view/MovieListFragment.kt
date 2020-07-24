@@ -15,10 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
-import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.Spinner
-import android.widget.TextView
+import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
@@ -333,12 +330,13 @@ class MovieListFragment : Fragment(), MovieAdapter.ItemClickListener, View.OnCli
 
     override fun onClick(view: View) {
         try {
-            val id = view.getTag(R.id.id).toString()
-            if (view.id == R.id.tmdb_view) {
-                goToSite("https://www.themoviedb.org/person/$id")
-            } else if (view.id == R.id.imdb_view) {
-                goToSite("https://www.imdb.com/name/$id")
+            view.getTag(R.id.id)?.toString()?.let {
+                when (view.id) {
+                    R.id.tmdb_view -> goToSite("https://www.themoviedb.org/person/$it")
+                    R.id.imdb_view -> goToSite("https://www.imdb.com/name/$it")
+                }
             }
+                    ?: Toast.makeText(requireContext(), "Error: Link not found", Toast.LENGTH_SHORT).show()
         } catch (ignored: Exception) {
         }
     }

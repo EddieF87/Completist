@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -104,39 +105,30 @@ class MovieDetailsFragment : Fragment(), CastAdapter.ItemClickListener, View.OnC
     }
 
     override fun onClick(view: View) {
-        val id: String
         when (view.id) {
-            R.id.movie_genre -> {
-                if (view.tag == null) {
-                    return
-                }
-                val genre = view.tag as Genre
-                movieViewModel.getFilmsByGenre(genre, mFilm?.isFilm == true)
-            }
-            R.id.tmdb_view -> {
-                id = view.getTag(R.id.id).toString()
-                val tvOrMovieString = if (view.getTag(R.id.tvOrMovie) as Boolean) "movie" else "tv"
-                goToSite("https://www.themoviedb.org/$tvOrMovieString/$id")
-            }
+            R.id.movie_genre -> (view.tag as? Genre)?.let {
+                movieViewModel.getFilmsByGenre(it, mFilm?.isFilm == true)
+            } ?: Toast.makeText(requireContext(), "Error: Genre not found", Toast.LENGTH_SHORT).show()
+            R.id.tmdb_view -> view.getTag(R.id.id)?.toString()?.let {
+                val tvOrMovieString = if (view.getTag(R.id.tvOrMovie) as? Boolean == true) "movie" else "tv"
+                goToSite("https://www.themoviedb.org/$tvOrMovieString/$it")
+            } ?: Toast.makeText(requireContext(), "Error: TMDB link not found", Toast.LENGTH_SHORT).show()
             R.id.imdb_view -> {
-                val tvOrMovie = view.getTag(R.id.tvOrMovie) as Boolean
+                val tvOrMovie = view.getTag(R.id.tvOrMovie) as? Boolean == true
                 if (!tvOrMovie) {
                     return
                 }
-                id = view.getTag(R.id.id).toString()
-                goToSite("https://www.imdb.com/title/$id")
+                view.getTag(R.id.id)?.toString()?.let {
+                    goToSite("https://www.imdb.com/title/$it")
+                } ?: Toast.makeText(requireContext(), "Error: IMDB link not found", Toast.LENGTH_SHORT).show()
             }
-            R.id.similar_view -> {
-                if (view.tag == null) {
-                    return
-                }
-                val filmID = view.tag as String
+            R.id.similar_view -> (view.tag as? String)?.let {
                 if (mFilm?.isFilm == true) {
-                    movieViewModel.getMovieInfo(filmID)
+                    movieViewModel.getMovieInfo(it)
                 } else {
-                    movieViewModel.getShowInfo(filmID)
+                    movieViewModel.getShowInfo(it)
                 }
-            }
+            } ?: Toast.makeText(requireContext(), "Error: Film not found", Toast.LENGTH_SHORT).show()
         }
     }
 

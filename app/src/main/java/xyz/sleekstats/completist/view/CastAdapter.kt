@@ -36,7 +36,7 @@ class CastAdapter(private var castInfoList: List<CastInfo>) : RecyclerView.Adapt
         }
 
         override fun onClick(view: View) {
-            mClickListener?.onCastClick(mView.tag.toString())
+            mClickListener?.onCastClick(mView.tag?.toString())
         }
     }
 

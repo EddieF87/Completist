@@ -38,7 +38,7 @@ class GenresAdapter(private val genreList: List<Genre?>) : RecyclerView.Adapter<
         }
 
         override fun onClick(view: View) {
-            mClickListener?.onGenreClick(mView.tag as Genre)
+            mClickListener?.onGenreClick(mView.tag as? Genre)
         }
     }
 

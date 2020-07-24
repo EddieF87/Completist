@@ -54,7 +54,7 @@ class MyListsAdapter(private val mLists: List<MyList>) : RecyclerView.Adapter<Li
         val mWatchedView: TextView = mView.findViewById(R.id.list_pct)
 
         override fun onClick(view: View) {
-            mClickListener?.onListClick(mView.tag.toString())
+            mClickListener?.onListClick(mView.tag?.toString())
         }
     }
 
