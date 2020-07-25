@@ -8,7 +8,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import xyz.sleekstats.completist.service.MovieDao
 
-@Database(entities = [MediaByPerson::class, MyList::class], version = 2)
+@Database(entities = [MediaByPerson::class, MyList::class], version = 1)
 abstract class MovieRoomDB : RoomDatabase() {
     abstract fun movieDao(): MovieDao
 
